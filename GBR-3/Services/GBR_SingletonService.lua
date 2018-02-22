@@ -28,8 +28,8 @@ function GBR_SingletonService:FetchService(service)
 
     if self._instantiatedServices[service] == nil then
 
-        self:InstantiateService(service);
-        
+        return self:InstantiateService(service);
+
     end
 
     return self._instantiatedServices[service];
@@ -38,6 +38,13 @@ end
 
 function GBR_SingletonService:InstantiateService(service)
 
-    self._instantiatedServices[service] = self._serviceRegister[service]:New();
+    if self._serviceRegister[service] != nil then
+
+        self._instantiatedServices[service] = self._serviceRegister[service]:New();
+        return self._instantiatedServices[service];
+
+    end
+
+    return nil;
 
 end
