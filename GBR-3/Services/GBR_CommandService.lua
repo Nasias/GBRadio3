@@ -42,8 +42,9 @@ end
 
 function GBR_CommandService.CSendSpeechMessage(message)
 
-    local messageService = GBR_MessageService:New();
-    local playerService = GBR_PlayerService:New();
+    local messageService = GBR_Singletons:FetchService(GBR_Constants.SRV_MESSAGE_SERVICE);
+    local playerService = GBR_Singletons:FetchService(GBR_Constants.SRV_PLAYER_SERVICE);
+
     local messageModel = GBR_SpeechMessageModel:New();
 
     messageModel.MessageData.CharacterModel = playerService:GetCurrentCharacterModel();
@@ -55,8 +56,9 @@ end
 
 function GBR_CommandService.CSendSilentSpeechMessage(message)
 
-    local messageService = GBR_MessageService:New();
-    local playerService = GBR_PlayerService:New();
+    local messageService = GBR_Singletons:FetchService(GBR_Constants.SRV_MESSAGE_SERVICE);
+    local playerService = GBR_Singletons:FetchService(GBR_Constants.SRV_PLAYER_SERVICE);
+    
     local messageModel = GBR_SpeechMessageModel:New();
 
     messageModel.MessageData.CharacterModel = playerService:GetCurrentCharacterModel();
