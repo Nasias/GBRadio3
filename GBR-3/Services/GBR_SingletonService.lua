@@ -38,7 +38,7 @@ end
 
 function GBR_SingletonService:InstantiateService(service)
 
-    if self._serviceRegister[service] != nil then
+    if self._serviceRegister[service] ~= nil then
 
         self._instantiatedServices[service] = self._serviceRegister[service]:New();
         return self._instantiatedServices[service];
