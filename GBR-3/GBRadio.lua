@@ -11,3 +11,4 @@ function GBRadio:Initialized()
     local commandService = GBR_Singletons:FetchService(GBR_Constants.SRV_COMMAND_SERVICE);
 
 end
+-- end
