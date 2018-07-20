@@ -4,7 +4,7 @@ GBR_Constants =
     LIB_ACE_SERIALISER = "AceSerializer-3.0",
     LIB_ACE_SETTINGS = "AceConfig-3.0",
     LIB_ACE_COMM = "AceComm-3.0",
-    LIB_HBD_LOCATION = "HereBeDragons-1.0",
+    LIB_HBD_LOCATION = "HereBeDragons-2.0",
 
     SRV_COMMAND_SERVICE = "CommandService",
     SRV_CONFIG_SERVICE = "ConfigService",

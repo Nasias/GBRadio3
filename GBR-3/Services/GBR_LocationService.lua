@@ -10,16 +10,15 @@ end
 
 function GBR_LocationService:GetCurrentCharacterLocation()
 
-    -- HereBeDragons pollutes the global namespace with these functions -_-
-    SetMapToCurrentZone();
-    local x, y = GetPlayerMapPosition(GBR_Constants.ID_PLAYER);
+    local uiMapID = C_Map.GetBestMapForUnit("player");
+    local position = C_Map.GetPlayerMapPosition(uiMapID, GBR_Constants.ID_PLAYER);
     local zone = GetZoneText();
     local subZone = GetSubZoneText();
-    local map = GetMapInfo();
+    local map = C_Map.GetMapInfo(uiMapID).mapID;
     local positionVector = GBR_Vector3:New
     {
-        X = x,
-        Y = y,
+        X = position.x,
+        Y = position.y,
         Z = 0.0
     };
 
