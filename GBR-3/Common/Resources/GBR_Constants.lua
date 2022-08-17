@@ -15,11 +15,13 @@ GBR_Constants =
     SRV_PLAYER_SERVICE = "PlayerService",
     SRV_SERIALISER_SERVICE = "SerialiserService",
     SRV_SINGLETON_SERVICE = "SingletonService",
+    SRV_ADDON_SERVICE = "AddonService",
 
     CMD_MAIN = "gbr",
     CMD_DEV_TEST = "gbr3test",
     CMD_SEND_MESSAGE = "bb",
     CMD_SEND_QUIET_MESSAGE = "wbb",
+    CMD_TEST_RECEIVE_MESSAGE = "tbb",
 
     ID_PLAYER = "player",
     ID_TARGET = "targer",
@@ -30,5 +32,8 @@ GBR_Constants =
     UI_COLOUR_ESCAPE_STRING_END = "|r",
     UI_HYPERLINK_ESCAPE_STRING = "|H",
 
-    ADDON_CHANNEL_PREFIX = "GBR3",
+    OPT_ADDON_CHANNEL_PREFIX = "GBR3",
+    OPT_ADDON_VERSION = "3.0",
+    OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
+    OPT_COMM_CHANNEL_TARGET = "CHANNEL",
 };

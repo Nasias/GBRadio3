@@ -10,24 +10,33 @@ end
 
 function GBR_LocationService:GetCurrentCharacterLocation()
 
-    local uiMapID = C_Map.GetBestMapForUnit("player");
-    local position = C_Map.GetPlayerMapPosition(uiMapID, GBR_Constants.ID_PLAYER);
+    local zonePositionX, zonePositionY, zoneMapId, zoneMapType = self._locationLib:GetPlayerZonePosition();
+    local worldPositionX, worldPositionY, worldInstanceId = self._locationLib:GetPlayerWorldPosition();
+
     local zone = GetZoneText();
     local subZone = GetSubZoneText();
-    local map = C_Map.GetMapInfo(uiMapID).mapID;
-    local positionVector = GBR_Vector3:New
+
+    local zonePositionVector = GBR_Vector3:New
     {
-        X = position.x,
-        Y = position.y,
+        X = zonePositionX,
+        Y = zonePositionY,
+        Z = 0.0
+    };
+
+    local worldPositionVector = GBR_Vector3:New
+    {
+        X = worldPositionX,
+        Y = worldPositionY,
         Z = 0.0
     };
 
     return GBR_LocationModel:New
     {
-        Position = positionVector,
+        ZonePosition = zonePositionVector,
+        WorldPosition = worldPositionVector,
         Zone = zone,
         SubZone = subZone,
-        Map = map,
+        MapId = mapId,
         LocationType = GBR_ELocationType.Character
     };
 

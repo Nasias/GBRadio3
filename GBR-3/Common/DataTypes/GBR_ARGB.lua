@@ -11,22 +11,38 @@ function GBR_ARGB:New(obj)
 
 end
 
-function GBR_ARGB:GetAsHex()
+function GBR_ARGB:NewFromHex(hexString)
 
-    return  GBR_Converter.ColourToHex(A),
-            GBR_Converter.ColourToHex(R),
-            GBR_Converter.ColourToHex(G),
-            GBR_Converter.ColourToHex(B);
+    local a = strsub(hexString, 1, 2);
+    local r = strsub(hexString, 3, 4);
+    local g = strsub(hexString, 5, 6);
+    local b = strsub(hexString, 7, 8);
+
+    self.A = tonumber(a, 16);
+    self.R = tonumber(r, 16);
+    self.G = tonumber(g, 16);
+    self.B = tonumber(b, 16);
+    
+    return self:RegisterNew(obj);
 
 end
 
-function GBR_ARGB:GetAsHexString()
+function GBR_ARGB:ToHex()
 
-    return table.concat { self:GetAsHex() };
+    return  GBR_Converter.ColourToHex(self.A),
+            GBR_Converter.ColourToHex(self.R),
+            GBR_Converter.ColourToHex(self.G),
+            GBR_Converter.ColourToHex(self.B);
 
 end
 
-function GBR_ARGB:GetEscapedHexString()
+function GBR_ARGB:ToHexString()
+
+    return table.concat { self:ToHex() };
+
+end
+
+function GBR_ARGB:ToEscapedHexString()
 
     return GBR_Constants.UI_COLOUR_ESCAPE_STRING .. self:GetAsHexString();
 

@@ -2,7 +2,7 @@ GBR_SingletonService = GBR_Object:New();
 
 function GBR_SingletonService:New(obj)
 
-    self._serviceRegister = 
+    self._serviceRegister =
     {
         [GBR_Constants.SRV_COMMAND_SERVICE] = GBR_CommandService,
         [GBR_Constants.SRV_CONFIG_SERVICE] = GBR_ConfigService,
@@ -28,7 +28,7 @@ function GBR_SingletonService:FetchService(service)
 
     if self._instantiatedServices[service] == nil then
 
-        return self:InstantiateService(service);
+        self:InstantiateService(service);
 
     end
 
@@ -38,13 +38,20 @@ end
 
 function GBR_SingletonService:InstantiateService(service)
 
-    if self._serviceRegister[service] ~= nil then
+    self._instantiatedServices[service] = self._serviceRegister[service]:New();
+    return self._instantiatedServices[service];
 
-        self._instantiatedServices[service] = self._serviceRegister[service]:New();
+end
+
+function GBR_SingletonService:RegisterManualService(service, serviceReference)
+
+    if self._instantiatedServices[service] == nil then
+    
+        self._instantiatedServices[service] = serviceReference;
         return self._instantiatedServices[service];
-
+    
     end
-
+    
     return nil;
 
 end
