@@ -8,6 +8,12 @@
 
 embeds.xml
 
+Common/Types/GBR_EGenderType.lua
+Common/Types/GBR_ELocationType.lua
+Common/Types/GBR_EMessageMethodType.lua
+Common/Types/GBR_EMessageType.lua
+Common/Types/GBR_ENameType.lua
+
 Common/Resources/GBR_Constants.lua
 
 Common/DataTypes/GBR_Object.lua
@@ -19,12 +25,6 @@ Common/Helpers/GBR_Converter.lua
 Common/Helpers/GBR_Table.lua
 
 Common/Resources/GBR_ConfigPresets.lua
-
-Common/Types/GBR_EGenderType.lua
-Common/Types/GBR_ELocationType.lua
-Common/Types/GBR_EMessageMethodType.lua
-Common/Types/GBR_EMessageType.lua
-Common/Types/GBR_ENameType.lua
 
 Models/GBR_CharacterModel.lua
 Models/GBR_CommChannelModel.lua

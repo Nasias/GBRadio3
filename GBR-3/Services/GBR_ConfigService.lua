@@ -2,16 +2,19 @@ GBR_ConfigService = GBR_Object:New();
 
 function GBR_ConfigService:New(obj)
 
-    self.Initialize();
+    self.StagingVars =
+    {
+        NewChannelName = nil,
+        NewChannelFrequency = nil,
+    };
+
+    self:Initialize();
 
     return self:RegisterNew(obj);
-
 
 end
 
 function GBR_ConfigService:GetCommunicationFrequencies()
-
-
 
 end
 
@@ -61,19 +64,23 @@ function GBR_ConfigService:Initialize()
 
     local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
     
-    addon.OptionsTable = {
+    addon.OptionsTable = 
+    {
         type = "group",
         name = "GBRadio " .. GBR_Constants.OPT_ADDON_VERSION,
         childGroups = "tree",
         handler = addon,        
         args = {
-            deviceConfigPage = {
+            deviceConfigPage = 
+            {
                 type = "group",
                 name = "Device Config",
                 cmdHidden = true,
                 order = 0,
-                args = {
-                    name = {
+                args = 
+                {
+                    name = 
+                    {
                         name = "Comms Device Name",
                         desc = "The name of your comms device\n\nNote: This is used in emotes to describe the type of device you have, as well as in messages.",
                         type = "input",
@@ -85,251 +92,586 @@ function GBR_ConfigService:Initialize()
                     }
                 }
             },
-            channelConfig = {
+            channelConfig =
+            {
                 type = "group",
                 name = "Channels",
                 cmdHidden = true,
                 order = 1,
-                args = {             
-                    addNewChannelPage = {
-                        name = "New Channel",
-                        desc = "Channel name",
+                args =
+                {
+                    newChannelName =
+                    {
+                        name = "New channel name",
+                        desc = "Enter a descriptive name for the channel you would like to use.",
                         type = "input",
+                        width = "full",
                         cmdHidden = true,
-                        set = function(info, value) GBR_ConfigService.AddChannel(addon.OptionsTable.args.channelConfig.args, value) end,
+                        validate = GBR_ConfigService.ValidateChannelName,
+                        set = 
+                            function(info, value)
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                configService:SetNewChannelName(value);
+                            end,
+                        get = 
+                            function(info, value)
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                return configService:GetNewChannelName(value);
+                            end,
+                        order = 0,
                     },
-                    ["Channel 1"] = {
-                        type = "group",
-                        name = "Channel 1",
-                        childGroups = "tab",
-                        args = {
-                            channelSettingsDesc = {
-                                order = 0,
-                                type = "description",
-                                name = "Channel 1",
-                                fontSize = "large",
-                                image = "Interface\\Icons\\inv_gizmo_goblingtonkcontroller",
-                                imageWidth = 40,
-                                imageHeight = 40
-                            },
-                            channelSettingsConfigurationPage = {
-                                type = "group",
-                                name = "Channel",
-                                args = {
-                                    channelSettingsHeader = {
-                                        order = 0,
-                                        type = "group",
-                                        name = "Channel settings",
-                                        guiInline = true,
-                                        args = {
-                                            channelName = {
-                                                order = 0,
-                                                name = "Channel name",
-                                                desc = "Enter a name for your channel.\n\nOnly use letters and numbers for this and please don't use spaces.",
-                                                type = "input",
-                                                cmdHidden = true,
-                                                set = function(info, value) GBR_ConfigService.AddChannel(value) end,
-                                                width = "full"
-                                            }
-                                        }
-                                    },
-                                    channelChatFrameGroup = {
-                                        order = 1,
-                                        name = "Chat frame settings",
-                                        type = "group",
-                                        guiInline = true,
-                                        args = {
-                                            channelChatMessageColour = {
-                                                order = 0,
-                                                name = "Message colour",
-                                                type = "color",
-                                                hasAlpha = false,
-                                                width = "full"
-                                            },
-                                            channelChatFrame = {
-                                                order = 1,
-                                                name = "Output chat frame",
-                                                type = "range",
-                                                min = 1,
-                                                max = 10,
-                                                softMin = 1,
-                                                softMax = 10,
-                                                step = 1,
-                                                width = "full"
-                                            },
-                                            channelChatFrameIdentify = {
-                                                order = 2,
-                                                name = "Identify chat frames",
-                                                type = "execute",
-                                                width = "full"
-                                            },
-                                        }
-                                    },
-                                    channelCooldownGroup = {
-                                        order = 3,
-                                        name = "Cooldown settings",
-                                        type = "group",
-                                        guiInline = true,
-                                        args = {
-                                            channelEmoteCooldown = {
-                                                order = 0,
-                                                name = "Emote cooldown (seconds)",
-                                                type = "range",
-                                                min = 0,
-                                                max = 30,
-                                                softMin = 0,
-                                                softMax = 30,
-                                                step = 1,
-                                                width = "full"
-                                            },
-                                            channelAudioCooldown = {
-                                                order = 1,
-                                                name = "Audio cooldown (seconds)",
-                                                type = "range",
-                                                min = 0,
-                                                max = 30,
-                                                softMin = 0,
-                                                softMax = 30,
-                                                step = 1,
-                                                width = "full"
-                                            },
-                                        }
-                                    },
-                                    channelDeleteHeader = {
-                                        order = 4,
-                                        type = "group",
-                                        name = "Delete channel",
-                                        guiInline = true,
-                                        args = {
-                                            channelDeleteDesc = {
-                                                order = 0,
-                                                type = "description",
-                                                name = "|cFFFF0000If you no longer need this channel then you can delete it here.\nNote that this action is irreversible!"
-                                            },
-                                            channelDeleteButton = {
-                                                order = 1,
-                                                type = "execute",
-                                                name = "DELETE CHANNEL",
-                                                width = "full",
-                                                confirm = function() return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!" end
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            identitySettingsConfigurationPage = {
-                                type = "group",
-                                name = "Identity",
-                                args = {
-                                    identityGroup = {
-                                        order = 0,
-                                        type = "group",
-                                        name = "Identity settings",
-                                        guiInline = true,
-                                        args = {
-                                            identifyOnChannelAs = {
-                                                order = 0,
-                                                type = "select",
-                                                name = "Identify using",
-                                                values = {[GBR_ENameType.Character] = "Character name", [GBR_ENameType.Mrp] = "TRP3 Full Name", [GBR_ENameType.Callsign] = "Channel Callsign"},
-                                                style = "dropdown",
-                                                width = "full"
-                                            },
-                                            channelCallsign = {
-                                                order = 1,
-                                                type = "input",
-                                                name = "Channel callsign",
-                                                width = "full"
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            interactionSettingsConfigurationPage = {
-                                type = "group",
-                                name = "Interaction",
-                                args = {
-                                    interactionGroup = {
-                                        order = 0,
-                                        type = "group",
-                                        name = "Interaction settings",
-                                        guiInline = true,
-                                        args = {
-                                            speakOnSend = {
-                                                order = 0,
-                                                type = "toggle",
-                                                name = "Speak on send",
-                                            },
-                                            emoteOnSend = {
-                                                order = 1,
-                                                type = "toggle",
-                                                name = "Emote on send",
-                                            },
-                                            emoteOnReceive = {
-                                                order = 2,
-                                                type = "toggle",
-                                                name = "Emote on receive",
-                                            },
-                                            emoteOnEmergency = {
-                                                order = 3,
-                                                type = "toggle",
-                                                name = "Emote on emergency",
-                                            },
-                                        }
-                                    }
-                                }
-                            },
-                            transmitterSettingsConfigurationPage = {
-                                type = "group",
-                                name = "Transmitter",
-                                args = {
-                                    channelName = {
-                                        name = "Channel Name",
-                                        desc = "Enter the channel name",
-                                        type = "input",
-                                        cmdHidden = true,
-                                        set = function(info, value) GBR_ConfigService.AddChannel(value) end,
-                                    },
-                                    deleteChannel = {
-                                        name = "Delete Channel",
-                                        desc = "Delete this channel",
-                                        type = "execute"
-                                    }
-                                },
-                                disabled = true
-                            }
-                        }
+                    newChannelFrequency =
+                    {
+                        name = "New channel frequency",
+                        desc = "Enter a descriptive name for the channel you would like to use.",
+                        type = "input",
+                        width = "full",
+                        cmdHidden = true,
+                        validate = GBR_ConfigService.ValidateChannelFrequency,
+                        set = 
+                            function(info, value)
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                configService:SetNewChannelFrequency(value);
+                            end,
+                        get = 
+                            function(info, value)
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                return configService:GetNewChannelFrequency(value);
+                            end,
+                        order = 1,
+                    },
+                    addNewChannelButton =
+                    {
+                        name = "Add new channel",
+                        type = "execute",
+                        disabled = 
+                            function(info) 
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                configService:IsAddChannelReady(info);
+                            end,
+                        order = 2,
+                        func = 
+                            function(info, value)
+                                
+                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                local newChannelName = configService:GetNewChannelName();
+                                local newChannelFrequency = configService:GetNewChannelFrequency();
+                                local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
+                                local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                                local channelKey = configService:GetNextChannelKey();
+
+                                GBR_ConfigService.AddChannelToUi(
+                                    addon.OptionsTable.args.channelConfig.args, 
+                                    channelKey, 
+                                    newSettingsModel);
+
+                                GBR_ConfigService.AddChannelToDb(
+                                    GBRadioAddonData.SettingsDB.char.Channels,
+                                    channelKey,
+                                    newSettingsModel);
+
+                                configService:SetNewChannelName("");
+                                configService:SetNewChannelFrequency("");
+                            end
                     }
                 }
             }
         }
     };
+
+    for frequencyKey, channelData in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        self.AddChannelToUi(addon.OptionsTable.args.channelConfig.args, frequencyKey, channelData);
+    end
     
-    addon.db = LibStub:GetLibrary("AceDB-3.0"):New("GBRadio3DB", {});
     addon.ConfigRegistry = LibStub("AceConfig-3.0"):RegisterOptionsTable("GBRadio3", addon.OptionsTable);
     addon.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GBRadio3", "GBRadio3");
 
 end
 
-function GBR_ConfigService.AddChannel(target, name)
 
-    target[name] = {
-        type = "group",
-        name = name,
-        args = {
-            channelName = {
-                name = "Channel Name",
-                desc = "Enter the channel name",
-                type = "input",
-                cmdHidden = true,
-                set = function(info, value) GBR_ConfigService.AddChannel(value) end,
-            },
-            deleteChannel = {
-                name = "Delete Channel",
-                desc = "Delete this channel",
-                type = "execute"
+function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
+
+    return 
+    {
+        channelSettingsHeader = 
+        {
+            order = 0,
+            type = "group",
+            name = "Channel settings",
+            guiInline = true,
+            args = 
+            {
+                channelIsEnabled =
+                {
+                    order = 0,
+                    name = "Channel is enabled",
+                    desc = "Toggle to determine whether you can send and receive messages on this channel",
+                    type = "toggle",
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value end,
+                },
+                channelName = 
+                {
+                    order = 1,
+                    name = "Channel name",
+                    desc = "Enter a descriptive name for the channel you would like to use.",
+                    type = "input",
+                    cmdHidden = true,
+                    validate = GBR_ConfigService.ValidateChannelName,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName end,
+                    set = 
+                        function(info, value)
+                            local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                            addon.OptionsTable.args.channelConfig.args[key].name = value;
+                            addon.OptionsTable.args.channelConfig.args[key].args.channelSettingsDesc.name = value;
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName = value;
+                        end,
+                },
+                channelFrequency = 
+                {
+                    order = 2,
+                    name = "Channel frequency",
+                    desc = "Enter the channel's frequency. .\n\nOnly use letters and numbers, and don't use spaces.",
+                    type = "input",
+                    cmdHidden = true,
+                    validate = GBR_ConfigService.ValidateChannelFrequency,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; end,
+                },
+                channelNotes =
+                {
+                    order = 3,
+                    name = "Channel notes",
+                    desc = "Enter any notes that you want to keep for this channel",
+                    type = "input",
+                    width = "full",
+                    multiline = 4,
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes = value end,
+                }
+            }
+        },
+        channelChatFrameGroup = 
+        {
+            order = 1,
+            name = "Chat frame settings",
+            type = "group",
+            guiInline = true,
+            args = 
+            {
+                channelChatMessageColour = 
+                {
+                    order = 0,
+                    name = "Message colour",
+                    type = "color",
+                    hasAlpha = false,
+                    width = "full",
+                    get = 
+                        function(info) 
+                            local colour = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour;
+                            return colour.A, colour.R, colour.G, colour.B;
+                        end,
+                    set = 
+                        function(info, a, r, g, b) 
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour = 
+                            { 
+                                A = a, 
+                                R = r, 
+                                G = g, 
+                                B = b 
+                            } 
+                        end,
+                },
+                channelChatFrame = 
+                {
+                    order = 1,
+                    name = "Output chat frame",
+                    type = "range",
+                    min = 1,
+                    max = 10,
+                    softMin = 1,
+                    softMax = 10,
+                    step = 1,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value end,
+                },
+                channelChatFrameIdentify = 
+                {
+                    order = 2,
+                    name = "Identify chat frames",
+                    type = "execute",
+                    width = "full"
+                },
+            }
+        },
+        channelDeleteHeader = 
+        {
+            order = 4,
+            type = "group",
+            name = "Delete channel",
+            guiInline = true,
+            args = 
+            {
+                channelDeleteDesc = 
+                {
+                    order = 0,
+                    type = "description",
+                    name = "|cFFFF0000If you no longer need this channel then you can delete it here.\nNote that this action is irreversible!"
+                },
+                channelDeleteButton = 
+                {
+                    order = 1,
+                    type = "execute",
+                    name = "DELETE CHANNEL",
+                    width = "full",
+                    confirm = function() return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!" end
+                }
             }
         }
-    };
+    }
 
+end
+
+function GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData)
+
+    return 
+    {
+        identityGroup = 
+        {
+            order = 0,
+            type = "group",
+            name = "Identity settings",
+            guiInline = true,
+            args = 
+            {
+                identifyOnChannelAs = 
+                {
+                    order = 0,
+                    type = "select",
+                    name = "Identify using",
+                    values = 
+                    {
+                        [GBR_ENameType.Character] = "Character name", 
+                        [GBR_ENameType.Mrp] = "TRP3 full Name", 
+                        [GBR_ENameType.Callsign] = "Channel callsign",
+                        [GBR_ENameType.MrpWithCallsign] = "TRP3 full name, with channel callsign",
+                    },
+                    style = "dropdown",
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs = value end,
+                },
+                channelCallsign = 
+                {
+                    order = 1,
+                    type = "input",
+                    name = "Channel callsign",
+                    validate = GBR_ConfigService.ValidateCallsign,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value end,
+                }
+            }
+        }
+    }
+
+end
+
+function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelData)
+
+    return
+    {
+        interactionTextGroup = 
+        {
+            order = 0,
+            type = "group",
+            name = "Interaction text settings",
+            guiInline = true,
+            args = 
+            {
+                speakOnSend = 
+                {
+                    order = 0,
+                    type = "toggle",
+                    name = "Speak on send",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend = value end,
+                },
+                emoteOnSend = 
+                {
+                    order = 1,
+                    type = "toggle",
+                    name = "Emote on send",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend = value end,
+                },
+                emoteOnReceive = 
+                {
+                    order = 2,
+                    type = "toggle",
+                    name = "Emote on receive",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive = value end,
+                },
+                emoteOnEmergency = 
+                {
+                    order = 3,
+                    type = "toggle",
+                    name = "Emote on emergency",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency = value end,
+                }
+            }
+        },
+        interactionAudioGroup = 
+        {
+            order = 1,
+            type = "group",
+            name = "Interaction audio settings",
+            guiInline = true,
+            args = 
+            {
+                audioOnSend =
+                {
+                    order = 4,
+                    type = "toggle",
+                    name = "Play audio on send",
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend = value end,
+                },
+                audioOnReceive =
+                {
+                    order = 5,
+                    type = "toggle",
+                    name = "Play audio on receive",
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive = value end,
+                },
+                audioOnEmergency=
+                {
+                    order = 6,
+                    type = "toggle",
+                    name = "Play audio on emergency",
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergency end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergency = value end,
+                }
+            }
+        },
+        interactionCooldownGroup = 
+        {
+            order = 2,
+            name = "Cooldown settings",
+            type = "group",
+            guiInline = true,
+            args = 
+            {
+                channelEmoteCooldown = 
+                {
+                    order = 0,
+                    name = "Receive emote cooldown (seconds)",
+                    type = "range",
+                    min = 0,
+                    max = 30,
+                    softMin = 0,
+                    softMax = 30,
+                    step = 1,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown = value end,
+                },
+                channelAudioCooldown = 
+                {
+                    order = 1,
+                    name = "Receive audio cooldown (seconds)",
+                    type = "range",
+                    min = 0,
+                    max = 30,
+                    softMin = 0,
+                    softMax = 30,
+                    step = 1,
+                    width = "full",
+                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown end,
+                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown = value end,
+                },
+            }
+        },
+    }
+
+end
+
+function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
+
+    return
+    {
+        channelName = {
+            name = "Channel Name",
+            desc = "Enter the channel name",
+            type = "input",
+            cmdHidden = true,
+            set = function(info, value) GBR_ConfigService.AddChannel(value) end
+        },
+        deleteChannel = {
+            name = "Delete Channel",
+            desc = "Delete this channel",
+            type = "execute"
+        }
+    }
+
+end
+
+function GBR_ConfigService.AddChannelToDb(targetDbTable, key, channelData)
+    targetDbTable[key] = channelData;
+end
+
+function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
+
+    targetSettingsTable[key] = 
+    {
+        type = "group",
+        name = channelData.ChannelSettings.ChannelName,
+        childGroups = "tab",
+        args = 
+        {
+            channelSettingsDesc = 
+            {
+                order = 0,
+                type = "description",
+                name = channelData.ChannelSettings.ChannelName,
+                fontSize = "large",
+                image = "Interface\\Icons\\inv_gizmo_goblingtonkcontroller",
+                imageWidth = 40,
+                imageHeight = 40
+            },
+            channelSettingsConfigurationPage = 
+            {
+                type = "group",
+                name = "Channel",
+                args = GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
+            },
+            identitySettingsConfigurationPage = 
+            {
+                type = "group",
+                name = "Identity",
+                args = GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData)
+            },
+            interactionSettingsConfigurationPage = 
+            {
+                type = "group",
+                name = "Interaction",
+                args = GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelData)
+            },
+            transmitterSettingsConfigurationPage = 
+            {
+                type = "group",
+                name = "Transmitter",
+                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(key, channelData),
+                disabled = true
+            }
+        }
+    }
+
+end
+
+function GBR_ConfigService:IsAddChannelReady(info)
+
+    if self.StagingVars.NewChannelName ~= nil 
+        and self.StagingVars.NewChannelName:len() > 0
+        and self.StagingVars.NewChannelFrequency ~= nil 
+        and self.StagingVars.NewChannelFrequency:len() > 0 then
+            return false;
+    end
+
+    return true;
+end
+
+function GBR_ConfigService:SetNewChannelName(value)
+    self.StagingVars.NewChannelName = value;
+end
+
+function GBR_ConfigService:SetNewChannelFrequency(value)
+    self.StagingVars.NewChannelFrequency = value;
+end
+
+function GBR_ConfigService:GetNewChannelName(value)
+    return self.StagingVars.NewChannelName;
+end
+
+function GBR_ConfigService:GetNewChannelFrequency(value)
+    return self.StagingVars.NewChannelFrequency;
+end
+
+function GBR_ConfigService:GetNextChannelKey()
+    return date();
+end
+
+function GBR_ConfigService.GetNewSettingsModel(frequency, channelName)
+    return
+    {
+        ChannelSettings =
+        {
+            ChannelIsEnabled = true,
+            ChannelName = channelName,
+            ChannelFrequency = frequency,
+            ChannelNotes = "",
+            ChannelChatMessageColour = 
+            { 
+                A = 1,
+                R = 1,
+                G = 1,
+                B = 1
+            },
+            ChannelChatFrame = 1,
+        },
+        IdentitySettings =
+        {
+            IdentifyOnChannelAs = GBR_ENameType.Character,
+            ChannelCallsign = "",
+        },
+        InteractionSettings =
+        {
+            SpeakOnSend = true,
+            EmoteOnSend = true,
+            EmoteOnReceive = true,
+            EmoteOnEmergency = true,
+            AudioOnSend = true,
+            AudioOnReceive = true,
+            AudioOnEmergency = true,
+            ChannelEmoteCooldown = 5,
+            ChannelAudioCooldown = 5,
+        }
+    };
+end
+
+function GBR_ConfigService.ValidateChannelName(info, value)
+    if value:len() < 1 then return "Channel name must be at least 1 character." end;
+    if value:len() > 20 then return "Channel name must be 12 characters or less." end;
+    return true;
+end
+
+function GBR_ConfigService.ValidateChannelFrequency(info, value)
+    if value:match("%W") then return "Channel frequency must only contain letters or numbers." end;
+    if value:len() < 3 then return "Channel frequency must be at least 3 characters." end;
+    if value:len() > 8 then return "Channel frequency must be 8 characters or less." end;
+    return GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value);
+end
+
+function GBR_ConfigService.ValidateCallsign(info, value)
+    if value:len() > 20 then return "Channel callsign must be less than 20 characters." end;
+    return true;
+end
+
+function GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value)
+    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        if v.ChannelSettings.ChannelFrequency == value then 
+            return "Channel frequencies must be unique.\n\nChannel frequency \"" .. value .. "\" is already in use by channel \"".. v.ChannelSettings.ChannelName .."\".\n\nPlease enter a different frequency."
+        end;
+    end
+    return true;
 end

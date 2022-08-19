@@ -5,6 +5,7 @@ GBR_Constants =
     LIB_ACE_SETTINGS = "AceConfig-3.0",
     LIB_ACE_COMM = "AceComm-3.0",
     LIB_HBD_LOCATION = "HereBeDragons-2.0",
+    LIB_ACE_DB = "AceDB-3.0",
 
     SRV_COMMAND_SERVICE = "CommandService",
     SRV_CONFIG_SERVICE = "ConfigService",
@@ -36,4 +37,5 @@ GBR_Constants =
     OPT_ADDON_VERSION = "3.0",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
+    OPT_ADDON_SETTINGS_DB = "GBRadioSettingsDb",
 };
