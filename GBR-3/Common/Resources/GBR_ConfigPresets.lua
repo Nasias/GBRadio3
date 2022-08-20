@@ -5,6 +5,7 @@ GBR_ConfigPresets.BuzzBox =
     char =
     {
         DeviceName = "buzzbox",
+        ActiveFrequency = "GBRADIO",
         Channels =
         {
             ["DEFAULT"] =
@@ -12,9 +13,9 @@ GBR_ConfigPresets.BuzzBox =
                 ChannelSettings =
                 {
                     ChannelIsEnabled = true,
-                    ChannelName = "Default Channel",
+                    ChannelName = "Default",
                     ChannelFrequency = "GBRADIO",
-                    ChannelNotes = "This is the default GBRadio channel for demonstration purposes. Feel free to change or delete this.",
+                    ChannelNotes = "This is the default GBRadio channel for demonstration purposes. You can freely change or delete this channel's settings.",
                     ChannelChatMessageColour = 
                     { 
                         A = 1,
@@ -37,7 +38,8 @@ GBR_ConfigPresets.BuzzBox =
                     EmoteOnEmergency = true,
                     AudioOnSend = true,
                     AudioOnReceive = true,
-                    AudioOnEmergency = true,
+                    AudioOnEmergencySend = true,
+                    AudioOnEmergencyReceive = true,
                     ChannelEmoteCooldown = 5,
                     ChannelAudioCooldown = 5,
                 }

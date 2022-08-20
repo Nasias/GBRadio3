@@ -23,6 +23,7 @@ GBR_Constants =
     CMD_SEND_MESSAGE = "bb",
     CMD_SEND_QUIET_MESSAGE = "wbb",
     CMD_TEST_RECEIVE_MESSAGE = "tbb",
+    CMD_SEND_EMERGENCY_MESSAGE = "pb",
 
     ID_PLAYER = "player",
     ID_TARGET = "targer",
@@ -38,4 +39,12 @@ GBR_Constants =
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
     OPT_ADDON_SETTINGS_DB = "GBRadioSettingsDb",
+
+    MSG_CHAT_FRAME_IDENTITY = "|TInterface\\DialogFrame\\UI-Dialog-Icon-AlertOther:16:16:0:-1|t%s [GBRadio - Chatframe Identity] This is chat frame #%d.",
+    -- colour, frequency, charactername, displayname, message
+    MSG_RADIO_MESSAGE = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8:0:16:16:0:16:0:16:0:255:0|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8:0:16:16:0:16:0:16:0:255:0|t %s[%s] [|Hplayer:%s|h%s|h]: %s",
+    -- colour, frequency, charactername, displayname, location, coord-x, coord-y
+    MSG_RADIO_EMERGENCY = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:8:2:64:64:16:46:16:46|t|TInterface\\DialogFrame\\DialogAlertIcon:16:16:-9999:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [EMERGENCY ALERT]: Emergency at %s (%.3f, %.3f).",
+    -- colour, frequency, charactername, displayname, location
+    MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8|t %s[%s] [|Hplayer:%s|h%s|h] [EMERGENCY ALERT]: Emergency at %s]",
 };

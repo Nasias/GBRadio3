@@ -24,7 +24,7 @@ function GBR_MessageService:SendMessage(messageModel)
         [GBR_EMessageType.Emergency] = self.SendEmergencyMessage,
     };
 
-    t[messageModel.MessageType](self, messageModel);
+    t[messageModel.MessageData.MessageType](self, messageModel);
 
 end
 
@@ -40,75 +40,121 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
     local serializedMessageModel = GBR_SerializableMessageModel:New(self._serialiserService:Deserialize(serializedMessageData));
     local messageModel = serializedMessageModel:ToMessageModel();
 
-    self:PlayReceiveMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+    local messageProcessor =
+    {
+        [GBR_EMessageType.Speech] = self.ProcessReceivedSpeechMessage,
+        [GBR_EMessageType.SilentSpeech] = self.ProcessReceivedSpeechMessage,
+        [GBR_EMessageType.Emergency] = self.ProcessReceivedEmergencyMessage
+    };
 
-    print("Received message:");
-    print(messageModel.MessageData.Message);
-    print(messageModel.MessageData.Timestamp);
-    print(messageModel.MessageData.MessageType);
-    print(messageModel.MessageData.CharacterModel.CharacterName);
-    print(messageModel.MessageData.CharacterModel.MSPName);    
-    print(messageModel.MessageData.CharacterModel.CharacterCallsign);
-    print(messageModel.MessageData.CharacterModel.CharacterColour:ToHexString());
-    print(messageModel.MessageData.CharacterModel.CharacterGender);
-    print(messageModel.MessageData.CharacterModel.Location.ZonePosition.X, messageModel.MessageData.CharacterModel.Location.ZonePosition.Y, messageModel.MessageData.CharacterModel.Location.ZonePosition.Z);
-    print(messageModel.MessageData.CharacterModel.Location.WorldPosition.X, messageModel.MessageData.CharacterModel.Location.WorldPosition.Y, messageModel.MessageData.CharacterModel.Location.WorldPosition.Z);
-    print(messageModel.MessageData.CharacterModel.Location.Zone);
-    print(messageModel.MessageData.CharacterModel.Location.SubZone);
-    print(messageModel.MessageData.CharacterModel.Location.MapId);
-    print(messageModel.MessageData.CharacterModel.Location.LocationType);
+    messageProcessor[messageModel.MessageData.MessageType](self, messageModel);
 
 end
 
 function GBR_MessageService:SendSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
     GBRadioAddonData:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
-
-    self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
-
-    print("Sent message:");
-    print(messageModel.MessageData.Message);
-    print(messageModel.MessageData.Timestamp);
-    print(messageModel.MessageData.MessageType);
-    print(messageModel.MessageData.CharacterModel.CharacterName);
-    print(messageModel.MessageData.CharacterModel.MSPName);    
-    print(messageModel.MessageData.CharacterModel.CharacterCallsign);
-    print(messageModel.MessageData.CharacterModel.CharacterColour:ToHexString());
-    print(messageModel.MessageData.CharacterModel.CharacterGender);
-    print(messageModel.MessageData.CharacterModel.Location.ZonePosition.X, messageModel.MessageData.CharacterModel.Location.ZonePosition.Y, messageModel.MessageData.CharacterModel.Location.ZonePosition.Z);
-    print(messageModel.MessageData.CharacterModel.Location.WorldPosition.X, messageModel.MessageData.CharacterModel.Location.WorldPosition.Y, messageModel.MessageData.CharacterModel.Location.WorldPosition.Z);
-    print(messageModel.MessageData.CharacterModel.Location.Zone);
-    print(messageModel.MessageData.CharacterModel.Location.SubZone);
-    print(messageModel.MessageData.CharacterModel.Location.MapId);
-    print(messageModel.MessageData.CharacterModel.Location.LocationType);
 
 end
 
 function GBR_MessageService:SendSilentSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
     self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
 
-    self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+end
+
+function GBR_MessageService:SendEmergencyMessage(messageModel)
+
+    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
+
+    local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
+
+    self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
 
 end
 
-function GBR_MessageService:SendEmergencyMessage()
+function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
-    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-
-    local characterData = messageModel.MessageData.CharacterModel;
-    local characterName = characterData.MSPName ~= nil and characterData.MSPName or characterData.CharacterName;
-
-    local message = string.format("A state-zero panic button has been activated by %s in %s -- The last known co-ordinates are %.3f, %.3f", messageModal.MessageData.CharacterModel.CharacterName);
+    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
     
+    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
+        return;
+    end
+
+    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
+    local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
+    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
+    local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
+
+    if chatFrame then
+        chatFrame:AddMessage(string.format(
+            GBR_Constants.MSG_RADIO_MESSAGE, 
+            channelColour:ToEscapedHexString(), 
+            messageModel.MessageData.Frequency,
+            messageModel.MessageData.CharacterModel.CharacterName,
+            messageModel.MessageData.CharacterModel.CharacterDisplayName,
+            messageModel.MessageData.Message));
+    end
+
+    if messageModel.MessageData.CharacterModel.CharacterName == characterName then
+        self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+    else
+        self:PlayReceiveMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+    end
+
+end
+
+function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
+
+    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
+
+    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
+        return;
+    end
+
+    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
+    local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
+    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
+    local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
+    
+    if chatFrame then
+        local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil
+            and string.format(
+                GBR_Constants.MSG_RADIO_EMERGENCY, 
+                channelColour:ToEscapedHexString(), 
+                messageModel.MessageData.Frequency,
+                messageModel.MessageData.CharacterModel.CharacterName,
+                messageModel.MessageData.CharacterModel.CharacterDisplayName,
+                messageModel.MessageData.CharacterModel.Location.Zone,
+                messageModel.MessageData.CharacterModel.Location.ZonePosition.X,
+                messageModel.MessageData.CharacterModel.Location.ZonePosition.Y)
+            or string.format(
+                GBR_Constants.MSG_RADIO_EMERGENCY_NO_COORDS, 
+                channelColour:ToEscapedHexString(), 
+                messageModel.MessageData.Frequency,
+                messageModel.MessageData.CharacterModel.Location.CharacterName,
+                messageModel.MessageData.CharacterModel.Location.CharacterDisplayName,
+                messageModel.MessageData.CharacterModel.Location.Zone);
+
+        chatFrame:AddMessage(emergencyMessage);
+    end
+
+    if messageModel.MessageData.CharacterModel.CharacterName == characterName then
+        self:PlaySendEmergencyMessageAudio();
+    else        
+        self:PlayReceiveEmergencyMessageAudio();
+    end
 
 end
 
@@ -144,6 +190,26 @@ function GBR_MessageService:PlayReceiveMessageAudio(characterGender)
 
 end
 
+function GBR_MessageService:PlaySendEmergencyMessageAudio()
+
+    if not self._configService:IsSendEmergencyMessageAudioEnabled() then
+        return;
+    end
+
+    PlaySoundFile(self.Sounds.Emergency, "SFX");
+
+end
+
+function GBR_MessageService:PlayReceiveEmergencyMessageAudio()
+
+    if not self._configService:IsReceiveEmergencyMessageAudioEnabled() then
+        return;
+    end
+
+    PlaySoundFile(self.Sounds.Emergency, "SFX");
+
+end
+
 GBR_MessageService.Sounds = {
     Send = {
         M = {
@@ -165,7 +231,5 @@ GBR_MessageService.Sounds = {
             "Interface\\AddOns\\GBR-3\\Audio\\fr-2.ogg"
         },
     },
-    Emergency = {
-        "Interface\\AddOns\\GBR-3\\Audio\\emergency.ogg"
-    }
+    Emergency = "Interface\\AddOns\\GBR-3\\Audio\\emergency.ogg"
 };

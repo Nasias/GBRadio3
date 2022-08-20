@@ -3,6 +3,7 @@ GBR_SerializableMessageModel = GBR_Object:New();
 function GBR_SerializableMessageModel:New(obj)
   
         self.CharacterName = nil;
+        self.CharacterDisplayName = nil;
         self.CharacterNameType = nil;
         self.CharacterColourHex = nil;
         self.CharacterGender = nil;
@@ -20,6 +21,7 @@ function GBR_SerializableMessageModel:New(obj)
         self.Message = nil;
         self.Timestamp = nil;
         self.MessageType = nil;
+        self.Frequency = nil;
     
     return self:RegisterNew(obj);
 
@@ -34,6 +36,7 @@ function GBR_SerializableMessageModel:ToMessageModel()
             CharacterModel = GBR_CharacterModel:New
             {            
                 CharacterName = self.CharacterName,
+                CharacterDisplayName = self.CharacterDisplayName,
                 CharacterNameType = self.CharacterNameType,
                 CharacterColour = GBR_ARGB:NewFromHex(self.CharacterColourHex),
                 CharacterGender = self.CharacterGender,
@@ -61,6 +64,7 @@ function GBR_SerializableMessageModel:ToMessageModel()
             Message = self.Message,
             Timestamp = self.Timestamp,
             MessageType = self.MessageType,
+            Frequency = self.Frequency,
         }
     };
 end

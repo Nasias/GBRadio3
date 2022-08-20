@@ -16,7 +16,8 @@ function GBR_PlayerService:GetCurrentCharacterModel()
 
     return GBR_CharacterModel:New
     {
-        CharacterName = GBR_PlayerService:GetCharacterNameForNameType(preferredNamePreference),
+        CharacterName = UnitName(GBR_Constants.ID_PLAYER),
+        CharacterDisplayName = GBR_PlayerService:GetCharacterNameForNameType(preferredNamePreference),
         CharacterNameType = preferredNamePreference,
         CharacterColour = GBR_ARGB:New(),
         CharacterGender = self._configService:GetCharacterGender(),

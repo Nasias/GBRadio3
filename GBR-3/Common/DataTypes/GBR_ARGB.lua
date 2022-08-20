@@ -44,6 +44,6 @@ end
 
 function GBR_ARGB:ToEscapedHexString()
 
-    return GBR_Constants.UI_COLOUR_ESCAPE_STRING .. self:GetAsHexString();
+    return GBR_Constants.UI_COLOUR_ESCAPE_STRING .. self:ToHexString();
 
 end

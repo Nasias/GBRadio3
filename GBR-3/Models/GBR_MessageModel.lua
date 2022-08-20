@@ -8,6 +8,7 @@ function GBR_MessageModel:New(obj)
         Message = nil,
         Timestamp = nil,
         MessageType = nil,
+        Frequency = nil,
     };
     
     return self:RegisterNew(obj);
@@ -19,6 +20,7 @@ function GBR_MessageModel:ToSerializeableMessageModel()
     return GBR_SerializableMessageModel:New
     {        
         CharacterName = self.MessageData.CharacterModel.CharacterName,
+        CharacterDisplayName = self.MessageData.CharacterModel.CharacterDisplayName,
         CharacterNameType = self.MessageData.CharacterModel.CharacterNameType,
         CharacterColourHex = self.MessageData.CharacterModel.CharacterColour:ToHexString(),
         CharacterGender = self.MessageData.CharacterModel.CharacterGender,
@@ -36,6 +38,7 @@ function GBR_MessageModel:ToSerializeableMessageModel()
         Message = self.MessageData.Message,
         Timestamp = self.MessageData.TimeStamp,
         MessageType = self.MessageData.MessageType,
+        Frequency = self.MessageData.Frequency,
     };
 
 end

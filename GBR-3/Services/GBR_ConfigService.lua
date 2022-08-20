@@ -14,7 +14,15 @@ function GBR_ConfigService:New(obj)
 
 end
 
-function GBR_ConfigService:GetCommunicationFrequencies()
+function GBR_ConfigService:GetRegisteredCommunicationFrequencies()
+
+    local registeredFrequencies = {};
+
+    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        registeredFrequencies[v.ChannelSettings.ChannelFrequency] = true;
+    end
+
+    return registeredFrequencies;
 
 end
 
@@ -44,7 +52,7 @@ end
 
 function GBR_ConfigService:GetDefaultNamePreference()
 
-    return GBR_ENameType.Mrp;
+    return GBR_ENameType.Character;
 
 end
 
@@ -60,6 +68,33 @@ function GBR_ConfigService:IsReceiveMessageAudioEnabled()
 
 end
 
+function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabled()
+
+    return true;
+
+end
+
+function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
+
+    return true;
+
+end
+
+function GBR_ConfigService:GetChatFrameForChannel(frequency)
+    local settings = self:GetSettingsForFrequency(frequency);    
+    return settings.ChannelSettings.ChannelChatFrame;
+end
+
+function GBR_ConfigService:GetSettingsForFrequency(frequency)
+
+    for k,v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        if v.ChannelSettings.ChannelFrequency == frequency then
+            return v;
+        end
+    end
+
+end
+
 function GBR_ConfigService:Initialize()
 
     local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
@@ -71,7 +106,7 @@ function GBR_ConfigService:Initialize()
         childGroups = "tree",
         handler = addon,        
         args = {
-            deviceConfigPage = 
+            deviceConfig = 
             {
                 type = "group",
                 name = "Device Config",
@@ -189,7 +224,7 @@ function GBR_ConfigService:Initialize()
 end
 
 
-function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
+function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
 
     return 
     {
@@ -208,8 +243,23 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     desc = "Toggle to determine whether you can send and receive messages on this channel",
                     type = "toggle",
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled;
+                        end,
+                    set = 
+                        function(info, value)
+                            local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                            local key = info[#info-3];
+
+                            addon.OptionsTable.args.channelConfig.args[key].name = GBR_ConfigService.GetChannelGroupName(
+                                value, 
+                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName,                            
+                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
+
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value;
+                        end,
                 },
                 channelName = 
                 {
@@ -220,11 +270,21 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     cmdHidden = true,
                     validate = GBR_ConfigService.ValidateChannelName,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName;
+                        end,
                     set = 
                         function(info, value)
                             local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-                            addon.OptionsTable.args.channelConfig.args[key].name = value;
+                            local key = info[#info-3];
+
+                            addon.OptionsTable.args.channelConfig.args[key].name = GBR_ConfigService.GetChannelGroupName(
+                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled, 
+                                value,
+                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
+
                             addon.OptionsTable.args.channelConfig.args[key].args.channelSettingsDesc.name = value;
                             GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName = value;
                         end,
@@ -238,8 +298,16 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     cmdHidden = true,
                     validate = GBR_ConfigService.ValidateChannelFrequency,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; end,
+                    get = 
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                        end,
+                    set = 
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; 
+                        end,
                 },
                 channelNotes =
                 {
@@ -249,8 +317,16 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     type = "input",
                     width = "full",
                     multiline = 4,
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes = value end,
+                    get = 
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes;
+                        end,
+                    set = 
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes = value;
+                        end,
                 }
             }
         },
@@ -270,12 +346,14 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     hasAlpha = false,
                     width = "full",
                     get = 
-                        function(info) 
+                        function(info)
+                            local key = info[#info-3];
                             local colour = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour;
-                            return colour.A, colour.R, colour.G, colour.B;
+                            return colour.R, colour.G, colour.B, colour.A;
                         end,
                     set = 
-                        function(info, a, r, g, b) 
+                        function(info, r, g, b, a)
+                            local key = info[#info-3];
                             GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour = 
                             { 
                                 A = a, 
@@ -296,15 +374,38 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
                     softMax = 10,
                     step = 1,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value;
+                        end,
                 },
                 channelChatFrameIdentify = 
                 {
                     order = 2,
                     name = "Identify chat frames",
                     type = "execute",
-                    width = "full"
+                    width = "full",
+                    func = 
+                        function(info, val)
+                            local key = info[#info-3];
+                            local channelColour = GBR_ARGB:New(GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour);
+
+                            for i = 1, NUM_CHAT_WINDOWS do
+                                local frame = _G["ChatFrame"..i]
+                                if frame then
+                                    
+                                    frame:AddMessage(string.format(GBR_Constants.MSG_CHAT_FRAME_IDENTITY,
+                                        channelColour:ToEscapedHexString(),
+                                        i));
+                                end
+                            end
+                        end
                 },
             }
         },
@@ -336,7 +437,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
 
 end
 
-function GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData)
+function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
 
     return 
     {
@@ -362,8 +463,16 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData
                     },
                     style = "dropdown",
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs = value;
+                        end,
                 },
                 channelCallsign = 
                 {
@@ -372,8 +481,16 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData
                     name = "Channel callsign",
                     validate = GBR_ConfigService.ValidateCallsign,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value;
+                        end,
                 }
             }
         }
@@ -381,7 +498,7 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData
 
 end
 
-function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelData)
+function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
 
     return
     {
@@ -398,32 +515,64 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelD
                     order = 0,
                     type = "toggle",
                     name = "Speak on send",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend = value;
+                        end,
                 },
                 emoteOnSend = 
                 {
                     order = 1,
                     type = "toggle",
                     name = "Emote on send",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend = value;
+                        end,
                 },
-                emoteOnReceive = 
+                emoteOnReceive =
                 {
                     order = 2,
                     type = "toggle",
                     name = "Emote on receive",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive = value;
+                        end,
                 },
                 emoteOnEmergency = 
                 {
                     order = 3,
                     type = "toggle",
                     name = "Emote on emergency",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency = value end,
+                    get = 
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency;
+                        end,
+                    set = 
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency = value;
+                        end,
                 }
             }
         },
@@ -441,8 +590,16 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelD
                     type = "toggle",
                     name = "Play audio on send",
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend;
+                        end,
+                    set = 
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend = value;
+                        end,
                 },
                 audioOnReceive =
                 {
@@ -450,17 +607,50 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelD
                     type = "toggle",
                     name = "Play audio on receive",
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive = value end,
+                    get =
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive;
+                        end,
+                    set =
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive = value;
+                        end,
                 },
-                audioOnEmergency=
+                audioOnEmergencySend =
                 {
                     order = 6,
                     type = "toggle",
-                    name = "Play audio on emergency",
+                    name = "Play audio on emergency send",
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergency end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergency = value end,
+                    get =
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend;
+                        end,
+                    set =
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend = value;
+                        end,
+                },
+                audioOnEmergencyReceive =
+                {
+                    order = 6,
+                    type = "toggle",
+                    name = "Play audio on emergency receive",
+                    width = "full",
+                    get =
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive;
+                        end,
+                    set =
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive = value;
+                        end,
                 }
             }
         },
@@ -483,8 +673,16 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelD
                     softMax = 30,
                     step = 1,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown = value;
+                        end,
                 },
                 channelAudioCooldown = 
                 {
@@ -497,8 +695,16 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelD
                     softMax = 30,
                     step = 1,
                     width = "full",
-                    get = function(info) return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown end,
-                    set = function(info, value) GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown = value end,
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown = value;
+                        end,
                 },
             }
         },
@@ -535,9 +741,12 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
     targetSettingsTable[key] = 
     {
         type = "group",
-        name = channelData.ChannelSettings.ChannelName,
+        name = GBR_ConfigService.GetChannelGroupName(
+            channelData.ChannelSettings.ChannelIsEnabled, 
+            channelData.ChannelSettings.ChannelName,
+            channelData.ChannelSettings.ChannelFrequency),
         childGroups = "tab",
-        args = 
+        args =
         {
             channelSettingsDesc = 
             {
@@ -553,26 +762,109 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
             {
                 type = "group",
                 name = "Channel",
-                args = GBR_ConfigService.AddChannelSettingsConfigurationPage(key, channelData)
+                args = GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData),
+                order = 1
             },
             identitySettingsConfigurationPage = 
             {
                 type = "group",
                 name = "Identity",
-                args = GBR_ConfigService.AddIdentitySettingsConfigurationPage(key, channelData)
+                args = GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData),
+                order = 2
             },
             interactionSettingsConfigurationPage = 
             {
                 type = "group",
                 name = "Interaction",
-                args = GBR_ConfigService.AddInteractionSettingsConfigurationPage(key, channelData)
+                args = GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData),
+                order = 3
             },
             transmitterSettingsConfigurationPage = 
             {
                 type = "group",
                 name = "Transmitter",
-                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(key, channelData),
+                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(channelData),
+                order = 4,
                 disabled = true
+            },
+            channelAdminPage =
+            {
+                type = "group",
+                name = "Admin",
+                childGroups = "tab",
+                disabled = true,
+                args = {                    
+                    userAdminPage =
+                    {
+                        type = "group",
+                        name = "Channel Users",
+                        childGroups = "tree",
+                        args = {
+                            refreshChannelUsers =
+                            {
+                                type = "execute",
+                                name = "Refresh user list",
+                                order = 0
+                            },
+                            ["Testcharacter1"] =
+                            {
+                                type = "group",
+                                name = "Nasias",
+                                args = {
+                                    blacklistUserDesc =
+                                    {
+                                        type = "description",
+                                        name = "Blacklist this user from being able to send and receive messages on this frequency."
+                                    },
+                                    blacklistUser =
+                                    {
+                                        type = "execute",
+                                        name = "Blacklist user",
+                                        order = 1
+                                    }
+                                }
+                            },
+                            ["Testcharacter2"] =
+                            {
+                                type = "group",
+                                name = "Róok",
+                                args = {
+                                    blacklistUserDesc =
+                                    {
+                                        type = "description",
+                                        name = "Blacklist this user from being able to send and receive messages on this frequency."
+                                    },
+                                    blacklistUser =
+                                    {
+                                        type = "execute",
+                                        name = "Blacklist User",
+                                        order = 1
+                                    }
+                                }
+                            },
+                            ["Testcharacter3"] =
+                            {
+                                type = "group",
+                                name = "Isilador",
+                                args = {
+                                    blacklistUserDesc =
+                                    {
+                                        type = "description",
+                                        name = "Blacklist this user from being able to send and receive messages on this frequency."
+                                    },
+                                    blacklistUser =
+                                    {
+                                        type = "execute",
+                                        name = "Blacklist User",
+                                        order = 1
+                                    }
+                                }
+                            },
+                        },
+                        order = 0
+                    }
+                },
+                order = 5
             }
         }
     }
@@ -608,7 +900,7 @@ function GBR_ConfigService:GetNewChannelFrequency(value)
 end
 
 function GBR_ConfigService:GetNextChannelKey()
-    return date();
+    return date("!%Y%m%d%H%M%S");
 end
 
 function GBR_ConfigService.GetNewSettingsModel(frequency, channelName)
@@ -647,6 +939,12 @@ function GBR_ConfigService.GetNewSettingsModel(frequency, channelName)
             ChannelAudioCooldown = 5,
         }
     };
+end
+
+function GBR_ConfigService.GetChannelGroupName(channelIsEnabled, channelName, channelFrequency)
+    --local isEnabledElement = channelIsEnabled and "|cFF00FF00•|r" or "|cFFFF0000•|r";
+    local isEnabledElement = channelIsEnabled and "|TInterface\\COMMON\\Indicator-Green:16|t" or "|TInterface\\COMMON\\Indicator-Red:16|t";
+    return isEnabledElement .. " " .. channelName .. " (".. channelFrequency ..")";
 end
 
 function GBR_ConfigService.ValidateChannelName(info, value)
