@@ -7,6 +7,7 @@ function GBR_SerializableMessageModel:New(obj)
         self.CharacterNameType = nil;
         self.CharacterColourHex = nil;
         self.CharacterGender = nil;
+        self.CharacterVoiceType = nil;
         self.CharacterLocationName = nil;
         self.CharacterLocationZPosX = nil;
         self.CharacterLocationZPosY = nil;
@@ -40,6 +41,7 @@ function GBR_SerializableMessageModel:ToMessageModel()
                 CharacterNameType = self.CharacterNameType,
                 CharacterColour = GBR_ARGB:NewFromHex(self.CharacterColourHex),
                 CharacterGender = self.CharacterGender,
+                CharacterVoiceType = self.CharacterVoiceType,
                 Location = GBR_LocationModel:New
                 {
                     Name = "",

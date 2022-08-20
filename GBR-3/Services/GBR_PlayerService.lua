@@ -21,6 +21,7 @@ function GBR_PlayerService:GetCurrentCharacterModel()
         CharacterNameType = preferredNamePreference,
         CharacterColour = GBR_ARGB:New(),
         CharacterGender = self._configService:GetCharacterGender(),
+        CharacterVoiceType = self._configService.GetCharacterVoiceType(),
         Location = self._locationService:GetCurrentCharacterLocation(),
     };
 

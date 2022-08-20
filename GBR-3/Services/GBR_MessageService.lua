@@ -57,8 +57,20 @@ function GBR_MessageService:SendSpeechMessage(messageModel)
     messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
+    --self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
 
-    GBRadioAddonData:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
+    self:ProcessSendEmote();
+    self:ProcessSendSpeech(messageModel);
+
+    GBR_Delay:Delay(
+        self._configService:GetRadioMessageDelay(),
+        self._communicationLib.SendCommMessage,
+        self._communicationLib,
+        self._configService.GetAddonChannelPrefix(),
+        serializedMessageData,
+        self._configService.GetCommChannelTarget(),
+        GetChannelName(self._configService.GetCommChannelName()),
+        "ALERT");
 
 end
 
@@ -69,7 +81,17 @@ function GBR_MessageService:SendSilentSpeechMessage(messageModel)
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
-    self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
+    self:ProcessSilentSendEmote();
+
+    GBR_Delay:Delay(
+        self._configService:GetRadioMessageDelay(),
+        self._communicationLib.SendCommMessage,
+        self._communicationLib,
+        self._configService.GetAddonChannelPrefix(),
+        serializedMessageData,
+        self._configService.GetCommChannelTarget(),
+        GetChannelName(self._configService.GetCommChannelName()),
+        "ALERT");
 
 end
 
@@ -80,14 +102,24 @@ function GBR_MessageService:SendEmergencyMessage(messageModel)
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
-    self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
+    self:ProcessEmergencySendEmote();
+
+    GBR_Delay:Delay(
+        self._configService:GetRadioMessageDelay(),
+        self._communicationLib.SendCommMessage,
+        self._communicationLib,
+        self._configService.GetAddonChannelPrefix(),
+        serializedMessageData,
+        self._configService.GetCommChannelTarget(),
+        GetChannelName(self._configService.GetCommChannelName()),
+        "ALERT");
 
 end
 
 function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
     local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-    print(registeredFrequencies[messageModel.MessageData.Frequency])
+    
     if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
         return;
     end
@@ -108,9 +140,10 @@ function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
     end
 
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
-        self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+        self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterVoiceType);
     else
-        self:PlayReceiveMessageAudio(messageModel.MessageData.CharacterModel.CharacterGender);
+        self:ProcessReceiveEmote(messageModel.MessageData.Frequency);
+        self:PlayReceiveMessageAudio(messageModel.MessageData.Frequency, messageModel.MessageData.CharacterModel.CharacterVoiceType);
     end
 
 end
@@ -137,8 +170,8 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
                 messageModel.MessageData.CharacterModel.CharacterName,
                 messageModel.MessageData.CharacterModel.CharacterDisplayName,
                 messageModel.MessageData.CharacterModel.Location.Zone,
-                messageModel.MessageData.CharacterModel.Location.ZonePosition.X,
-                messageModel.MessageData.CharacterModel.Location.ZonePosition.Y)
+                messageModel.MessageData.CharacterModel.Location.ZonePosition.X * 100,
+                messageModel.MessageData.CharacterModel.Location.ZonePosition.Y * 100)
             or string.format(
                 GBR_Constants.MSG_RADIO_EMERGENCY_NO_COORDS, 
                 channelColour:ToEscapedHexString(), 
@@ -153,7 +186,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
         self:PlaySendEmergencyMessageAudio();
     else
-        self:PlayReceiveEmergencyMessageAudio();
+        self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
     end
 
 end
@@ -174,9 +207,9 @@ function GBR_MessageService:PlaySendMessageAudio(characterGender)
 
 end
 
-function GBR_MessageService:PlayReceiveMessageAudio(characterGender)
+function GBR_MessageService:PlayReceiveMessageAudio(frequency, characterGender)
 
-    if not self._configService:IsReceiveMessageAudioEnabled() then
+    if not self._configService:IsReceiveMessageAudioEnabledForFrequency(frequency) then
         return;
     end
 
@@ -200,14 +233,73 @@ function GBR_MessageService:PlaySendEmergencyMessageAudio()
 
 end
 
-function GBR_MessageService:PlayReceiveEmergencyMessageAudio()
+function GBR_MessageService:PlayReceiveEmergencyMessageAudio(frequency)
 
-    if not self._configService:IsReceiveEmergencyMessageAudioEnabled() then
+    if not self._configService:IsReceiveEmergencyMessageAudioEnabledForFrequency(frequency) then
         return;
     end
 
     PlaySoundFile(self.Sounds.Emergency, "SFX");
 
+end
+
+function GBR_MessageService:ProcessSendSpeech(messageModel)
+
+    if not self._configService:IsSendMessageSpeechEnabled() then
+        return;
+    end
+
+    SendChatMessage(messageModel.MessageData.Message, "SAY", DEFAULT_CHAT_FRAME.editBox.LanguageID);
+
+end
+
+function GBR_MessageService:ProcessSendEmote()
+
+    if not self._configService:IsSendMessageEmoteEnabled() then
+        return;
+    end
+
+    local pronouns = self._configService:GetCharacterPronouns();
+    local deviceName = self._configService:GetDeviceName();
+
+    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_SEND_MESSAGE, pronouns.A, deviceName), "EMOTE");
+end
+
+function GBR_MessageService:ProcessSilentSendEmote()
+
+    if not self._configService:IsSendMessageEmoteEnabled() then
+        return;
+    end
+
+    local pronouns = self._configService:GetCharacterPronouns();
+    local deviceName = self._configService:GetDeviceName();
+
+    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_SILENT_SEND_MESSAGE, pronouns.A, deviceName), "EMOTE");
+end
+
+function GBR_MessageService:ProcessEmergencySendEmote()
+
+    if not self._configService:IsSendMessageEmoteEnabled() then
+        return;
+    end
+
+    local pronouns = self._configService:GetCharacterPronouns();
+    local deviceName = self._configService:GetDeviceName();
+
+    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_EMERGENCY_SEND_MESSAGE, pronouns.A, deviceName), "EMOTE");
+end
+
+function GBR_MessageService:ProcessReceiveEmote(frequency)
+
+    if not self._configService:IsReceiveMessageEmoteEnabledForFrequency(frequency) then
+        return;
+    end
+
+    local pronouns = self._configService:GetCharacterPronouns();
+    local deviceName = self._configService:GetDeviceName();
+    local radioVerb = GBR_Constants.MSG_EMOTE_RECEIVE_VERBS[math.random(1, #GBR_Constants.MSG_EMOTE_RECEIVE_VERBS)];
+
+    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_RECEIVE_MESSAGE, deviceName, radioVerb, pronouns.C), "EMOTE");
 end
 
 GBR_MessageService.Sounds = {

@@ -28,7 +28,7 @@ function GBR_ConfigService:Initialize()
             deviceConfig = 
             {
                 type = "group",
-                name = "Device Config",
+                name = "Device config",
                 cmdHidden = true,
                 order = 0,
                 args = 
@@ -135,12 +135,105 @@ function GBR_ConfigService:Initialize()
                     }
                 }
             },
+            characterConfig =
+            {
+                type = "group",
+                name = "Character config",
+                cmdHidden = true,
+                order = 1,
+                args =
+                {
+                    characterConfigGroup =
+                    {
+                        
+                        type = "group",
+                        name = "Character configuration",
+                        guiInline = true,
+                        args =
+                        {
+                            characterGender =
+                            {
+                                name = "Character gender",
+                                type = "select",
+                                values =
+                                {
+                                    "Custom",
+                                    "Male",
+                                    "Female"
+                                },
+                                width = "full",
+                                get = GBR_ConfigService.GetCharacterGender,
+                                set = 
+                                    function(info, value)
+                                        local newPronouns = GBR_ConfigService.GetDefaultPronouns(value);
+                                        GBRadioAddonData.SettingsDB.char.Gender = value;
+                                        GBR_ConfigService.SetPronouns(newPronouns);
+                                    end,
+                                order = 0
+                            },
+                            customPronounA =
+                            {
+                                name = "Pronoun A",
+                                type = "input",
+                                width = 0.75,
+                                get =
+                                    function(info)
+                                        local pronouns = GBR_ConfigService.GetCharacterPronouns();
+                                        return pronouns.A;
+                                    end,
+                                order = 1
+                            },
+                            customPronounB =
+                            {
+                                name = "Pronoun B",
+                                type = "input",
+                                width = 0.75,
+                                get =
+                                    function(info)
+                                        local pronouns = GBR_ConfigService.GetCharacterPronouns();
+                                        return pronouns.B;
+                                    end,
+                                order = 2
+                            },
+                            customPronounC =
+                            {
+                                name = "Pronoun C",
+                                type = "input",
+                                width = 0.75,
+                                get =
+                                    function(info)
+                                        local pronouns = GBR_ConfigService.GetCharacterPronouns();
+                                        return pronouns.C;
+                                    end,
+                                order = 3
+                            },
+                            characterVoiceType =
+                            {
+                                name = "Character voice type",
+                                type = "select",
+                                values =
+                                {
+                                    [2] = "Masculine",
+                                    [3] = "Femanine"
+                                },
+                                width = "full",
+                                get = GBR_ConfigService.GetCharacterVoiceType,
+                                set = 
+                                    function(info, value)
+                                        GBRadioAddonData.SettingsDB.char.VoiceType = value;
+                                    end,
+                                order = 4
+                            },
+                        }
+                    }
+                }
+            },
             channelConfig =
             {
                 type = "group",
                 name = "Channels",
                 cmdHidden = true,
-                order = 1,
+                order = 2,
                 args =
                 {
                     addChannelGroup =
@@ -1045,9 +1138,65 @@ function GBR_ConfigService:GetCommChannelTarget()
 
 end
 
-function GBR_ConfigService:GetCharacterGender()
+function GBR_ConfigService.GetCharacterGender()
 
-    return UnitSex(GBR_Constants.ID_PLAYER);
+    if GBRadioAddonData.SettingsDB.char.Gender == nil then
+        local defaultGender = UnitSex(GBR_Constants.ID_PLAYER);
+        local defaultPronouns = GBR_ConfigService.GetDefaultPronouns(defaultGender);
+        local defaultVoiceType = UnitSex(GBR_Constants.ID_PLAYER);
+        
+        GBRadioAddonData.SettingsDB.char.Gender = defaultGender;
+        GBR_ConfigService.SetPronouns(defaultPronouns);
+        GBRadioAddonData.SettingsDB.char.VoiceType = defaultVoiceType;
+    end
+
+    return GBRadioAddonData.SettingsDB.char.Gender;
+
+end
+
+function GBR_ConfigService.SetPronouns(pronounTable)
+
+    GBRadioAddonData.SettingsDB.char.PronounA = pronounTable.A;
+    GBRadioAddonData.SettingsDB.char.PronounB = pronounTable.B;
+    GBRadioAddonData.SettingsDB.char.PronounC = pronounTable.C;
+
+end
+
+function GBR_ConfigService.GetDefaultPronouns(genderId)
+
+    local defaultPronouns =
+    {
+        { A = "their", B = "them", C = "they" },
+        { A = "his",  B = "him",    C = "he" },
+        { A = "her",  B = "her",   C = "she" }
+    };
+
+    return defaultPronouns[genderId];
+
+end
+
+function GBR_ConfigService.GetCharacterPronouns()
+
+    local gender = GBR_ConfigService.GetCharacterGender();
+
+    return
+    {
+        A = GBRadioAddonData.SettingsDB.char.PronounA,
+        B = GBRadioAddonData.SettingsDB.char.PronounB,
+        C = GBRadioAddonData.SettingsDB.char.PronounC
+    };
+    
+end
+
+function GBR_ConfigService.GetCharacterVoiceType()
+
+    return GBRadioAddonData.SettingsDB.char.VoiceType;
+
+end
+
+function GBR_ConfigService.GetDeviceName()
+
+    return GBRadioAddonData.SettingsDB.char.DeviceName;
 
 end
 
@@ -1057,33 +1206,71 @@ function GBR_ConfigService:GetDefaultNamePreference()
 
 end
 
+function GBR_ConfigService:IsEmoteOnEmergencyEnabled()
+
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.EmoteOnEmergency;
+
+end
+
+function GBR_ConfigService:IsSendMessageSpeechEnabled()
+
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.SpeakOnSend;
+
+end
+
+function GBR_ConfigService:IsSendMessageEmoteEnabled()    
+
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.EmoteOnSend;
+
+end
+
+function GBR_ConfigService:IsReceiveMessageEmoteEnabledForFrequency(frequency)    
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.EmoteOnReceive;
+
+end
+
 function GBR_ConfigService:IsSendMessageAudioEnabled()
 
-    return GBRadioAddonData.SettingsDB.char.ch;
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.AudioOnSend;
 
 end
 
-function GBR_ConfigService:IsReceiveMessageAudioEnabled()
+function GBR_ConfigService:IsReceiveMessageAudioEnabledForFrequency(frequency)
 
-    return true;
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.AudioOnReceive;
 
 end
 
-function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabled()
+function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabledForFrequency(frequency)
 
-    return true;
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.AudioOnEmergencyReceive;
 
 end
 
 function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
 
-    return true;
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.AudioOnEmergencySend;
 
 end
 
+function GBR_ConfigService:GetRadioMessageDelay()
+    return GBRadioAddonData.SettingsDB.char.RadioMessageDelay;
+end
+
 function GBR_ConfigService:GetChatFrameForChannel(frequency)
+
     local settings = self:GetSettingsForFrequency(frequency);    
     return settings.ChannelSettings.ChannelChatFrame;
+
 end
 
 function GBR_ConfigService:GetSettingsForFrequency(frequency)

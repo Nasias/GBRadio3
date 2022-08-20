@@ -5,8 +5,13 @@ GBR_ConfigPresets.BuzzBox =
     char =
     {
         DeviceName = "buzzbox",
-        PrimaryFrequency = "GBRADIO",
+        PrimaryFrequency = "GBRADIO1",
         RadioMessageDelay = 1.5,
+        Gender = nil,
+        PronounA = nil,
+        PronounB = nil,
+        PronounC = nil,
+        VoiceType = nil,
         Channels =
         {
             ["DEFAULT"] =
@@ -15,7 +20,7 @@ GBR_ConfigPresets.BuzzBox =
                 {
                     ChannelIsEnabled = true,
                     ChannelName = "Default",
-                    ChannelFrequency = "GBRADIO",
+                    ChannelFrequency = "GBRADIO1",
                     ChannelNotes = "This is the default GBRadio channel for demonstration purposes. You can freely change or delete this channel's settings.",
                     ChannelChatMessageColour = 
                     { 

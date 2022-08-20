@@ -24,6 +24,7 @@ function GBR_MessageModel:ToSerializeableMessageModel()
         CharacterNameType = self.MessageData.CharacterModel.CharacterNameType,
         CharacterColourHex = self.MessageData.CharacterModel.CharacterColour:ToHexString(),
         CharacterGender = self.MessageData.CharacterModel.CharacterGender,
+        CharacterVoiceType = self.MessageData.CharacterModel.CharacterVoiceType,
         CharacterLocationName = self.MessageData.CharacterModel.Location.Name,
         CharacterLocationZPosX = self.MessageData.CharacterModel.Location.ZonePosition.X,
         CharacterLocationZPosY = self.MessageData.CharacterModel.Location.ZonePosition.Y,
