@@ -54,7 +54,7 @@ end
 function GBR_MessageService:SendSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
@@ -65,7 +65,7 @@ end
 function GBR_MessageService:SendSilentSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
@@ -76,7 +76,7 @@ end
 function GBR_MessageService:SendEmergencyMessage(messageModel)
 
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.ActiveFrequency;
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
 
@@ -87,7 +87,7 @@ end
 function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
     local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-    
+    print(registeredFrequencies[messageModel.MessageData.Frequency])
     if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
         return;
     end
@@ -152,7 +152,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
 
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
         self:PlaySendEmergencyMessageAudio();
-    else        
+    else
         self:PlayReceiveEmergencyMessageAudio();
     end
 

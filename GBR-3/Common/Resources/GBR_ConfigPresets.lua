@@ -5,7 +5,8 @@ GBR_ConfigPresets.BuzzBox =
     char =
     {
         DeviceName = "buzzbox",
-        ActiveFrequency = "GBRADIO",
+        PrimaryFrequency = "GBRADIO",
+        RadioMessageDelay = 1.5,
         Channels =
         {
             ["DEFAULT"] =

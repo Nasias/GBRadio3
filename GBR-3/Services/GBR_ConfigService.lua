@@ -14,87 +14,6 @@ function GBR_ConfigService:New(obj)
 
 end
 
-function GBR_ConfigService:GetRegisteredCommunicationFrequencies()
-
-    local registeredFrequencies = {};
-
-    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
-        registeredFrequencies[v.ChannelSettings.ChannelFrequency] = true;
-    end
-
-    return registeredFrequencies;
-
-end
-
-function GBR_ConfigService:GetAddonChannelPrefix()
-    
-    return GBR_Constants.OPT_ADDON_CHANNEL_PREFIX;
-
-end
-
-function GBR_ConfigService:GetCommChannelName()
-    
-    return GBR_Constants.OPT_COMM_CHANNEL_NAME;
-
-end
-
-function GBR_ConfigService:GetCommChannelTarget()
-    
-    return GBR_Constants.OPT_COMM_CHANNEL_TARGET;
-
-end
-
-function GBR_ConfigService:GetCharacterGender()
-
-    return UnitSex(GBR_Constants.ID_PLAYER);
-
-end
-
-function GBR_ConfigService:GetDefaultNamePreference()
-
-    return GBR_ENameType.Character;
-
-end
-
-function GBR_ConfigService:IsSendMessageAudioEnabled()
-
-    return true;
-
-end
-
-function GBR_ConfigService:IsReceiveMessageAudioEnabled()
-
-    return true;
-
-end
-
-function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabled()
-
-    return true;
-
-end
-
-function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
-
-    return true;
-
-end
-
-function GBR_ConfigService:GetChatFrameForChannel(frequency)
-    local settings = self:GetSettingsForFrequency(frequency);    
-    return settings.ChannelSettings.ChannelChatFrame;
-end
-
-function GBR_ConfigService:GetSettingsForFrequency(frequency)
-
-    for k,v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
-        if v.ChannelSettings.ChannelFrequency == frequency then
-            return v;
-        end
-    end
-
-end
-
 function GBR_ConfigService:Initialize()
 
     local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
@@ -114,16 +33,105 @@ function GBR_ConfigService:Initialize()
                 order = 0,
                 args = 
                 {
-                    name = 
+                    deviceConfigGroup =
                     {
-                        name = "Comms Device Name",
-                        desc = "The name of your comms device\n\nNote: This is used in emotes to describe the type of device you have, as well as in messages.",
-                        type = "input",
-                        --set = function(info, value) GBRadioSettingsDb.db.char["Name"] = val; end,
-                        --get = function(info, value) GBRadioSettingsDb.db.char["Name"]; end,
-                        width = "full",
-                        cmdHidden = true,
-                        order = 0
+                        type = "group",
+                        name = "Device configuration",
+                        guiInline = true,
+                        args =
+                        {
+                            deviceName = 
+                            {
+                                name = "Device name",
+                                desc = "The name of your comms device\n\nNote: This is used in emotes to describe the type of device you're using",
+                                type = "input",
+                                get = 
+                                    function(info) 
+                                        return GBRadioAddonData.SettingsDB.char.DeviceName;
+                                    end,
+                                set = 
+                                    function(info, value) 
+                                        GBRadioAddonData.SettingsDB.char.DeviceName = value;
+                                    end,
+                                width = "full",
+                                cmdHidden = true,
+                                order = 0
+                            },
+                            deviceNameDescription =
+                            {
+                                type = "description",
+                                name = "Your device's name is used in emotes to describe the type of device you're using.",
+                                order = 1
+                            },
+                            primaryChannel =
+                            {
+                                name = "Primary channel",
+                                desc = "Select the primary channel for your device.",
+                                type = "select",
+                                values = 
+                                    function()                                        
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        local channels = configService:GetRegisteredCommunicationFrequencies();
+                                        local dropdownValues = {};
+
+                                        for k,v in pairs(channels) do
+                                            dropdownValues[k] = GBR_ConfigService.GetChannelGroupName(v.IsEnabled, v.ChannelName, k);
+                                        end
+
+                                        return dropdownValues;
+                                    end,
+                                width = "full",
+                                sorting =
+                                    function()
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        local channels = configService:GetRegisteredCommunicationFrequencies();
+                                        local dropdownValues = {};
+
+                                        for k,v in pairs(channels) do
+                                            table.insert(dropdownValues, k);
+                                        end
+
+                                        table.sort(dropdownValues, function(a, b) return a < b end);
+                                        return dropdownValues;
+                                    end,
+                                get = 
+                                    function(info)
+                                        return GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+                                    end,
+                                set = 
+                                    function(info, value)                                        
+                                        GBRadioAddonData.SettingsDB.char.PrimaryFrequency = value;
+                                    end,
+                                order = 2
+                            },
+                            primaryChannelDescription =
+                            {
+                                type = "description",
+                                name = "You can listen on multiple different channels at once, but you can only send messages on one at a time.\n\nYour primary channel determines the channel that you use to send messages.",
+                                order = 3
+                            },
+                            radioMessagedDelay = 
+                            {
+                                type = "range",
+                                min = 0,
+                                max = 10,
+                                softMin = 0,
+                                softMax = 10,
+                                step = 0.5,
+                                width = "full",
+                                name = "Radio message delay (seconds)",
+                                desc = "The delay (in seconds) between /saying a message and the message being sent over the radio.\n\nThe purpose of this setting is to prevent messages appearing over the radio channel before your character has spoken it aloud in laggy environments.",
+                                get = 
+                                    function(info) 
+                                        return GBRadioAddonData.SettingsDB.char.RadioMessageDelay;
+                                    end,
+                                set = 
+                                    function(info, value) 
+                                        GBRadioAddonData.SettingsDB.char.RadioMessageDelay = value;
+                                    end,
+                                order = 4
+                            }
+                        }
                     }
                 }
             },
@@ -135,79 +143,94 @@ function GBR_ConfigService:Initialize()
                 order = 1,
                 args =
                 {
-                    newChannelName =
+                    addChannelGroup =
                     {
-                        name = "New channel name",
-                        desc = "Enter a descriptive name for the channel you would like to use.",
-                        type = "input",
-                        width = "full",
-                        cmdHidden = true,
-                        validate = GBR_ConfigService.ValidateChannelName,
-                        set = 
-                            function(info, value)
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                configService:SetNewChannelName(value);
-                            end,
-                        get = 
-                            function(info, value)
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                return configService:GetNewChannelName(value);
-                            end,
-                        order = 0,
-                    },
-                    newChannelFrequency =
-                    {
-                        name = "New channel frequency",
-                        desc = "Enter a descriptive name for the channel you would like to use.",
-                        type = "input",
-                        width = "full",
-                        cmdHidden = true,
-                        validate = GBR_ConfigService.ValidateChannelFrequency,
-                        set = 
-                            function(info, value)
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                configService:SetNewChannelFrequency(value);
-                            end,
-                        get = 
-                            function(info, value)
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                return configService:GetNewChannelFrequency(value);
-                            end,
-                        order = 1,
-                    },
-                    addNewChannelButton =
-                    {
+                        type = "group",
                         name = "Add new channel",
-                        type = "execute",
-                        disabled = 
-                            function(info) 
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                configService:IsAddChannelReady(info);
-                            end,
-                        order = 2,
-                        func = 
-                            function(info, value)
-                                
-                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                local newChannelName = configService:GetNewChannelName();
-                                local newChannelFrequency = configService:GetNewChannelFrequency();
-                                local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
-                                local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-                                local channelKey = configService:GetNextChannelKey();
+                        guiInline = true,
+                        order = 0,
+                        args =
+                        {
+                            addChannelDescription =
+                            {
+                                type = "description",
+                                name = "Add a new channel by providing a name and frequency that you'd like to use.\n\nNote that you can't use the same frequency on multiple channels.",
+                                order = 0
+                            },
+                            newChannelName =
+                            {
+                                name = "New channel name",
+                                desc = "Enter a descriptive name for the channel you would like to use.",
+                                type = "input",
+                                width = "full",
+                                cmdHidden = true,
+                                validate = GBR_ConfigService.ValidateChannelName,
+                                set = 
+                                    function(info, value)
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        configService:SetNewChannelName(value);
+                                    end,
+                                get = 
+                                    function(info, value)
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        return configService:GetNewChannelName(value);
+                                    end,
+                                order = 0,
+                            },
+                            newChannelFrequency =
+                            {
+                                name = "New channel frequency",
+                                desc = "Enter a descriptive name for the channel you would like to use.",
+                                type = "input",
+                                width = "full",
+                                cmdHidden = true,
+                                validate = GBR_ConfigService.ValidateChannelFrequency,
+                                set = 
+                                    function(info, value)
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        configService:SetNewChannelFrequency(value);
+                                    end,
+                                get = 
+                                    function(info, value)
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        return configService:GetNewChannelFrequency(value);
+                                    end,
+                                order = 1,
+                            },
+                            addNewChannelButton =
+                            {
+                                name = "Add new channel",
+                                type = "execute",
+                                disabled = 
+                                    function(info) 
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        return configService:IsAddChannelReady(info);
+                                    end,
+                                order = 2,
+                                func = 
+                                    function(info, value)                                        
+                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                        local newChannelName = configService:GetNewChannelName();
+                                        local newChannelFrequency = configService:GetNewChannelFrequency();
+                                        local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
+                                        local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                                        local channelKey = configService:GetNextChannelKey();
 
-                                GBR_ConfigService.AddChannelToUi(
-                                    addon.OptionsTable.args.channelConfig.args, 
-                                    channelKey, 
-                                    newSettingsModel);
+                                        GBR_ConfigService.AddChannelToUi(
+                                            addon.OptionsTable.args.channelConfig.args, 
+                                            channelKey, 
+                                            newSettingsModel);
 
-                                GBR_ConfigService.AddChannelToDb(
-                                    GBRadioAddonData.SettingsDB.char.Channels,
-                                    channelKey,
-                                    newSettingsModel);
+                                        GBR_ConfigService.AddChannelToDb(
+                                            GBRadioAddonData.SettingsDB.char.Channels,
+                                            channelKey,
+                                            newSettingsModel);
 
-                                configService:SetNewChannelName("");
-                                configService:SetNewChannelFrequency("");
-                            end
+                                        configService:SetNewChannelName("");
+                                        configService:SetNewChannelFrequency("");
+                                    end
+                            }
+                        }
                     }
                 }
             }
@@ -222,7 +245,6 @@ function GBR_ConfigService:Initialize()
     addon.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GBRadio3", "GBRadio3");
 
 end
-
 
 function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
 
@@ -429,7 +451,18 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     type = "execute",
                     name = "DELETE CHANNEL",
                     width = "full",
-                    confirm = function() return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!" end
+                    confirm = 
+                        function()
+                            return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!"
+                        end,
+                    func =
+                        function(info, value)
+                            local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                            local key = info[#info-3];
+
+                            GBRadioAddonData.SettingsDB.char.Channels[key] = nil;
+                            addon.OptionsTable.args.channelConfig.args[key] = nil;
+                        end
                 }
             }
         }
@@ -943,7 +976,7 @@ end
 
 function GBR_ConfigService.GetChannelGroupName(channelIsEnabled, channelName, channelFrequency)
     --local isEnabledElement = channelIsEnabled and "|cFF00FF00•|r" or "|cFFFF0000•|r";
-    local isEnabledElement = channelIsEnabled and "|TInterface\\COMMON\\Indicator-Green:16|t" or "|TInterface\\COMMON\\Indicator-Red:16|t";
+    local isEnabledElement = channelIsEnabled and "|TInterface\\COMMON\\Indicator-Green:16:16:0:-2|t" or "|TInterface\\COMMON\\Indicator-Red:16:16:0:-2|t";
     return isEnabledElement .. " " .. channelName .. " (".. channelFrequency ..")";
 end
 
@@ -972,4 +1005,93 @@ function GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value)
         end;
     end
     return true;
+end
+
+
+function GBR_ConfigService:GetRegisteredCommunicationFrequencies()
+
+    local registeredFrequencies = {};
+
+    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        registeredFrequencies[v.ChannelSettings.ChannelFrequency] =
+        {
+            ChannelKey = k,
+            ChannelName = v.ChannelSettings.ChannelName,
+            IsEnabled = v.ChannelSettings.ChannelIsEnabled,
+        };
+    end
+
+    return registeredFrequencies;
+
+end
+
+------------------------------------------------------
+
+function GBR_ConfigService:GetAddonChannelPrefix()
+    
+    return GBR_Constants.OPT_ADDON_CHANNEL_PREFIX;
+
+end
+
+function GBR_ConfigService:GetCommChannelName()
+    
+    return GBR_Constants.OPT_COMM_CHANNEL_NAME;
+
+end
+
+function GBR_ConfigService:GetCommChannelTarget()
+    
+    return GBR_Constants.OPT_COMM_CHANNEL_TARGET;
+
+end
+
+function GBR_ConfigService:GetCharacterGender()
+
+    return UnitSex(GBR_Constants.ID_PLAYER);
+
+end
+
+function GBR_ConfigService:GetDefaultNamePreference()
+
+    return GBR_ENameType.Character;
+
+end
+
+function GBR_ConfigService:IsSendMessageAudioEnabled()
+
+    return GBRadioAddonData.SettingsDB.char.ch;
+
+end
+
+function GBR_ConfigService:IsReceiveMessageAudioEnabled()
+
+    return true;
+
+end
+
+function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabled()
+
+    return true;
+
+end
+
+function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
+
+    return true;
+
+end
+
+function GBR_ConfigService:GetChatFrameForChannel(frequency)
+    local settings = self:GetSettingsForFrequency(frequency);    
+    return settings.ChannelSettings.ChannelChatFrame;
+end
+
+function GBR_ConfigService:GetSettingsForFrequency(frequency)
+
+    for k,v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+        if v.ChannelSettings.ChannelFrequency == frequency then
+            return v;
+        end
+    end
+
 end
