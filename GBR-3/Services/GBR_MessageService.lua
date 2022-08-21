@@ -25,6 +25,7 @@ function GBR_MessageService:SendMessage(messageModel)
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,
         [GBR_EMessageType.SilentSpeech] = self.SendSilentSpeechMessage,
         [GBR_EMessageType.Emergency] = self.SendEmergencyMessage,
+        [GBR_EMessageType.WhoIsListening] = self.SendWhoIsListeningMessage
     };
 
     t[messageModel.MessageData.MessageType](self, messageModel);
@@ -49,7 +50,9 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
     {
         [GBR_EMessageType.Speech] = self.ProcessReceivedSpeechMessage,
         [GBR_EMessageType.SilentSpeech] = self.ProcessReceivedSpeechMessage,
-        [GBR_EMessageType.Emergency] = self.ProcessReceivedEmergencyMessage
+        [GBR_EMessageType.Emergency] = self.ProcessReceivedEmergencyMessage,
+        [GBR_EMessageType.WhoIsListening] = self.ProcessReceivedWhoIsListeningMessage,
+        [GBR_EMessageType.IAmListening] = self.ProcessReceivedIAmListeningMessage,
     };
 
     messageProcessor[messageModel.MessageData.MessageType](self, messageModel);
@@ -121,6 +124,43 @@ function GBR_MessageService:SendEmergencyMessage(messageModel)
         GetChannelName(self._configService.GetCommChannelName()),
         "ALERT");
 
+end
+
+function GBR_MessageService:SendWhoIsListeningMessage(messageModel)    
+
+    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
+
+    self._communicationLib:SendCommMessage(
+        self._configService.GetAddonChannelPrefix(),
+        serializedMessageData,
+        self._configService.GetCommChannelTarget(),
+        GetChannelName(self._configService.GetCommChannelName()),
+        "ALERT");
+end
+
+function GBR_MessageService:SendIAmListeningMessage(responseFrequency)    
+
+    local messageModel = GBR_MessageModel:New
+    {
+        MessageData =
+        {
+            CharacterModel = self._playerService:GetCurrentCharacterModel(),
+            Frequency = responseFrequency,
+            MessageType = GBR_EMessageType.IAmListening,
+        }
+    };
+
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
+
+        self._communicationLib:SendCommMessage(
+            self._configService.GetAddonChannelPrefix(),
+            serializedMessageData,
+            self._configService.GetCommChannelTarget(),
+            GetChannelName(self._configService.GetCommChannelName()),
+            "ALERT");
 end
 
 function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
@@ -195,6 +235,36 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
     else
         self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
     end
+
+end
+
+function GBR_MessageService:ProcessReceivedWhoIsListeningMessage(messageModel)
+
+    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
+
+    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
+        return;
+    end
+
+    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
+    local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
+
+    self:SendIAmListeningMessage(messageModel.MessageData.Frequency);
+
+end
+
+function GBR_MessageService:ProcessReceivedIAmListeningMessage(messageModel)
+
+    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
+
+    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
+        return;
+    end
+
+    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
+    local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
+
+    self._configService:AddFrequencyListener(messageModel.MessageData.Frequency, characterName);
 
 end
 
@@ -311,7 +381,7 @@ function GBR_MessageService:ProcessReceiveEmote(frequency)
     local deviceName = self._configService:GetDeviceName();
     local radioVerb = GBR_Constants.MSG_EMOTE_RECEIVE_VERBS[math.random(1, #GBR_Constants.MSG_EMOTE_RECEIVE_VERBS)];
 
-    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_RECEIVE_MESSAGE, deviceName, radioVerb, pronouns.C), "EMOTE");
+    SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_RECEIVE_MESSAGE, deviceName, radioVerb), "EMOTE");
     self:StartChannelEmoteCooldownForFrequency(frequency);
 end
 

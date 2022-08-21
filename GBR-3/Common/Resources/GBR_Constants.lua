@@ -44,7 +44,7 @@ GBR_Constants =
     -- colour, frequency, charactername, displayname, message
     MSG_RADIO_MESSAGE = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:0:0:16:16:0:16:0:16:0:255:0|t %s[%s] [|Hplayer:%s|h%s|h]: %s",
     -- colour, frequency, charactername, displayname, location, coord-x, coord-y
-    MSG_RADIO_EMERGENCY = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s (%.3f, %.3f).",
+    MSG_RADIO_EMERGENCY = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s (%.2f, %.2f).",
     -- colour, frequency, charactername, displayname, location
     MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s]",
 
@@ -58,7 +58,7 @@ GBR_Constants =
     MSG_EMOTE_EMERGENCY_SEND_MESSAGE = "presses the emergency button on %s %s.",
 
     -- device name, audio cue (crackles, buzzes), pronoun
-    MSG_EMOTE_RECEIVE_MESSAGE = "'s %s %s as %s receives a message.",
+    MSG_EMOTE_RECEIVE_MESSAGE = "'s %s %s as a message is received.",
 
     MSG_EMOTE_RECEIVE_VERBS =
     {

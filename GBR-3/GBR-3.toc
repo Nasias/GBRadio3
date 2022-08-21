@@ -26,6 +26,7 @@ Common/Helpers/GBR_Table.lua
 
 Common/Resources/GBR_ConfigPresets.lua
 
+Models/GBR_IAmListeningModel.lua
 Models/GBR_CharacterModel.lua
 Models/GBR_CommChannelModel.lua
 Models/GBR_LocationModel.lua
