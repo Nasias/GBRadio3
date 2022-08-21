@@ -633,6 +633,41 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                         end,
                 }
             }
+        },
+        displayNameGroup =
+        {
+            order = 1,
+            type = "group",
+            name = "Identity preview",
+            guiInline = true,
+            args =
+            {
+                displayNamePreviewDesc =
+                {
+                    name = "Your name will appear in messages as the example below:\n\n",
+                    type = "description",
+                    order = 0
+                },
+                displayNamePreview =
+                {
+                    name = 
+                        function(info)
+                            local key = info[#info-3];
+                            local frequency = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+
+                            return "|cFF00FF00[" .. GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency) .. "]|r";
+                        end,
+                    type = "description",
+                    fontSize = "medium",
+                    order = 1
+                },
+                displayNamePreviewHelpDesc =
+                {
+                    name = "|CFFFFFF00\nNote that if you use a TRP3 name option or a callsign option, but you don't have TRP3 installed or you don't specify a callsign, then those respective elements will either default back to your base character name, or they will be omitted.",
+                    type = "description",
+                    order = 2
+                },
+            }
         }
     }
 
@@ -1074,9 +1109,10 @@ function GBR_ConfigService.GetNewSettingsModel(frequency, channelName)
             EmoteOnEmergency = true,
             AudioOnSend = true,
             AudioOnReceive = true,
-            AudioOnEmergency = true,
-            ChannelEmoteCooldown = 5,
-            ChannelAudioCooldown = 5,
+            AudioOnEmergencySend = true,
+            AudioOnEmergencyReceive = true,
+            ChannelEmoteCooldown = 10,
+            ChannelAudioCooldown = 10,
         }
     };
 end
