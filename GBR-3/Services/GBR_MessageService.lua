@@ -261,10 +261,7 @@ function GBR_MessageService:ProcessReceivedIAmListeningMessage(messageModel)
         return;
     end
 
-    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
-    local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
-
-    self._configService:AddFrequencyListener(messageModel.MessageData.Frequency, characterName);
+    self._configService:AddFrequencyListener(messageModel.MessageData.Frequency, messageModel.MessageData.CharacterModel.CharacterName);
 
 end
 
