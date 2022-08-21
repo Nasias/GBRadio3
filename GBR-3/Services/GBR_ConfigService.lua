@@ -23,7 +23,7 @@ function GBR_ConfigService:Initialize()
     addon.OptionsTable = 
     {
         type = "group",
-        name = "GBRadio " .. GBR_Constants.OPT_ADDON_VERSION,
+        name = "GB|cff00c0ffRadio|r 3 (v3.0.0) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
         childGroups = "tree",
         handler = addon,        
         args = {
@@ -247,100 +247,159 @@ function GBR_ConfigService:Initialize()
                 type = "group",
                 name = "Channels",
                 cmdHidden = true,
+                childGroups = "tree",
                 order = 2,
                 args =
                 {
-                    addChannelGroup =
+                    addChannelGroupPage =
                     {
                         type = "group",
-                        name = "Add new channel",
-                        guiInline = true,
-                        order = 0,
+                        name = "|TInterface\\BUTTONS\\UI-PlusButton-Up:16:16:0:0|t Add new channel",
+                        order = 999,
                         args =
                         {
-                            addChannelDescription =
+                            addChannelGroup =
                             {
-                                type = "description",
-                                name = "Add a new channel by providing a name and frequency that you'd like to use.\n\nNote that you can't use the same frequency on multiple channels.",
-                                order = 0
-                            },
-                            newChannelName =
-                            {
-                                name = "New channel name",
-                                desc = "Enter a descriptive name for the channel you would like to use.",
-                                type = "input",
-                                width = "full",
-                                cmdHidden = true,
-                                validate = GBR_ConfigService.ValidateChannelName,
-                                set = 
-                                    function(info, value)
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        configService:SetNewChannelName(value);
-                                    end,
-                                get = 
-                                    function(info, value)
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        return configService:GetNewChannelName(value);
-                                    end,
-                                order = 0,
-                            },
-                            newChannelFrequency =
-                            {
-                                name = "New channel frequency",
-                                desc = "Enter a descriptive name for the channel you would like to use.",
-                                type = "input",
-                                width = "full",
-                                cmdHidden = true,
-                                validate = GBR_ConfigService.ValidateChannelFrequency,
-                                set = 
-                                    function(info, value)
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        configService:SetNewChannelFrequency(value);
-                                    end,
-                                get = 
-                                    function(info, value)
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        return configService:GetNewChannelFrequency(value);
-                                    end,
-                                order = 1,
-                            },
-                            addNewChannelButton =
-                            {
+                                type = "group",
                                 name = "Add new channel",
-                                type = "execute",
-                                disabled = 
-                                    function(info) 
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        return configService:IsAddChannelReady(info);
-                                    end,
-                                order = 2,
-                                func = 
-                                    function(info, value)                                        
-                                        local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                        local newChannelName = configService:GetNewChannelName();
-                                        local newChannelFrequency = configService:GetNewChannelFrequency();
-                                        local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
-                                        local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-                                        local channelKey = configService:GetNextChannelKey();
+                                order = 0,
+                                guiInline = true,
+                                args =
+                                {
+                                    addChannelDescription =
+                                    {
+                                        type = "description",
+                                        name = "Add a new channel by providing a name and frequency that you'd like to use.\n\nNote that you can't use the same frequency on multiple channels.",
+                                        order = 0
+                                    },
+                                    newChannelName =
+                                    {
+                                        name = "New channel name",
+                                        desc = "Enter a descriptive name for the channel you would like to use.",
+                                        type = "input",
+                                        width = "full",
+                                        cmdHidden = true,
+                                        validate = GBR_ConfigService.ValidateChannelName,
+                                        set = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                configService:SetNewChannelName(value);
+                                            end,
+                                        get = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                return configService:GetNewChannelName(value);
+                                            end,
+                                        order = 0,
+                                    },
+                                    newChannelFrequency =
+                                    {
+                                        name = "New channel frequency",
+                                        desc = "Enter a descriptive name for the channel you would like to use.",
+                                        type = "input",
+                                        width = "full",
+                                        cmdHidden = true,
+                                        validate = GBR_ConfigService.ValidateChannelFrequency,
+                                        set = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                configService:SetNewChannelFrequency(value);
+                                            end,
+                                        get = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                return configService:GetNewChannelFrequency(value);
+                                            end,
+                                        order = 1,
+                                    },
+                                    addNewChannelButton =
+                                    {
+                                        name = "Add new channel",
+                                        type = "execute",
+                                        disabled = 
+                                            function(info) 
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                return configService:IsAddChannelReady(info);
+                                            end,
+                                        order = 2,
+                                        func = 
+                                            function(info, value)                                        
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                local newChannelName = configService:GetNewChannelName();
+                                                local newChannelFrequency = configService:GetNewChannelFrequency();
+                                                local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
+                                                local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                                                local channelKey = configService:GetNextChannelKey();
 
-                                        GBR_ConfigService.AddChannelToUi(
-                                            addon.OptionsTable.args.channelConfig.args, 
-                                            channelKey, 
-                                            newSettingsModel);
+                                                GBR_ConfigService.AddChannelToUi(
+                                                    addon.OptionsTable.args.channelConfig.args, 
+                                                    channelKey, 
+                                                    newSettingsModel);
 
-                                        GBR_ConfigService.AddChannelToDb(
-                                            GBRadioAddonData.SettingsDB.char.Channels,
-                                            channelKey,
-                                            newSettingsModel);
+                                                GBR_ConfigService.AddChannelToDb(
+                                                    GBRadioAddonData.SettingsDB.char.Channels,
+                                                    channelKey,
+                                                    newSettingsModel);
 
-                                        configService:SetNewChannelName("");
-                                        configService:SetNewChannelFrequency("");
-                                    end
+                                                configService:SetNewChannelName("");
+                                                configService:SetNewChannelFrequency("");
+                                            end
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            },            
+            geoLocationTools =
+            {
+                name = "Geolocation tools",
+                type = "group",
+                order = 3,
+                args =
+                {
+                    geoLocationToolsGroup =
+                    {
+                        name = "Geolocation Tools",
+                        type = "group",
+                        guiInline = true,
+                        order = 0,
+                        args =
+                        {
+                            geoLocationToolsDesc =
+                            {
+                                name = "A number of components of GBRadio use a coordinates system, such as transmitter locations.\n\nUse the geolocation tools to find out your local or world coordinates to help you discover these values.",
+                                type = "description",
+                                order = 0
+                            },
+                            worldCoordinatesInput =
+                            {
+                                name = "World coordinates",
+                                type = "input",
+                                order = 1,
+                            },
+                            getWorldCoordinatesButton =
+                            {
+                                name = "Get world coordinates",
+                                type = "execute",
+                                order = 2,
+                            },
+                            localCoordinatesInput =
+                            {
+                                name = "World coordinates",
+                                type = "input",
+                                order = 3,
+                            },
+                            getLocalCoordinatesButton =
+                            {
+                                name = "Get local coordinates",
+                                type = "execute",
+                                order = 4,
+                            },
+                        }
+                    }                    
+                }
+            },
         }
     };
 
@@ -349,7 +408,7 @@ function GBR_ConfigService:Initialize()
     end
     
     addon.ConfigRegistry = LibStub("AceConfig-3.0"):RegisterOptionsTable("GBRadio3", addon.OptionsTable);
-    addon.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GBRadio3", "GBRadio3");
+    addon.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GBRadio3", "GB|cff00c0ffRadio|r 3");
 
 end
 
@@ -891,18 +950,216 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
 
     return
     {
-        channelName = {
-            name = "Channel Name",
-            desc = "Enter the channel name",
-            type = "input",
-            cmdHidden = true,
-            set = function(info, value) GBR_ConfigService.AddChannel(value) end
-        },
-        deleteChannel = {
-            name = "Delete Channel",
-            desc = "Delete this channel",
-            type = "execute"
-        }
+        transmitterSettingsGroup =
+        {
+            type = "group",
+            name = "Transmitter config",
+            order = 0,
+            childGroups = "tree",
+            args =
+            {
+                transmitterSettings =
+                {
+                    name = "Transmitter configuration",
+                    type = "group",
+                    guiInline = true,
+                    order = 0,
+                    args =
+                    {
+                        useTransmitters =
+                        {
+                            name = "Use transmitters",
+                            type = "toggle",
+                            order = 0,
+                        },
+                        transmitterRange =
+                        {
+                            name = "Range (yards)",
+                            type = "range",
+                            min = 0,
+                            max = 10000,
+                            softMin = 0,
+                            softMax = 1000,
+                            step = 1,
+                            width = "full",
+                        },
+                        lowIntensityInterferenceFalloff =
+                        {
+                            name = "Static(L) falloff (yards)",
+                            type = "range",
+                            min = 0,
+                            max = 10000,
+                            softMin = 0,
+                            softMax = 1000,
+                            step = 1,
+                            width = "full",
+                        },
+                        HighIntensityInterferenceFalloff =
+                        {
+                            name = "Static(H) falloff (yards)",
+                            type = "range",
+                            min = 0,
+                            max = 10000,
+                            softMin = 0,
+                            softMax = 1000,
+                            step = 1,
+                            width = "full",
+                        }
+                    }
+                },
+                addTransmitterGroup =
+                {
+                    type = "group",
+                    name = "Add new transmitter",
+                    args =
+                    {
+                        addTransmitterDescription =
+                        {
+                            type = "description",
+                            name = "Add a new transmitter at your current location by providing a name and clicking \"Add at my location\".",
+                            order = 0
+                        },
+                        newTransmitterName =
+                        {
+                            name = "New transmitter name",
+                            desc = "Enter a descriptive name for this transmitter.",
+                            type = "input",
+                            cmdHidden = true,
+                            validate = GBR_ConfigService.ValidateTransmitterName,
+                            -- set = 
+                            --     function(info, value)
+                            --         local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                            --         configService:SetNewChannelName(value);
+                            --     end,
+                            -- get = 
+                            --     function(info, value)
+                            --         local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                            --         return configService:GetNewChannelName(value);
+                            --     end,
+                            order = 1,
+                        },
+                        addNewTransmitterButton =
+                        {
+                            name = "Add at my location",
+                            type = "execute",
+                            -- disabled = 
+                            --     function(info) 
+                            --         local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                            --         return configService:IsAddChannelReady(info);
+                            --     end,
+                            order = 2,
+                            -- func = 
+                            --     function(info, value)                                        
+                            --         local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                            --         local newChannelName = configService:GetNewChannelName();
+                            --         local newChannelFrequency = configService:GetNewChannelFrequency();
+                            --         local newSettingsModel = GBR_ConfigService.GetNewSettingsModel(newChannelFrequency, newChannelName);
+                            --         local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                            --         local channelKey = configService:GetNextChannelKey();
+        
+                            --         GBR_ConfigService.AddChannelToUi(
+                            --             addon.OptionsTable.args.channelConfig.args, 
+                            --             channelKey, 
+                            --             newSettingsModel);
+        
+                            --         GBR_ConfigService.AddChannelToDb(
+                            --             GBRadioAddonData.SettingsDB.char.Channels,
+                            --             channelKey,
+                            --             newSettingsModel);
+        
+                            --         configService:SetNewChannelName("");
+                            --         configService:SetNewChannelFrequency("");
+                            --     end
+                        }
+                    }
+                },
+                tmp = {
+                    name = "Test transmitter 1",
+                    type = "group",
+                    args =
+                    {
+                        transmitterIsActive =
+                        {
+                            name = "Transmitter is enabled",
+                            type = "toggle",
+                            order = 0,
+                            width = "full",
+                        },
+                        transmitterName =
+                        {
+                            name = "Transmitter name",
+                            type = "input",
+                            order = 1,
+                            width = "full",
+                        },
+                        transmitterCoordX =
+                        {
+                            name = "X Pos",
+                            type = "input",
+                            width = "half",
+                            order = 2,
+                        },
+                        transmitterCoordY =
+                        {
+                            name = "Y Pos",
+                            type = "input",
+                            width = "half",
+                            order = 3,
+                        },
+                        updateCoordsToCurrentLocationButton =
+                        {
+                            name = "Use current location",
+                            type = "execute",
+                            order = 4,
+                        },
+                        transmitterDescription =
+                        {
+                            name = "Transmitter notes",
+                            type = "input",
+                            order = 5,
+                            multiline = 4,
+                            width = "full"
+                        }
+                    }
+                },
+                tmp2 = {
+                    name = "Test transmitter 2",
+                    type = "group",
+                    args =
+                    {
+                        transmitterName =
+                        {
+                            name = "Transmitter name",
+                            type = "input",
+                            order = 0,
+                            width = "full",
+                        },
+                        transmitterCoordX =
+                        {
+                            name = "X Pos",
+                            type = "input",
+                            width = "half",
+                            order = 1,
+                        },
+                        transmitterCoordY =
+                        {
+                            name = "Y Pos",
+                            type = "input",
+                            width = "half",
+                            order = 2,
+                        },
+                        transmitterDescription =
+                        {
+                            name = "Transmitter notes",
+                            type = "input",
+                            order = 4,
+                            multiline = 4,
+                            width = "full"
+                        }
+                    }
+                }   
+            }
+        }        
     }
 
 end
@@ -959,8 +1216,8 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
                 type = "group",
                 name = "Transmitter",
                 args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(channelData),
-                order = 4,
-                disabled = true
+                childGroups = "tree",
+                order = 4
             },
             channelAdminPage =
             {

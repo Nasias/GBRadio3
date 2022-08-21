@@ -40,8 +40,10 @@ end
 
 function GBR_MessageService:ReceiveMessage(serializedMessageData)
 
-    local serializedMessageModel = GBR_SerializableMessageModel:New(self._serialiserService:Deserialize(serializedMessageData));
-    local messageModel = serializedMessageModel:ToMessageModel();
+    local messageModel = GBR_MessageModel:New
+    {
+        MessageData = self._serialiserService:Deserialize(serializedMessageData)
+    };
 
     local messageProcessor =
     {
@@ -60,8 +62,7 @@ function GBR_MessageService:SendSpeechMessage(messageModel)
     messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
     messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
 
-    local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
-    --self._communicationLib:SendCommMessage(self._configService.GetAddonChannelPrefix(), serializedMessageData, self._configService.GetCommChannelTarget(), GetChannelName(self._configService.GetCommChannelName()), "ALERT");
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
     self:ProcessSendEmote();
     self:ProcessSendSpeech(messageModel);
@@ -84,7 +85,7 @@ function GBR_MessageService:SendSilentSpeechMessage(messageModel)
     messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
     messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
 
-    local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
     self:ProcessSilentSendEmote();
 
@@ -106,7 +107,7 @@ function GBR_MessageService:SendEmergencyMessage(messageModel)
     messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
     messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
 
-    local serializedMessageData = self._serialiserService:Serialize(messageModel:ToSerializeableMessageModel());
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
     self:ProcessEmergencySendEmote();
 

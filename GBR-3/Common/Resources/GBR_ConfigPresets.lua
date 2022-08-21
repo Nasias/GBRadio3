@@ -48,6 +48,23 @@ GBR_ConfigPresets.BuzzBox =
                     AudioOnEmergencyReceive = true,
                     ChannelEmoteCooldown = 10,
                     ChannelAudioCooldown = 10,
+                },
+                TransmitterSettings =
+                {
+                    UseTransmitters = false,
+                    TransmitterRange = 0,
+                    LowIntensityInterferenceFalloff = 0,
+                    HighntensityInterferenceFalloff = 0,
+                    StationaryTransmitters = {
+                        ["DEFAULT"] =
+                        {
+                            TransmitterIsEnabled = true,
+                            TransmitterName = "Default",
+                            TransmitterNotes = "This is the default transmitter for this channel. You can freely change or delete this transmitter's settings.",
+                            PositionX = 0,
+                            PositionY = 0,
+                        }
+                    }
                 }
             }
         }

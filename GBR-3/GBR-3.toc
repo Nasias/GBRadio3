@@ -29,7 +29,6 @@ Common/Resources/GBR_ConfigPresets.lua
 Models/GBR_CharacterModel.lua
 Models/GBR_CommChannelModel.lua
 Models/GBR_LocationModel.lua
-Models/GBR_SerializableMessageModel.lua
 Models/GBR_MessageModel.lua
 
 Services/GBR_CommandService.lua
