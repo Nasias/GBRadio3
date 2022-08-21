@@ -2,6 +2,8 @@ GBR_ConfigService = GBR_Object:New();
 
 function GBR_ConfigService:New(obj)
 
+    self._mrpService = GBR_Singletons:FetchService(GBR_Constants.SRV_MRP_SERVICE);
+
     self.StagingVars =
     {
         NewChannelName = nil,
@@ -151,6 +153,12 @@ function GBR_ConfigService:Initialize()
                         guiInline = true,
                         args =
                         {
+                            characterGenderDesc =
+                            {
+                                name = "Select from a pre-set list of genders for your character, or specify your own custom pronouns to use in auto-generated emotes.",
+                                type = "description",
+                                order = 0
+                            },
                             characterGender =
                             {
                                 name = "Character gender",
@@ -169,7 +177,7 @@ function GBR_ConfigService:Initialize()
                                         GBRadioAddonData.SettingsDB.char.Gender = value;
                                         GBR_ConfigService.SetPronouns(newPronouns);
                                     end,
-                                order = 0
+                                order = 1
                             },
                             customPronounA =
                             {
@@ -181,7 +189,7 @@ function GBR_ConfigService:Initialize()
                                         local pronouns = GBR_ConfigService.GetCharacterPronouns();
                                         return pronouns.A;
                                     end,
-                                order = 1
+                                order = 2
                             },
                             customPronounB =
                             {
@@ -193,7 +201,7 @@ function GBR_ConfigService:Initialize()
                                         local pronouns = GBR_ConfigService.GetCharacterPronouns();
                                         return pronouns.B;
                                     end,
-                                order = 2
+                                order = 3
                             },
                             customPronounC =
                             {
@@ -205,7 +213,13 @@ function GBR_ConfigService:Initialize()
                                         local pronouns = GBR_ConfigService.GetCharacterPronouns();
                                         return pronouns.C;
                                     end,
-                                order = 3
+                                order = 4
+                            },
+                            characterVoiceTypeDesc =
+                            {
+                                name = "Your character's voice type determines the voice audio that plays when messages are sent and received.",
+                                type = "description",
+                                order = 5
                             },
                             characterVoiceType =
                             {
@@ -222,7 +236,7 @@ function GBR_ConfigService:Initialize()
                                     function(info, value)
                                         GBRadioAddonData.SettingsDB.char.VoiceType = value;
                                     end,
-                                order = 4
+                                order = 6
                             },
                         }
                     }
@@ -1259,6 +1273,59 @@ function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
 
     local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.AudioOnEmergencySend;
+
+end
+
+function GBR_ConfigService:GetChannelEmoteCooldownPeriodForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.ChannelEmoteCooldown;
+
+end
+
+function GBR_ConfigService:GetChannelAudioCooldownPeriodForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.ChannelAudioCooldown;
+
+end
+
+function GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    local t =
+    {
+        [GBR_ENameType.Character] = function()
+            return UnitName(GBR_Constants.ID_PLAYER);
+        end,
+        [GBR_ENameType.Mrp] = function()
+            return self._mrpService:GetPlayerName();
+        end,
+        [GBR_ENameType.Callsign] = function()
+            return settingsForFrequency.IdentitySettings.ChannelCallsign;
+        end,
+        [GBR_ENameType.MrpWithCallsign] = function()
+            local playerName = self._mrpService:GetPlayerName();
+            
+            if playerName == nil then
+                playerName = UnitName(GBR_Constants.ID_PLAYER)
+            end
+
+            if settingsForFrequency.IdentitySettings.ChannelCallsign ~= nil and settingsForFrequency.IdentitySettings.ChannelCallsign:len() > 1 then
+                playerName = playerName .. " (" .. settingsForFrequency.IdentitySettings.ChannelCallsign .. ")";
+            end
+
+            return playerName;
+        end,
+    };
+
+    local displayName = t[settingsForFrequency.IdentitySettings.IdentifyOnChannelAs]();
+
+    if displayName == nil or displayName:len() < 1 then
+        displayName = UnitName(GBR_Constants.ID_PLAYER);
+    end
+
+    return displayName;
 
 end
 

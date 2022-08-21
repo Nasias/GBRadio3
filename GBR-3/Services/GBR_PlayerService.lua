@@ -12,12 +12,9 @@ end
 
 function GBR_PlayerService:GetCurrentCharacterModel()
 
-    local preferredNamePreference = GBR_ConfigService:GetDefaultNamePreference();
-
     return GBR_CharacterModel:New
     {
         CharacterName = UnitName(GBR_Constants.ID_PLAYER),
-        CharacterDisplayName = GBR_PlayerService:GetCharacterNameForNameType(preferredNamePreference),
         CharacterNameType = preferredNamePreference,
         CharacterColour = GBR_ARGB:New(),
         CharacterGender = self._configService:GetCharacterGender(),
@@ -32,8 +29,7 @@ function GBR_PlayerService:GetCharacterNameForNameType(nameType)
     local t =
     {
         [GBR_ENameType.Character] = UnitName(GBR_Constants.ID_PLAYER),
-        [GBR_ENameType.Mrp] = self._mrpService:GetPlayerName(),
-        [GBR_ENameType.Callsign] = "CALLSIGN",
+        [GBR_ENameType.Mrp] = self._mrpService:GetPlayerName()
     };
 
     return t[nameType];
