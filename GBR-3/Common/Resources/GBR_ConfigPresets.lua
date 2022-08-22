@@ -52,6 +52,7 @@ GBR_ConfigPresets.BuzzBox =
                 TransmitterSettings =
                 {
                     UseTransmitters = false,
+                    AlwaysOnInInstances = true,
                     TransmitterRange = 0,
                     LowIntensityInterferenceFalloff = 0,
                     HighntensityInterferenceFalloff = 0,
@@ -61,8 +62,15 @@ GBR_ConfigPresets.BuzzBox =
                             TransmitterIsEnabled = true,
                             TransmitterName = "Default",
                             TransmitterNotes = "This is the default transmitter for this channel. You can freely change or delete this transmitter's settings.",
-                            PositionX = 0,
-                            PositionY = 0,
+                            WorldPositionX = 0,
+                            WorldPositionY = 0,
+                            ZonePositionX = 0,
+                            ZonePositionY = 0,
+                            MapId = 0,
+                            WorldInstanceId = 0,
+                            MapTypeId = 0,
+                            Zone = "",
+                            SubZone = "",
                         }
                     }
                 }

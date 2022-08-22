@@ -10,8 +10,9 @@ end
 
 function GBR_LocationService:GetCurrentCharacterLocation()
 
-    local zonePositionX, zonePositionY, zoneMapId, zoneMapType = self._locationLib:GetPlayerZonePosition();
+    local zonePositionX, zonePositionY = self._locationLib:GetPlayerZonePosition();
     local worldPositionX, worldPositionY, worldInstanceId = self._locationLib:GetPlayerWorldPosition();
+    local zoneMapId, zoneMapType = self._locationLib:GetPlayerZone();
 
     local zone = GetZoneText();
     local subZone = GetSubZoneText();
@@ -36,7 +37,9 @@ function GBR_LocationService:GetCurrentCharacterLocation()
         WorldPosition = worldPositionVector,
         Zone = zone,
         SubZone = subZone,
-        MapId = mapId,
+        MapId = zoneMapId,
+        WorldInstanceId = worldInstanceId,
+        MapTypeId = zoneMapType,
         LocationType = GBR_ELocationType.Character
     };
 

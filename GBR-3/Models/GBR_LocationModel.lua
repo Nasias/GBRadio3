@@ -8,6 +8,8 @@ function GBR_LocationModel:New(obj)
     self.Zone = "";
     self.SubZone = "";
     self.MapId = "";
+    self.WorldInstanceId = "";
+    self.ZoneMapType = "";
     self.LocationType = GBR_ELocationType.Undefined;
 
     return self:RegisterNew(obj);
