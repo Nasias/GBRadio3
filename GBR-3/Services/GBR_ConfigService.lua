@@ -54,11 +54,11 @@ function GBR_ConfigService:Initialize()
                                 type = "input",
                                 get = 
                                     function(info) 
-                                        return GBRadioAddonData.SettingsDB.char.DeviceName;
+                                        return GBRadioAddonDataSettingsDB.char.DeviceName;
                                     end,
                                 set = 
                                     function(info, value) 
-                                        GBRadioAddonData.SettingsDB.char.DeviceName = value;
+                                        GBRadioAddonDataSettingsDB.char.DeviceName = value;
                                     end,
                                 width = "full",
                                 cmdHidden = true,
@@ -103,11 +103,11 @@ function GBR_ConfigService:Initialize()
                                     end,
                                 get = 
                                     function(info)
-                                        return GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+                                        return GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
                                     end,
                                 set = 
                                     function(info, value)                                        
-                                        GBRadioAddonData.SettingsDB.char.PrimaryFrequency = value;
+                                        GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
                                     end,
                                 order = 2
                             },
@@ -130,11 +130,11 @@ function GBR_ConfigService:Initialize()
                                 desc = "The delay (in seconds) between /saying a message and the message being sent over the radio.\n\nThe purpose of this setting is to prevent messages appearing over the radio channel before your character has spoken it aloud in laggy environments.",
                                 get = 
                                     function(info) 
-                                        return GBRadioAddonData.SettingsDB.char.RadioMessageDelay;
+                                        return GBRadioAddonDataSettingsDB.char.RadioMessageDelay;
                                     end,
                                 set = 
                                     function(info, value) 
-                                        GBRadioAddonData.SettingsDB.char.RadioMessageDelay = value;
+                                        GBRadioAddonDataSettingsDB.char.RadioMessageDelay = value;
                                     end,
                                 order = 4
                             }
@@ -179,7 +179,7 @@ function GBR_ConfigService:Initialize()
                                 set = 
                                     function(info, value)
                                         local newPronouns = GBR_ConfigService.GetDefaultPronouns(value);
-                                        GBRadioAddonData.SettingsDB.char.Gender = value;
+                                        GBRadioAddonDataSettingsDB.char.Gender = value;
                                         GBR_ConfigService.SetPronouns(newPronouns);
                                     end,
                                 order = 1
@@ -239,7 +239,7 @@ function GBR_ConfigService:Initialize()
                                 get = GBR_ConfigService.GetCharacterVoiceType,
                                 set = 
                                     function(info, value)
-                                        GBRadioAddonData.SettingsDB.char.VoiceType = value;
+                                        GBRadioAddonDataSettingsDB.char.VoiceType = value;
                                     end,
                                 order = 6
                             },
@@ -342,7 +342,7 @@ function GBR_ConfigService:Initialize()
                                                     newSettingsModel);
 
                                                 GBR_ConfigService.AddChannelToDb(
-                                                    GBRadioAddonData.SettingsDB.char.Channels,
+                                                    GBRadioAddonDataSettingsDB.char.Channels,
                                                     channelKey,
                                                     newSettingsModel);
 
@@ -446,7 +446,7 @@ function GBR_ConfigService:Initialize()
         }
     };
 
-    for channelKey, channelData in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+    for channelKey, channelData in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         self.AddChannelToUi(addon.OptionsTable.args.channelConfig.args, channelKey, channelData);
 
         for transmitterKey, transmitterData in pairs(channelData.TransmitterSettings.StationaryTransmitters) do
@@ -484,7 +484,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled;
                         end,
                     set = 
                         function(info, value)
@@ -493,10 +493,10 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
 
                             addon.OptionsTable.args.channelConfig.args[key].name = GBR_ConfigService.GetChannelGroupName(
                                 value, 
-                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName,                            
-                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelName,                            
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
 
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value;
                         end,
                 },
                 channelName = 
@@ -511,7 +511,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelName;
                         end,
                     set = 
                         function(info, value)
@@ -519,12 +519,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                             local key = info[#info-3];
 
                             addon.OptionsTable.args.channelConfig.args[key].name = GBR_ConfigService.GetChannelGroupName(
-                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled, 
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled, 
                                 value,
-                                GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency);
 
                             addon.OptionsTable.args.channelConfig.args[key].args.channelSettingsDesc.name = value;
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelName = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelName = value;
                         end,
                 },
                 channelFrequency = 
@@ -539,18 +539,18 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
                         end,
                     set = 
                         function(info, value) 
                             local key = info[#info-3];
-                            local oldFrequencyValue = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                            local oldFrequencyValue = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
 
-                            if GBRadioAddonData.SettingsDB.char.PrimaryFrequency == oldFrequencyValue then
-                                GBRadioAddonData.SettingsDB.char.PrimaryFrequency = value;
+                            if GBRadioAddonDataSettingsDB.char.PrimaryFrequency == oldFrequencyValue then
+                                GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
                             end
 
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; 
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; 
                         end,
                 },
                 channelNotes =
@@ -564,12 +564,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelNotes;
                         end,
                     set = 
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelNotes = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelNotes = value;
                         end,
                 }
             }
@@ -592,13 +592,13 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            local colour = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour;
+                            local colour = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour;
                             return colour.R, colour.G, colour.B, colour.A;
                         end,
                     set = 
                         function(info, r, g, b, a)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour = 
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour = 
                             { 
                                 A = a, 
                                 R = r, 
@@ -621,12 +621,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value;
                         end,
                 },
                 channelChatFrameIdentify = 
@@ -638,7 +638,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     func = 
                         function(info, val)
                             local key = info[#info-3];
-                            local channelColour = GBR_ARGB:New(GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour);
+                            local channelColour = GBR_ARGB:New(GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatMessageColour);
 
                             for i = 1, NUM_CHAT_WINDOWS do
                                 local frame = _G["ChatFrame"..i]
@@ -682,7 +682,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                             local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
                             local key = info[#info-3];
 
-                            GBRadioAddonData.SettingsDB.char.Channels[key] = nil;
+                            GBRadioAddonDataSettingsDB.char.Channels[key] = nil;
                             addon.OptionsTable.args.channelConfig.args[key] = nil;
                         end
                 }
@@ -722,12 +722,12 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.IdentifyOnChannelAs = value;
                         end,
                 },
                 channelCallsign = 
@@ -740,12 +740,12 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value;
                         end,
                 }
             }
@@ -769,7 +769,7 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     name = 
                         function(info)
                             local key = info[#info-3];
-                            local frequency = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                            local frequency = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
 
                             return "|cFF00FF00[" .. GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency) .. "]|r";
                         end,
@@ -809,12 +809,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.SpeakOnSend = value;
                         end,
                 },
                 emoteOnSend = 
@@ -825,12 +825,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnSend = value;
                         end,
                 },
                 emoteOnReceive =
@@ -841,12 +841,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnReceive = value;
                         end,
                 },
                 emoteOnEmergency = 
@@ -857,12 +857,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency;
                         end,
                     set = 
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.EmoteOnEmergency = value;
                         end,
                 }
             }
@@ -884,12 +884,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnSend;
                         end,
                     set = 
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnSend = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnSend = value;
                         end,
                 },
                 audioOnReceive =
@@ -901,12 +901,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get =
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive;
                         end,
                     set =
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnReceive = value;
                         end,
                 },
                 audioOnEmergencySend =
@@ -918,12 +918,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get =
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend;
                         end,
                     set =
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencySend = value;
                         end,
                 },
                 audioOnEmergencyReceive =
@@ -935,12 +935,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get =
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive;
                         end,
                     set =
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive = value;
                         end,
                 },
                 audioOnNoSignal =
@@ -952,12 +952,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get =
                         function(info) 
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal;
                         end,
                     set =
                         function(info, value) 
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal = value;
                         end,
                 }
             }
@@ -984,12 +984,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.ChannelEmoteCooldown = value;
                         end,
                 },
                 channelAudioCooldown = 
@@ -1006,12 +1006,12 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                     get = 
                         function(info)
                             local key = info[#info-3];
-                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown;
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown;
                         end,
                     set = 
                         function(info, value)
                             local key = info[#info-3];
-                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.ChannelAudioCooldown = value;
                         end,
                 },
             }
@@ -1048,12 +1048,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.UseTransmitters;
+                                    return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.UseTransmitters;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.UseTransmitters = value;
+                                    GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.UseTransmitters = value;
                                 end,
                         },
                         alwaysOnInInstances =
@@ -1066,12 +1066,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.AlwaysOnInInstances;
+                                    return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.AlwaysOnInInstances;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.AlwaysOnInInstances = value;
+                                    GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.AlwaysOnInInstances = value;
                                 end,
                         },
                         transmitterRange =
@@ -1088,12 +1088,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange;
+                                    return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange = value;
+                                    GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange = value;
                                 end,
                         },
                         lowIntensityInterferenceFalloff =
@@ -1110,12 +1110,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff;
+                                    return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff = value;
+                                    GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff = value;
                                 end,
                         },
                         highIntensityInterferenceFalloff =
@@ -1132,12 +1132,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff;
+                                    return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff = value;
+                                    GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff = value;
                                 end,
                         }
                     }
@@ -1201,7 +1201,7 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                                         newSettingsModel);
         
                                     GBR_ConfigService.AddTransmitterToDb(
-                                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters,
+                                        GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters,
                                         transmitterKey,
                                         newSettingsModel);
         
@@ -1280,7 +1280,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled;
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled;
                     end,
                 set = 
                     function(info, value)
@@ -1291,9 +1291,9 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                         addon.OptionsTable.args.channelConfig.args[channelKey].args.transmitterSettingsConfigurationPage
                             .args.transmitterSettingsGroup.args[transmitterKey].name = GBR_ConfigService.GetTransmitterGroupName(
                                 value,
-                                GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName);
+                                GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName);
 
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled = value;
+                        GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled = value;
                     end,
             },
             transmitterName =
@@ -1307,7 +1307,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];       
 
-                        return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName;
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName;
                     end,
                 set = 
                     function(info, value)
@@ -1317,10 +1317,10 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
 
                         addon.OptionsTable.args.channelConfig.args[channelKey].args.transmitterSettingsConfigurationPage
                             .args.transmitterSettingsGroup.args[transmitterKey].name = GBR_ConfigService.GetTransmitterGroupName(
-                                GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled,
+                                GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterIsEnabled,
                                 value);
 
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName = value;
+                        GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterName = value;
                     end,
             },
             transmitterDescription =
@@ -1334,13 +1334,13 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];                                    
-                        return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterNotes;
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterNotes;
                     end,
                 set = 
                     function(info, value)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];                                    
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterNotes = value;
+                        GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].TransmitterNotes = value;
                     end,
             },
             updateCoordsToCurrentLocationButton =
@@ -1354,7 +1354,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                         local transmitterKey = info[#info-1];
                         local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
 
-                        configService:AddCurrentLocationToTransmitterData(GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey]);
+                        configService:AddCurrentLocationToTransmitterData(GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey]);
                     end,
             },
             transmitterCoordX =
@@ -1368,7 +1368,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return string.format("%.2f", GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionX);
+                        return string.format("%.2f", GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionX);
                     end,
             },
             transmitterCoordY =
@@ -1382,7 +1382,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return string.format("%.2f", GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionY);
+                        return string.format("%.2f", GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionY);
                     end,
             },
             transmitterZoneCoordX =
@@ -1396,7 +1396,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return string.format("%.2f", GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionX * 100);
+                        return string.format("%.2f", GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionX * 100);
                     end,
             },
             transmitterZoneCoordY =
@@ -1410,7 +1410,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return string.format("%.2f", GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionY * 100);
+                        return string.format("%.2f", GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionY * 100);
                     end,
             },
             zone =
@@ -1424,7 +1424,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].Zone;
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].Zone;
                     end,
             },
             subZone =
@@ -1438,7 +1438,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                     function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
-                        return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].SubZone;
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].SubZone;
                     end,
             }
         }
@@ -1692,7 +1692,7 @@ function GBR_ConfigService.ValidateCallsign(info, value)
 end
 
 function GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value)
-    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+    for k, v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         if v.ChannelSettings.ChannelFrequency == value then 
             return "Channel frequencies must be unique.\n\nChannel frequency \"" .. value .. "\" is already in use by channel \"".. v.ChannelSettings.ChannelName .."\".\n\nPlease enter a different frequency."
         end;
@@ -1728,9 +1728,9 @@ end
 
 function GBR_ConfigService.SetPronouns(pronounTable)
 
-    GBRadioAddonData.SettingsDB.char.PronounA = pronounTable.A;
-    GBRadioAddonData.SettingsDB.char.PronounB = pronounTable.B;
-    GBRadioAddonData.SettingsDB.char.PronounC = pronounTable.C;
+    GBRadioAddonDataSettingsDB.char.PronounA = pronounTable.A;
+    GBRadioAddonDataSettingsDB.char.PronounB = pronounTable.B;
+    GBRadioAddonDataSettingsDB.char.PronounC = pronounTable.C;
 
 end
 
@@ -1753,7 +1753,7 @@ function GBR_ConfigService:GetRegisteredCommunicationFrequencies()
 
     local registeredFrequencies = {};
 
-    for k, v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+    for k, v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         registeredFrequencies[v.ChannelSettings.ChannelFrequency] =
         {
             ChannelKey = k,
@@ -1786,17 +1786,17 @@ end
 
 function GBR_ConfigService.GetCharacterGender()
 
-    if GBRadioAddonData.SettingsDB.char.Gender == nil then
+    if GBRadioAddonDataSettingsDB.char.Gender == nil then
         local defaultGender = UnitSex(GBR_Constants.ID_PLAYER);
         local defaultPronouns = GBR_ConfigService.GetDefaultPronouns(defaultGender);
         local defaultVoiceType = UnitSex(GBR_Constants.ID_PLAYER);
         
-        GBRadioAddonData.SettingsDB.char.Gender = defaultGender;
+        GBRadioAddonDataSettingsDB.char.Gender = defaultGender;
         GBR_ConfigService.SetPronouns(defaultPronouns);
-        GBRadioAddonData.SettingsDB.char.VoiceType = defaultVoiceType;
+        GBRadioAddonDataSettingsDB.char.VoiceType = defaultVoiceType;
     end
 
-    return GBRadioAddonData.SettingsDB.char.Gender;
+    return GBRadioAddonDataSettingsDB.char.Gender;
 
 end
 
@@ -1806,42 +1806,42 @@ function GBR_ConfigService.GetCharacterPronouns()
 
     return
     {
-        A = GBRadioAddonData.SettingsDB.char.PronounA,
-        B = GBRadioAddonData.SettingsDB.char.PronounB,
-        C = GBRadioAddonData.SettingsDB.char.PronounC
+        A = GBRadioAddonDataSettingsDB.char.PronounA,
+        B = GBRadioAddonDataSettingsDB.char.PronounB,
+        C = GBRadioAddonDataSettingsDB.char.PronounC
     };
     
 end
 
 function GBR_ConfigService.GetCharacterVoiceType()
 
-    return GBRadioAddonData.SettingsDB.char.VoiceType;
+    return GBRadioAddonDataSettingsDB.char.VoiceType;
 
 end
 
 function GBR_ConfigService.GetDeviceName()
 
-    return GBRadioAddonData.SettingsDB.char.DeviceName;
+    return GBRadioAddonDataSettingsDB.char.DeviceName;
 
 end
 
 function GBR_ConfigService:IsEmoteOnEmergencyEnabled()
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.EmoteOnEmergency;
 
 end
 
 function GBR_ConfigService:IsSendMessageSpeechEnabled()
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.SpeakOnSend;
 
 end
 
 function GBR_ConfigService:IsSendMessageEmoteEnabled()    
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.EmoteOnSend;
 
 end
@@ -1855,14 +1855,14 @@ end
 
 function GBR_ConfigService:IsSendMessageAudioEnabled()
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.AudioOnSend;
 
 end
 
 function GBR_ConfigService:IsNoSignalAudioEnabled()
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.AudioOnNoSignal;
 
 end
@@ -1883,7 +1883,7 @@ end
 
 function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
 
-    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
     return settingsForFrequency.InteractionSettings.AudioOnEmergencySend;
 
 end
@@ -1951,7 +1951,7 @@ function GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency)
 end
 
 function GBR_ConfigService:GetRadioMessageDelay()
-    return GBRadioAddonData.SettingsDB.char.RadioMessageDelay;
+    return GBRadioAddonDataSettingsDB.char.RadioMessageDelay;
 end
 
 function GBR_ConfigService:GetChatFrameForChannel(frequency)
@@ -1963,7 +1963,7 @@ end
 
 function GBR_ConfigService:GetSettingsForFrequency(frequency)
 
-    for k,v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+    for k,v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         if v.ChannelSettings.ChannelFrequency == frequency then
             return v;
         end
@@ -1973,7 +1973,7 @@ end
 
 function GBR_ConfigService:GetSettingsKeyForFrequency(frequency)
 
-    for k,v in pairs(GBRadioAddonData.SettingsDB.char.Channels) do
+    for k,v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         if v.ChannelSettings.ChannelFrequency == frequency then
             return k;
         end
@@ -1982,7 +1982,7 @@ function GBR_ConfigService:GetSettingsKeyForFrequency(frequency)
 end
 
 function GBR_ConfigService:GetPrimaryFrequency()
-    return GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+    return GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
 end
 
 function GBR_ConfigService:GetTransmitterInterferenceTypeForChannelSettings(channelSettings)

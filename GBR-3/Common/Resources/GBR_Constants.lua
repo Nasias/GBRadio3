@@ -38,7 +38,7 @@ GBR_Constants =
     OPT_ADDON_VERSION = "3.0",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
-    OPT_ADDON_SETTINGS_DB = "GBRadioSettingsDb",
+    OPT_ADDON_SETTINGS_DB = "GBRadioAddonDataSettingsDBSavedVars",
 
     MSG_CHAT_FRAME_IDENTITY = "|TInterface\\DialogFrame\\UI-Dialog-Icon-AlertOther:16:16:0:-1|t%s [GBRadio - Chatframe Identity] This is chat frame #%d.",
     -- colour, frequency, charactername, displayname, message

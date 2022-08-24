@@ -1,7 +1,7 @@
 ## Interface: 70300
 ## Title: GB|cff00c0ffRadio|r 3
 ## Notes: A buzzbox addon for roleplay.
-## SavedVariables: GBRSavedVar_MessageHistory
+## SavedVariables: GBRadioAddonDataSettingsDBSavedVars
 ## DefaultState: enabled
 ## Author: Nasias Darkstar
 ## Version: 3.0.0

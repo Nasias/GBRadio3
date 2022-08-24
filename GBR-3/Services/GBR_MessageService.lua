@@ -115,8 +115,8 @@ end
 function GBR_MessageService:SendSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
+    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -138,8 +138,8 @@ end
 function GBR_MessageService:SendSilentSpeechMessage(messageModel)
     
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
+    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -160,8 +160,8 @@ end
 function GBR_MessageService:SendEmergencyMessage(messageModel)
 
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
+    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -182,7 +182,7 @@ end
 function GBR_MessageService:SendWhoIsListeningMessage(messageModel)    
 
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 

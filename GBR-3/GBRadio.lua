@@ -19,7 +19,7 @@ function GBRadio:ConfigureServices()
 
     local defaultSettings = GBR_ConfigPresets.BuzzBox;
     
-    GBRadioAddonData.SettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
+    GBRadioAddonDataSettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
 
     GBR_Singletons:InstantiateService(GBR_Constants.SRV_CONFIG_SERVICE);
 
