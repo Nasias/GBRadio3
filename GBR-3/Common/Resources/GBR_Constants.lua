@@ -46,19 +46,23 @@ GBR_Constants =
     -- colour, frequency, charactername, displayname, location, coord-x, coord-y
     MSG_RADIO_EMERGENCY = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s (%.2f, %.2f).",
     -- colour, frequency, charactername, displayname, location
-    MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s]",
+    MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s.",
 
     -- pronoun, device name
     MSG_EMOTE_SEND_MESSAGE = "speaks into %s %s --",
-
     -- pronoun, device name
     MSG_EMOTE_SILENT_SEND_MESSAGE = "murmurs something quietly into %s %s.",
-
     -- pronoun, device name
     MSG_EMOTE_EMERGENCY_SEND_MESSAGE = "presses the emergency button on %s %s.",
-
     -- device name, audio cue (crackles, buzzes), pronoun
     MSG_EMOTE_RECEIVE_MESSAGE = "'s %s %s as a message is received.",
+
+    -- colour, frequency
+    MSG_RADIO_RADIO_OFF_ERROR = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] Cannot send a message because this channel is inactive.",
+
+    -- colour, frequency
+    MSG_RADIO_TRANSMITTER_RANGE_ERROR = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] Cannot send a message because the nearest transmitter is too far away.",
+
 
     MSG_EMOTE_RECEIVE_VERBS =
     {

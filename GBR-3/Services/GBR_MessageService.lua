@@ -20,15 +20,50 @@ function GBR_MessageService:New(obj)
 end
 
 function GBR_MessageService:SendMessage(messageModel)
+    
+    local primaryFrequency = self._configService:GetPrimaryFrequency();
+    local primaryChannelSettings = self._configService:GetSettingsForFrequency(primaryFrequency);
+    local chatFrame = _G["ChatFrame"..primaryChannelSettings.ChannelSettings.ChannelChatFrame];
+    local channelColour = GBR_ARGB:New(primaryChannelSettings.ChannelSettings.ChannelChatMessageColour);
 
-    local t = {
+    if not primaryChannelSettings.ChannelSettings.ChannelIsEnabled then
+    
+        if chatFrame then
+            chatFrame:AddMessage(string.format(
+                GBR_Constants.MSG_RADIO_RADIO_OFF_ERROR,
+                channelColour:ToEscapedHexString(),
+                primaryFrequency));
+        end
+
+        return;
+    end
+
+    if primaryChannelSettings.TransmitterSettings.UseTransmitters then
+
+        local interferenceType = self:AddMessageInterference(messageModel, primaryChannelSettings);
+
+        if interferenceType == GBR_EMessageInterferenceType.OutOfRange then
+            if chatFrame then
+                chatFrame:AddMessage(string.format(
+                    GBR_Constants.MSG_RADIO_TRANSMITTER_RANGE_ERROR,
+                    channelColour:ToEscapedHexString(),
+                    primaryFrequency));
+
+                GBR_MessageService:PlayNoSignalAudio();
+
+                return;
+            end            
+        end            
+    end
+
+    local dispatchMethod = {
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,
         [GBR_EMessageType.SilentSpeech] = self.SendSilentSpeechMessage,
         [GBR_EMessageType.Emergency] = self.SendEmergencyMessage,
         [GBR_EMessageType.WhoIsListening] = self.SendWhoIsListeningMessage
     };
 
-    t[messageModel.MessageData.MessageType](self, messageModel);
+    dispatchMethod[messageModel.MessageData.MessageType](self, messageModel);
 
 end
 
@@ -45,6 +80,12 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
     {
         MessageData = self._serialiserService:Deserialize(serializedMessageData)
     };
+
+    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
+
+    if registeredFrequencies[messageModel.MessageData.Frequency] == nil or not registeredFrequencies[messageModel.MessageData.Frequency].IsEnabled then
+        return;
+    end
 
     local messageProcessor =
     {
@@ -165,12 +206,6 @@ end
 
 function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
-    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-    
-    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
-        return;
-    end
-
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
     local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
@@ -196,12 +231,6 @@ function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 end
 
 function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
-
-    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-
-    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
-        return;
-    end
 
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
@@ -240,12 +269,6 @@ end
 
 function GBR_MessageService:ProcessReceivedWhoIsListeningMessage(messageModel)
 
-    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-
-    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
-        return;
-    end
-
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
 
@@ -254,12 +277,6 @@ function GBR_MessageService:ProcessReceivedWhoIsListeningMessage(messageModel)
 end
 
 function GBR_MessageService:ProcessReceivedIAmListeningMessage(messageModel)
-
-    local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
-
-    if registeredFrequencies[messageModel.MessageData.Frequency] == nil then
-        return;
-    end
 
     self._configService:AddFrequencyListener(messageModel.MessageData.Frequency, messageModel.MessageData.CharacterModel.CharacterName);
 
@@ -306,6 +323,16 @@ function GBR_MessageService:PlaySendEmergencyMessageAudio()
     end
 
     PlaySoundFile(self.Sounds.Emergency, "SFX");
+
+end
+
+function GBR_MessageService:PlayNoSignalAudio()
+
+    if not self._configService:IsNoSignalAudioEnabled() then
+        return;
+    end
+
+    PlaySoundFile(self.Sounds.NoSignal, "SFX");
 
 end
 
@@ -413,6 +440,70 @@ function GBR_MessageService:HasChannelAudioCooldownPassedForFrequency(frequency)
 
 end
 
+function GBR_MessageService:AddMessageInterference(messageModel, primaryChannelSettings)
+
+    local interferenceType = self._configService:GetTransmitterInterferenceTypeForChannelSettings(primaryChannelSettings);
+
+    if interferenceType == GBR_EMessageInterferenceType.None or interferenceType == GBR_EMessageInterferenceType.OutOfRange then
+        return interferenceType;
+    end
+
+    local stringSplits;
+    local letterEngulf;
+    local splitInterval;
+    local messageLength = messageModel.MessageData.Message:len();
+    local tmp = {};
+    local pivot;
+    local interferenceMessage = "";
+    local interferenceText = ".....";
+
+    if interferenceType == GBR_EMessageInterferenceType.Low then
+        stringSplits = math.random(0,2);
+        letterEngulf = math.random(1,2);
+    elseif interferenceType == GBR_EMessageInterferenceType.High then
+        stringSplits = math.random(0,6);
+        letterEngulf = math.random(2,6);
+    end
+
+    if stringSplits > messageLength then
+        stringSplits = messageLength;
+    end
+
+    splitInterval = math.ceil(messageLength / stringSplits);
+
+    if ((letterEngulf * 2) + 1) * stringSplits >= messageLength then
+        messageModel.MessageData.Message = interferenceText;
+        return interferenceType;
+    end
+
+    for i = 1, stringSplits, 1 do
+            
+        local startPoint = 1 + (splitInterval * ( i - 1 ) );
+        local endPoint = splitInterval * i;
+            
+        if endPoint > messageLength then            
+            endPoint = messageLength;                
+        end
+            
+        pivot = math.random(startPoint + letterEngulf, endPoint - letterEngulf);
+            
+        tmp[i] = { 
+            StartPoint = string.sub(messageModel.MessageData.Message, startPoint, pivot - letterEngulf),
+            EndPoint = string.sub(messageModel.MessageData.Message, pivot + letterEngulf + 1, endPoint)
+        }
+            
+    end
+    
+    for k, v in pairs(tmp) do
+    
+        interferenceMessage = interferenceMessage .. v.StartPoint .. interferenceText .. v.EndPoint;
+    
+    end
+
+    messageModel.MessageData.Message = interferenceMessage:len() > 0 and interferenceMessage or interferenceText;
+
+end
+
 GBR_MessageService.Sounds = {
     Send = {
         M = {
@@ -434,5 +525,6 @@ GBR_MessageService.Sounds = {
             "Interface\\AddOns\\GBR-3\\Audio\\fr-2.ogg"
         },
     },
-    Emergency = "Interface\\AddOns\\GBR-3\\Audio\\emergency.ogg"
+    Emergency = "Interface\\AddOns\\GBR-3\\Audio\\emergency.ogg",
+    NoSignal = "Interface\\AddOns\\GBR-3\\Audio\\no-signal.ogg",
 };

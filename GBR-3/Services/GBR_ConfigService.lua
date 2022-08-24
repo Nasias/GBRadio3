@@ -3,6 +3,7 @@ GBR_ConfigService = GBR_Object:New();
 function GBR_ConfigService:New(obj)
 
     self._mrpService = GBR_Singletons:FetchService(GBR_Constants.SRV_MRP_SERVICE);
+    self._locationService = GBR_SingletonService:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
 
     self.StagingVars =
     {
@@ -543,6 +544,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                     set = 
                         function(info, value) 
                             local key = info[#info-3];
+                            local oldFrequencyValue = GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+
+                            if GBRadioAddonData.SettingsDB.char.PrimaryFrequency == oldFrequencyValue then
+                                GBRadioAddonData.SettingsDB.char.PrimaryFrequency = value;
+                            end
+
                             GBRadioAddonData.SettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; 
                         end,
                 },
@@ -935,6 +942,23 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                             local key = info[#info-3];
                             GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnEmergencyReceive = value;
                         end,
+                },
+                audioOnNoSignal =
+                {
+                    order = 8,
+                    type = "toggle",
+                    name = "Play audio on no signal",
+                    width = "full",
+                    get =
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal;
+                        end,
+                    set =
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonData.SettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal = value;
+                        end,
                 }
             }
         },
@@ -1064,12 +1088,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterRange;
+                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterRange = value;
+                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.TransmitterRange = value;
                                 end,
                         },
                         lowIntensityInterferenceFalloff =
@@ -1086,12 +1110,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].LowIntensityInterferenceFalloff;
+                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].LowIntensityInterferenceFalloff = value;
+                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.LowIntensityInterferenceFalloff = value;
                                 end,
                         },
                         highIntensityInterferenceFalloff =
@@ -1108,12 +1132,12 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                             get =
                                 function(info)
                                     local channelKey = info[#info-4];
-                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].HighIntensityInterferenceFalloff;
+                                    return GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff;
                                 end,
                             set =
                                 function(info, value)
                                     local channelKey = info[#info-4];
-                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].HighIntensityInterferenceFalloff = value;
+                                    GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.HighIntensityInterferenceFalloff = value;
                                 end,
                         }
                     }
@@ -1166,10 +1190,8 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
                                     local transmitterKey = info[#info-1];
 
                                     local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
-                                    local locationService = GBR_Singletons:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
                                     local newTransmitterName = configService:GetNewTransmitterName();
-                                    local playerPosition = locationService:GetCurrentCharacterLocation();
-                                    local newSettingsModel = GBR_ConfigService.GetNewTransmitterSettingsModel(newTransmitterName, playerPosition.WorldPosition.X, playerPosition.WorldPosition.Y);
+                                    local newSettingsModel = configService:GetNewTransmitterSettingsModel(newTransmitterName);
                                     local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
                                     local transmitterKey = configService:GetNextRandomKey();
         
@@ -1329,19 +1351,10 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                 func =
                     function(info)                        
                         local channelKey = info[#info-4];
-                        local transmitterKey = info[#info-1]; 
-                        local locationService = GBR_Singletons:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
-                        local playerPosition = locationService:GetCurrentCharacterLocation();
-                        
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionX = playerPosition.WorldPosition.X;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldPositionY = playerPosition.WorldPosition.Y;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionX = playerPosition.ZonePosition.X;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].ZonePositionY = playerPosition.ZonePosition.Y;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].MapId = playerPosition.MapId;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].WorldInstanceId = playerPosition.WorldInstanceId;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].MapTypeId = playerPosition.MapTypeId;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].Zone = playerPosition.Zone;
-                        GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].SubZone = playerPosition.SubZone;
+                        local transmitterKey = info[#info-1];
+                        local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+
+                        configService:AddCurrentLocationToTransmitterData(GBRadioAddonData.SettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey]);
                     end,
             },
             transmitterCoordX =
@@ -1482,7 +1495,7 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
             {
                 type = "group",
                 name = "Transmitter",
-                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(channelData),
+                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(),
                 childGroups = "tree",
                 order = 4
             },
@@ -1588,15 +1601,17 @@ function GBR_ConfigService:GetNewTransmitterName()
     return self.StagingVars.NewTransmitterName;
 end
 
-function GBR_ConfigService.GetNewTransmitterSettingsModel(transmitterName, posX, posY)
-    return
+function GBR_ConfigService:GetNewTransmitterSettingsModel(transmitterName)
+    local transmitterData =
     {
         TransmitterIsEnabled = true,
         TransmitterName = transmitterName,
         TransmitterNotes = "",
-        PositionX = posX,
-        PositionY = posY,
     };
+
+    self:AddCurrentLocationToTransmitterData(transmitterData);
+
+    return transmitterData;
 end
 
 function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
@@ -1632,6 +1647,7 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
             AudioOnReceive = true,
             AudioOnEmergencySend = true,
             AudioOnEmergencyReceive = true,
+            AudioOnNoSignal = true,
             ChannelEmoteCooldown = 10,
             ChannelAudioCooldown = 10,
         },
@@ -1639,9 +1655,9 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
         {
             UseTransmitters = false,
             AlwaysOnInInstances = true,
-            TransmitterRange = 0,
-            LowIntensityInterferenceFalloff = 0,
-            HighntensityInterferenceFalloff = 0,
+            TransmitterRange = 500,
+            LowIntensityInterferenceFalloff = 25,
+            HighIntensityInterferenceFalloff = 25,
             StationaryTransmitters = {}
         }
     };
@@ -1844,6 +1860,13 @@ function GBR_ConfigService:IsSendMessageAudioEnabled()
 
 end
 
+function GBR_ConfigService:IsNoSignalAudioEnabled()
+
+    local settingsForFrequency = self:GetSettingsForFrequency(GBRadioAddonData.SettingsDB.char.PrimaryFrequency);
+    return settingsForFrequency.InteractionSettings.AudioOnNoSignal;
+
+end
+
 function GBR_ConfigService:IsReceiveMessageAudioEnabledForFrequency(frequency)
 
     local settingsForFrequency = self:GetSettingsForFrequency(frequency);
@@ -1955,5 +1978,78 @@ function GBR_ConfigService:GetSettingsKeyForFrequency(frequency)
             return k;
         end
     end
+
+end
+
+function GBR_ConfigService:GetPrimaryFrequency()
+    return GBRadioAddonData.SettingsDB.char.PrimaryFrequency;
+end
+
+function GBR_ConfigService:GetTransmitterInterferenceTypeForChannelSettings(channelSettings)
+
+    local currentPlayerLocation = self._locationService:GetCurrentCharacterLocation();
+    local closestInYards = nil;
+    local closestTransmitterKey = nil;    
+
+    for k,v in pairs(channelSettings.TransmitterSettings.StationaryTransmitters) do
+
+        if v.WorldInstanceId == currentPlayerLocation.WorldInstanceId and v.TransmitterIsEnabled then
+            local distance, _, _ = self._locationService:GetWorldDistance(
+                v.WorldInstanceId, 
+                currentPlayerLocation.WorldPosition.X,
+                currentPlayerLocation.WorldPosition.Y,
+                v.WorldPositionX, 
+                v.WorldPositionY);
+
+            if closestInYards == nil or distance < closestInYards then
+                closestInYards = distance;
+                closestTransmitterKey = k;
+            end
+        end 
+        
+    end
+
+    return self:GetInterferenceTypeForDistance(channelSettings, closestInYards);
+
+end
+
+function GBR_ConfigService:GetInterferenceTypeForDistance(primaryChannelSettings, distanceToTransmitter)
+
+    if distanceToTransmitter == nil then 
+        return GBR_EMessageInterferenceType.OutOfRange;
+    end
+
+    local transmitterRange = primaryChannelSettings.TransmitterSettings.TransmitterRange;
+    local lowIntensityFalloff = primaryChannelSettings.TransmitterSettings.LowIntensityInterferenceFalloff;
+    local highIntensityFalloff = primaryChannelSettings.TransmitterSettings.HighIntensityInterferenceFalloff;
+
+    if distanceToTransmitter <= transmitterRange then 
+        return GBR_EMessageInterferenceType.None;
+    end
+
+    if distanceToTransmitter <= transmitterRange + lowIntensityFalloff then 
+        return GBR_EMessageInterferenceType.Low;
+    end
+
+    if distanceToTransmitter <= transmitterRange + lowIntensityFalloff + highIntensityFalloff then 
+        return GBR_EMessageInterferenceType.High;
+    end
+
+    return GBR_EMessageInterferenceType.OutOfRange;
+
+end
+
+function GBR_ConfigService:AddCurrentLocationToTransmitterData(stationaryTransmitter)
+    local playerPosition = self._locationService:GetCurrentCharacterLocation();
+
+    stationaryTransmitter.WorldPositionX = playerPosition.WorldPosition.X;
+    stationaryTransmitter.WorldPositionY = playerPosition.WorldPosition.Y;
+    stationaryTransmitter.ZonePositionX = playerPosition.ZonePosition.X;
+    stationaryTransmitter.ZonePositionY = playerPosition.ZonePosition.Y;
+    stationaryTransmitter.MapId = playerPosition.MapId;
+    stationaryTransmitter.WorldInstanceId = playerPosition.WorldInstanceId;
+    stationaryTransmitter.MapTypeId = playerPosition.MapTypeId;
+    stationaryTransmitter.Zone = playerPosition.Zone;
+    stationaryTransmitter.SubZone = playerPosition.SubZone;
 
 end

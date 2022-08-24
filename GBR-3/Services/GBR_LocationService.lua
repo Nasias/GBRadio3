@@ -8,6 +8,12 @@ function GBR_LocationService:New(obj)
 
 end
 
+function GBR_LocationService:GetWorldDistance(instanceId, originX, originY, destinationX, destinationY)
+
+    return self._locationLib:GetWorldDistance(instanceId, originX, originY, destinationX, destinationY);
+
+end
+
 function GBR_LocationService:GetCurrentCharacterLocation()
 
     local zonePositionX, zonePositionY = self._locationLib:GetPlayerZonePosition();

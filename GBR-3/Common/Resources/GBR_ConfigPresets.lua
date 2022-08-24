@@ -46,6 +46,7 @@ GBR_ConfigPresets.BuzzBox =
                     AudioOnReceive = true,
                     AudioOnEmergencySend = true,
                     AudioOnEmergencyReceive = true,
+                    AudioOnNoSignal = true,
                     ChannelEmoteCooldown = 10,
                     ChannelAudioCooldown = 10,
                 },
@@ -53,9 +54,9 @@ GBR_ConfigPresets.BuzzBox =
                 {
                     UseTransmitters = false,
                     AlwaysOnInInstances = true,
-                    TransmitterRange = 0,
-                    LowIntensityInterferenceFalloff = 0,
-                    HighntensityInterferenceFalloff = 0,
+                    TransmitterRange = 500,
+                    LowIntensityInterferenceFalloff = 25,
+                    HighIntensityInterferenceFalloff = 25,
                     StationaryTransmitters = {
                         ["DEFAULT"] =
                         {
