@@ -87,6 +87,18 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
         return;
     end
 
+    local receivingFrequencySettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
+
+    if receivingFrequencySettings.TransmitterSettings.UseTransmitters then
+
+        local interferenceType = self:AddMessageInterference(messageModel, receivingFrequencySettings);
+
+        if interferenceType == GBR_EMessageInterferenceType.OutOfRange then
+            return;
+        end  
+
+    end
+
     local messageProcessor =
     {
         [GBR_EMessageType.Speech] = self.ProcessReceivedSpeechMessage,
@@ -443,8 +455,10 @@ end
 function GBR_MessageService:AddMessageInterference(messageModel, primaryChannelSettings)
 
     local interferenceType = self._configService:GetTransmitterInterferenceTypeForChannelSettings(primaryChannelSettings);
+    local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
+    local isOwnMessageReceived = messageModel.MessageData.CharacterModel.CharacterName == characterName;
 
-    if interferenceType == GBR_EMessageInterferenceType.None or interferenceType == GBR_EMessageInterferenceType.OutOfRange then
+    if isOwnMessageReceived or interferenceType == GBR_EMessageInterferenceType.None or interferenceType == GBR_EMessageInterferenceType.OutOfRange or messageModel.MessageData.Message == nil then
         return interferenceType;
     end
 
