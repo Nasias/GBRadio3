@@ -10,4 +10,5 @@
     <Include file="Libs\AceConfig-3.0\AceConfig-3.0.xml"/>
     <Include file="Libs\AceEvent-3.0\AceEvent-3.0.xml"/>
     <Include file="Libs\AceConsole-3.0\AceConsole-3.0.xml"/>
+    <Include file="Libs\LibToast-1.0\LibToast-1.0.lua"/>
 </Ui>
