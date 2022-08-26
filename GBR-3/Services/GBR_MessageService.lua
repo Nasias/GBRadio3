@@ -275,6 +275,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
         self:PlaySendEmergencyMessageAudio();
     else
         self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
+        GBR_Delay:Delay(2, GBRadio.NotificationTest);        
     end
 
 end
