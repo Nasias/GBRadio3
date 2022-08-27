@@ -20,34 +20,39 @@ function GBR_MessageService:New(obj)
 end
 
 function GBR_MessageService:SendMessage(messageModel)
-    
-    local primaryFrequency = self._configService:GetPrimaryFrequency();
-    local primaryChannelSettings = self._configService:GetSettingsForFrequency(primaryFrequency);
-    local chatFrame = _G["ChatFrame"..primaryChannelSettings.ChannelSettings.ChannelChatFrame];
-    local channelColour = GBR_ARGB:New(primaryChannelSettings.ChannelSettings.ChannelChatMessageColour);
 
-    if not primaryChannelSettings.ChannelSettings.ChannelIsEnabled then
+    local primaryFrequency = self._configService:GetPrimaryFrequency();
+    self:SendMessageForFrequency(messageModel, primaryFrequency);
+
+end
+
+function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
+    local channelSettings = self._configService:GetSettingsForFrequency(frequency);
+    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
+    local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
+
+    if not channelSettings.ChannelSettings.ChannelIsEnabled then
     
         if chatFrame then
             chatFrame:AddMessage(string.format(
                 GBR_Constants.MSG_RADIO_RADIO_OFF_ERROR,
                 channelColour:ToEscapedHexString(),
-                primaryFrequency));
+                frequency));
         end
 
         return;
     end
 
-    if primaryChannelSettings.TransmitterSettings.UseTransmitters then
+    if channelSettings.TransmitterSettings.UseTransmitters then
 
-        local interferenceType = self:AddMessageInterference(messageModel, primaryChannelSettings);
+        local interferenceType = self:AddMessageInterference(messageModel, channelSettings);
 
         if interferenceType == GBR_EMessageInterferenceType.OutOfRange then
             if chatFrame then
                 chatFrame:AddMessage(string.format(
                     GBR_Constants.MSG_RADIO_TRANSMITTER_RANGE_ERROR,
                     channelColour:ToEscapedHexString(),
-                    primaryFrequency));
+                    frequency));
 
                 GBR_MessageService:PlayNoSignalAudio();
 
@@ -55,6 +60,10 @@ function GBR_MessageService:SendMessage(messageModel)
             end            
         end            
     end
+
+    messageModel.MessageData.Frequency = frequency;    
+    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(frequency);
 
     local dispatchMethod = {
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,
@@ -64,7 +73,6 @@ function GBR_MessageService:SendMessage(messageModel)
     };
 
     dispatchMethod[messageModel.MessageData.MessageType](self, messageModel);
-
 end
 
 function GBR_MessageService.StaticReceiveMessage(prefix, data, method, senderName)
@@ -113,10 +121,6 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
 end
 
 function GBR_MessageService:SendSpeechMessage(messageModel)
-    
-    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -136,10 +140,6 @@ function GBR_MessageService:SendSpeechMessage(messageModel)
 end
 
 function GBR_MessageService:SendSilentSpeechMessage(messageModel)
-    
-    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -158,10 +158,6 @@ function GBR_MessageService:SendSilentSpeechMessage(messageModel)
 end
 
 function GBR_MessageService:SendEmergencyMessage(messageModel)
-
-    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(GBRadioAddonDataSettingsDB.char.PrimaryFrequency);
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -182,7 +178,6 @@ end
 function GBR_MessageService:SendWhoIsListeningMessage(messageModel)    
 
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.Frequency = GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
 
     local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
 
@@ -275,7 +270,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
         self:PlaySendEmergencyMessageAudio();
     else
         self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
-        GBR_Delay:Delay(2, GBRadio.NotificationTest);        
+        --GBR_Delay:Delay(2, GBRadio.NotificationTest);        
     end
 
 end

@@ -34,6 +34,7 @@ Models/GBR_CommChannelModel.lua
 Models/GBR_LocationModel.lua
 Models/GBR_MessageModel.lua
 Models/GBR_ClosestTransmitterModel.lua
+Models/GBR_ExportableChannelSettingsModel.lua
 
 Services/GBR_CommandService.lua
 Services/GBR_ConfigService.lua

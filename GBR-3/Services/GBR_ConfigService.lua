@@ -4,6 +4,8 @@ function GBR_ConfigService:New(obj)
 
     self._mrpService = GBR_Singletons:FetchService(GBR_Constants.SRV_MRP_SERVICE);
     self._locationService = GBR_SingletonService:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
+    self._serialiserService = GBR_SingletonService:FetchService(GBR_Constants.SRV_SERIALISER_SERVICE);
+    self._addonService = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
 
     self.StagingVars =
     {
@@ -13,6 +15,8 @@ function GBR_ConfigService:New(obj)
         GeoToolsWorldCoordinates = GBR_Vector3:New(),
         GeoToolsLocalCoordinates = GBR_Vector3:New(),
         FrequencyListeners = {},
+        DeserializedImportString = nil,
+        ImportFrequencyExists = false,
     };
 
     self:Initialize();
@@ -351,6 +355,53 @@ function GBR_ConfigService:Initialize()
                                             end
                                     }
                                 }
+                            },
+                            importChannelGroup =
+                            {
+                                type = "group",
+                                name = "Import channel",
+                                order = 0,
+                                guiInline = true,
+                                args =
+                                {
+                                    importChannelDescription =
+                                    {
+                                        type = "description",
+                                        name = "Add a new channel via a shared import string.",
+                                        order = 0
+                                    },
+                                    importChannelString =
+                                    {
+                                        name = "Import string",
+                                        desc = "Paste the import string for the channel.",
+                                        type = "input",
+                                        multiline = 5,
+                                        width = "full",
+                                        cmdHidden = true,
+                                        confirm = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                local settings = configService:GetImportedSettingsFromString(value);
+                                                local frequencyExists, message = GBR_ConfigService.ImportedFrequencyExists(settings.ChannelSettings.ChannelFrequency);
+
+                                                configService.StagingVars.DeserializedImportString = settings;                                               
+                                                configService.StagingVars.ImportFrequencyExists = frequencyExists;
+                                                return message;
+
+                                            end,
+                                        set = 
+                                            function(info, value)
+                                                local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                                local settings = configService.StagingVars.DeserializedImportString;
+                                                local inportToExisting = configService.StagingVars.ImportFrequencyExists;
+
+                                                if settings == nil then return end;
+
+                                                configService:ImportSettingsFromString(settings, inportToExisting);
+                                            end,
+                                        order = 2,
+                                    }
+                                }
                             }
                         }
                     }
@@ -448,13 +499,6 @@ function GBR_ConfigService:Initialize()
 
     for channelKey, channelData in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
         self.AddChannelToUi(addon.OptionsTable.args.channelConfig.args, channelKey, channelData);
-
-        for transmitterKey, transmitterData in pairs(channelData.TransmitterSettings.StationaryTransmitters) do
-            self.AddTransmitterToUi(
-                addon.OptionsTable.args.channelConfig.args[channelKey].args.transmitterSettingsConfigurationPage.args.transmitterSettingsGroup.args, 
-                transmitterKey, 
-                transmitterData);
-        end
     end
     
     addon.ConfigRegistry = LibStub("AceConfig-3.0"):RegisterOptionsTable("GBRadio3", addon.OptionsTable);
@@ -543,12 +587,18 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                         end,
                     set = 
                         function(info, value) 
+                            local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
                             local key = info[#info-3];
                             local oldFrequencyValue = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
 
                             if GBRadioAddonDataSettingsDB.char.PrimaryFrequency == oldFrequencyValue then
                                 GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
                             end
+
+                            addon.OptionsTable.args.channelConfig.args[key].name = GBR_ConfigService.GetChannelGroupName(
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled,
+                                GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelName,
+                                value);
 
                             GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency = value; 
                         end,
@@ -651,41 +701,6 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                             end
                         end
                 },
-            }
-        },
-        channelDeleteHeader = 
-        {
-            order = 4,
-            type = "group",
-            name = "Delete channel",
-            guiInline = true,
-            args = 
-            {
-                channelDeleteDesc = 
-                {
-                    order = 0,
-                    type = "description",
-                    name = "|cFFFF0000If you no longer need this channel then you can delete it here.\nNote that this action is irreversible!"
-                },
-                channelDeleteButton = 
-                {
-                    order = 1,
-                    type = "execute",
-                    name = "DELETE CHANNEL",
-                    width = "full",
-                    confirm = 
-                        function()
-                            return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!"
-                        end,
-                    func =
-                        function(info, value)
-                            local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-                            local key = info[#info-3];
-
-                            GBRadioAddonDataSettingsDB.char.Channels[key] = nil;
-                            addon.OptionsTable.args.channelConfig.args[key] = nil;
-                        end
-                }
             }
         }
     }
@@ -1020,9 +1035,9 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
 
 end
 
-function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
+function GBR_ConfigService.AddTransmitterSettingsConfigurationPage(channelData)
 
-    return
+    local transmitterUiData =
     {
         transmitterSettingsGroup =
         {
@@ -1213,6 +1228,15 @@ function GBR_ConfigService.AddTransmitterSettingsConfigurationPage()
             }
         }        
     }
+    
+    for transmitterKey, transmitterData in pairs(channelData.TransmitterSettings.StationaryTransmitters) do
+        GBR_ConfigService.AddTransmitterToUi(
+            transmitterUiData.transmitterSettingsGroup.args, 
+            transmitterKey, 
+            transmitterData);
+    end
+
+    return transmitterUiData;
 
 end
 
@@ -1302,6 +1326,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                 type = "input",
                 order = 1,
                 width = "full",
+                validate = GBR_ConfigService.ValidateTransmitterName,
                 get = 
                     function(info)
                         local channelKey = info[#info-4];
@@ -1440,6 +1465,42 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                         local transmitterKey = info[#info-1];
                         return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].SubZone;
                     end,
+            },
+            transmitterDeleteDescr =
+            {
+                name = "|cFFFF0000If you no longer need this transmitter then you can delete it here.\nNote that this action is irreversible!|r",
+                type = "description",
+                width = "full",
+                order = 11,
+                disabled = true,
+                get = 
+                    function(info)
+                        local channelKey = info[#info-4];
+                        local transmitterKey = info[#info-1];
+                        return GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey].SubZone;
+                    end,
+            },
+            transmitterDeleteButton = 
+            {
+                order = 12,
+                type = "execute",
+                name = "DELETE TRANSMITTER",
+                width = "full",
+                confirm = 
+                    function()
+                        return "|cFFFF0000Are you sure that you want to delete this transmitter?\n\nNote that this action is irreversible!|r"
+                    end,
+                func =
+                    function(info, value)
+                        local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                        local channelKey = info[#info-4];
+                        local transmitterKey = info[#info-1];
+
+                        addon.OptionsTable.args.channelConfig.args[channelKey].args.transmitterSettingsConfigurationPage
+                            .args.transmitterSettingsGroup.args[transmitterKey] = nil;
+
+                        GBRadioAddonDataSettingsDB.char.Channels[channelKey].TransmitterSettings.StationaryTransmitters[transmitterKey] = nil;
+                    end,
             }
         }
     };
@@ -1447,6 +1508,8 @@ end
 
 function GBR_ConfigService.AddChannelToDb(targetDbTable, key, channelData)
     targetDbTable[key] = channelData;
+
+    return targetDbTable[key];
 end
 
 function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
@@ -1495,7 +1558,7 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
             {
                 type = "group",
                 name = "Transmitter",
-                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(),
+                args = GBR_ConfigService.AddTransmitterSettingsConfigurationPage(channelData),
                 childGroups = "tree",
                 order = 4
             },
@@ -1504,7 +1567,8 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
                 type = "group",
                 name = "Admin",
                 childGroups = "tab",
-                args = {                    
+                args = 
+                {                    
                     userAdminPage =
                     {
                         type = "group",
@@ -1518,21 +1582,115 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
                                 order = 0,
                                 func =
                                     function(info)
-                                        local messageService = GBR_Singletons:FetchService(GBR_Constants.SRV_MESSAGE_SERVICE);    
+                                        local channelKey = info[#info-3];
+                                        local messageService = GBR_Singletons:FetchService(GBR_Constants.SRV_MESSAGE_SERVICE);
+                                        local frequency = GBRadioAddonDataSettingsDB.char.Channels[channelKey].ChannelSettings.ChannelFrequency;
                                         local messageModel = GBR_MessageModel:New();
                                     
                                         messageModel.MessageData.MessageType = GBR_EMessageType.WhoIsListening;                                    
-                                        messageService:SendMessage(messageModel);
-                                    end
+                                        messageService:SendMessageForFrequency(messageModel, frequency);
+                                    end,
                             },
                         },
                         order = 0
+                    },
+                    exportPage =
+                    {
+                        type = "group",
+                        name = "Export",
+                        childGroups = "tree",
+                        args = {
+                            exportChannelHeader = 
+                            {
+                                order = 1,
+                                type = "group",
+                                name = "Export channel",
+                                guiInline = true,
+                                args = 
+                                {
+                                    exportChannelDesc = 
+                                    {
+                                        order = 0,
+                                        type = "description",
+                                        name = "You can share a channel's 'Channel' and 'Transmitter' settings with other users by sharing the export string below."
+                                    },
+                                    channelExportString = 
+                                    {
+                                        order = 1,
+                                        type = "input",
+                                        multiline = 5,
+                                        name = "Export string",
+                                        width = "full",
+                                        get = function(info)
+                                            local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+                                            local key = info[#info-4];
+
+                                            return configService:GetExportableSettingsForChannel(key);
+                                        end
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    deleteChannelPage =
+                    {
+                        type = "group",
+                        name = "Delete",
+                        childGroups = "tree",
+                        args = {
+                            channelDeleteHeader = 
+                            {
+                                order = 1,
+                                type = "group",
+                                name = "Delete channel",
+                                guiInline = true,
+                                args = 
+                                {
+                                    channelDeleteDesc = 
+                                    {
+                                        order = 0,
+                                        type = "description",
+                                        name = "|cFFFF0000If you no longer need this channel then you can delete it here.\nNote that this action is irreversible!|r"
+                                    },
+                                    channelDeleteButton = 
+                                    {
+                                        order = 1,
+                                        type = "execute",
+                                        name = "DELETE CHANNEL",
+                                        width = "full",
+                                        confirm = 
+                                            function()
+                                                return "|cFFFF0000Are you sure that you want to delete this channel?\n\nNote that this action is irreversible!|r"
+                                                .."\n\nIf you proceed, please confirm that your primary channel is still set afterwards.";
+                                            end,
+                                        func =
+                                            function(info, value)
+                                                local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+                                                local key = info[#info-4];
+                                                local channelFrequency = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                                                local resetPrimaryChannel = channelFrequency == GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
+                    
+                                                GBRadioAddonDataSettingsDB.char.Channels[key] = nil;
+                                                addon.OptionsTable.args.channelConfig.args[key] = nil;
+
+                                                if resetPrimaryChannel then
+                                                    for k,v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do -- Pick the first channel to set the primary channel to.
+                                                        GBRadioAddonDataSettingsDB.char.PrimaryFrequency = v.ChannelSettings.ChannelFrequency;
+                                                        return;
+                                                    end
+                                                end
+                                            end
+                                    }
+                                }
+                            }
+                        }
                     }
-                },
-                order = 5
+                }
             }
         }
     };
+
+    return targetSettingsTable[key];
 end
 
 function GBR_ConfigService:IsAddChannelReady(info)
@@ -1675,12 +1833,12 @@ end
 
 function GBR_ConfigService.ValidateChannelName(info, value)
     if value:len() < 1 then return "Channel name must be at least 1 character." end;
-    if value:len() > 20 then return "Channel name must be 12 characters or less." end;
+    if value:len() > 20 then return "Channel name must be 20 characters or less." end;
     return true;
 end
 
 function GBR_ConfigService.ValidateChannelFrequency(info, value)
-    if value:match("%W") then return "Channel frequency must only contain letters or numbers." end;
+    if value:match("[^%w-_]") then return "Channel frequency must only contain letters, numbers, hyphens (-) or underscores (_)." end;
     if value:len() < 3 then return "Channel frequency must be at least 3 characters." end;
     if value:len() > 8 then return "Channel frequency must be 8 characters or less." end;
     return GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value);
@@ -1697,6 +1855,12 @@ function GBR_ConfigService.ValidateChannelFrequencyIsUnique(info, value)
             return "Channel frequencies must be unique.\n\nChannel frequency \"" .. value .. "\" is already in use by channel \"".. v.ChannelSettings.ChannelName .."\".\n\nPlease enter a different frequency."
         end;
     end
+    return true;
+end
+
+function GBR_ConfigService.ValidateTransmitterName(info, value)
+    if value:len() < 1 then return "Transmitter name must be at least 1 character." end;
+    if value:len() > 20 then return "Transmitter name must be 20 characters or less." end;
     return true;
 end
 
@@ -2051,5 +2215,70 @@ function GBR_ConfigService:AddCurrentLocationToTransmitterData(stationaryTransmi
     stationaryTransmitter.MapTypeId = playerPosition.MapTypeId;
     stationaryTransmitter.Zone = playerPosition.Zone;
     stationaryTransmitter.SubZone = playerPosition.SubZone;
+
+end
+
+function GBR_ConfigService:GetExportableSettingsForChannel(channelKey)
+    
+    local channelSettings = GBRadioAddonDataSettingsDB.char.Channels[channelKey];
+    local exportableSettings = GBR_ExportableChannelSettingsModel:New
+    {
+        ChannelFrequency = channelSettings.ChannelSettings.ChannelFrequency,
+        ChannelSettings = channelSettings.ChannelSettings,
+        InteractionSettings = channelSettings.InteractionSettings,
+        TransmitterSettings = channelSettings.TransmitterSettings,
+    };
+
+    return self._serialiserService:Serialize(exportableSettings);
+
+end
+
+function GBR_ConfigService:GetImportedSettingsFromString(settingsString)
+
+    local importedSettings = GBR_ExportableChannelSettingsModel:New(
+        self._serialiserService:Deserialize(settingsString)
+    );   
+
+    return importedSettings;
+end
+
+function GBR_ConfigService.ImportedFrequencyExists(frequency)    
+
+    for k, v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
+        if v.ChannelSettings.ChannelFrequency == frequency then 
+            return true, string.format("Channel frequency is already in use."
+                .. "\n\nChannel frequency '%s' is already in use by channel '%s' and proceeding will delete your current channel settings, replacing them entirely with the new settings."
+                .. "\n\nDo you want to continue?", frequency, v.ChannelSettings.ChannelName);
+        end
+    end
+
+    return false, nil;
+
+end
+
+function GBR_ConfigService:ImportSettingsFromString(importedSettings, addToExisting)
+
+    if addToExisting then
+        local existingChannelKey = self:GetSettingsKeyForFrequency(importedSettings.ChannelSettings.ChannelFrequency);
+        GBRadioAddonDataSettingsDB.char.Channels[existingChannelKey] = nil;
+        self._addonService.OptionsTable.args.channelConfig.args[existingChannelKey] = nil;
+    end
+
+    local channelKey = self:GetNextRandomKey();
+    local newSettingsModel = self.GetNewChannelSettingsModel(nil, nil); -- We're overriding the name and freq at the next step
+
+    newSettingsModel.ChannelSettings = importedSettings.ChannelSettings;
+    newSettingsModel.InteractionSettings = importedSettings.InteractionSettings;
+    newSettingsModel.TransmitterSettings = importedSettings.TransmitterSettings;
+
+    GBR_ConfigService.AddChannelToUi(
+        self._addonService.OptionsTable.args.channelConfig.args, 
+        channelKey, 
+        newSettingsModel);
+
+    GBR_ConfigService.AddChannelToDb(
+        GBRadioAddonDataSettingsDB.char.Channels,
+        channelKey,
+        newSettingsModel);
 
 end
