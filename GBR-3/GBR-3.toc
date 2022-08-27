@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 90207
 ## Title: GB|cff00c0ffRadio|r 3
 ## Notes: A buzzbox addon for roleplay.
 ## SavedVariables: GBRadioAddonDataSettingsDBSavedVars
@@ -35,6 +35,8 @@ Models/GBR_LocationModel.lua
 Models/GBR_MessageModel.lua
 Models/GBR_ClosestTransmitterModel.lua
 Models/GBR_ExportableChannelSettingsModel.lua
+Models/GBR_NotificationModel.lua
+Models/GBR_NotificationProxy.lua
 
 Services/GBR_CommandService.lua
 Services/GBR_ConfigService.lua
@@ -45,5 +47,6 @@ Services/GBR_MRPService.lua
 Services/GBR_PlayerService.lua
 Services/GBR_SerialiserService.lua
 Services/GBR_SingletonService.lua
+Services/GBR_NotificationService.lua
 
 GBRadio.lua

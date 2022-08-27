@@ -17,6 +17,7 @@ GBR_Constants =
     SRV_SERIALISER_SERVICE = "SerialiserService",
     SRV_SINGLETON_SERVICE = "SingletonService",
     SRV_ADDON_SERVICE = "AddonService",
+    SRV_NOTIFICATION_SERVICE = "NotificationService",
 
     CMD_MAIN = "gbr",
     CMD_DEV_TEST = "gbr3test",
@@ -46,7 +47,7 @@ GBR_Constants =
     -- colour, frequency, charactername, displayname, location, coord-x, coord-y
     MSG_RADIO_EMERGENCY = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s (%.2f, %.2f).",
     -- colour, frequency, charactername, displayname, location
-    MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\COMMON\\VOICECHAT-SPEAKER:16:16:8|t|TInterface\\COMMON\\VOICECHAT-ON:16:16:-8|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s.",
+    MSG_RADIO_EMERGENCY_NO_COORDS = "|TInterface\\DialogFrame\\DialogAlertIcon:16:16:0:2:64:64:16:46:16:46|t %s[%s] [|Hplayer:%s|h%s|h] [|cFFFF0000EMERGENCY ALERT|r]: Emergency at %s.",
 
     -- pronoun, device name
     MSG_EMOTE_SEND_MESSAGE = "speaks into %s %s --",

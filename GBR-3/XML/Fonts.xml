@@ -49,7 +49,7 @@
 
 	<FontFamily name="GBRAlert_Details" virtual="true">
 		<Member alphabet="roman">
-			<Font font="Interface\Addons\GBR-3\Media\Fonts\Transport Medium.ttf" height="10"/>
+			<Font font="Interface\Addons\GBR-3\Media\Fonts\PT_Sans-Narrow-Bold.ttf" height="12"/>
 				<Shadow><Offset><AbsDimension x='1' y='-1'/></Offset><Color r='0' g='0' b='0'/></Shadow>
 		</Member>
 		<Member alphabet="korean">

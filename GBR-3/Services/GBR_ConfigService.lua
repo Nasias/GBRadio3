@@ -543,9 +543,28 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                             GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelIsEnabled = value;
                         end,
                 },
-                channelName = 
+                channelNotificationsEnabled =
                 {
                     order = 1,
+                    name = "Channel notifications enabled",
+                    desc = "Show important messages in their own notification pop-up.",
+                    type = "toggle",
+                    width = "full",
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelNotificationsEnabled;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelNotificationsEnabled = value;
+                        end,
+                },
+                channelName = 
+                {
+                    order = 2,
                     name = "Channel name",
                     desc = "Enter a descriptive name for the channel you would like to use.",
                     type = "input",
@@ -573,7 +592,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                 },
                 channelFrequency = 
                 {
-                    order = 2,
+                    order = 3,
                     name = "Channel frequency",
                     desc = "Enter the channel's frequency. .\n\nOnly use letters and numbers, and don't use spaces.",
                     type = "input",
@@ -605,7 +624,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                 },
                 channelNotes =
                 {
-                    order = 3,
+                    order = 4,
                     name = "Channel notes",
                     desc = "Enter any notes that you want to keep for this channel",
                     type = "input",
@@ -973,6 +992,23 @@ function GBR_ConfigService.AddInteractionSettingsConfigurationPage(channelData)
                         function(info, value) 
                             local key = info[#info-3];
                             GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnNoSignal = value;
+                        end,
+                },
+                audioOnNotifications =
+                {
+                    order = 9,
+                    type = "toggle",
+                    name = "Play audio on notifications",
+                    width = "full",
+                    get =
+                        function(info) 
+                            local key = info[#info-3];
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnNotifications;
+                        end,
+                    set =
+                        function(info, value) 
+                            local key = info[#info-3];
+                            GBRadioAddonDataSettingsDB.char.Channels[key].InteractionSettings.AudioOnNotifications = value;
                         end,
                 }
             }
@@ -1778,6 +1814,7 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
         ChannelSettings =
         {
             ChannelIsEnabled = true,
+            ChannelNotificationsEnabled = true,
             ChannelName = channelName,
             ChannelFrequency = frequency,
             ChannelNotes = "",
@@ -1806,6 +1843,7 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
             AudioOnEmergencySend = true,
             AudioOnEmergencyReceive = true,
             AudioOnNoSignal = true,
+            AudioOnNotifications = true,
             ChannelEmoteCooldown = 10,
             ChannelAudioCooldown = 10,
         },
@@ -2042,6 +2080,13 @@ function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabledForFrequency(fre
 
     local settingsForFrequency = self:GetSettingsForFrequency(frequency);
     return settingsForFrequency.InteractionSettings.AudioOnEmergencyReceive;
+
+end
+
+function GBR_ConfigService:IsNotificationAudioForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.InteractionSettings.AudioOnNotifactions;
 
 end
 

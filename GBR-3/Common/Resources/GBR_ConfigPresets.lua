@@ -19,6 +19,7 @@ GBR_ConfigPresets.BuzzBox =
                 ChannelSettings =
                 {
                     ChannelIsEnabled = true,
+                    ChannelNotificationsEnabled = true,
                     ChannelName = "Default",
                     ChannelFrequency = "GBRADIO",
                     ChannelNotes = "This is the default GBRadio channel for demonstration purposes. You can freely change or delete this channel's settings.",
@@ -47,6 +48,7 @@ GBR_ConfigPresets.BuzzBox =
                     AudioOnEmergencySend = true,
                     AudioOnEmergencyReceive = true,
                     AudioOnNoSignal = true,
+                    AudioOnNotifications = true,
                     ChannelEmoteCooldown = 10,
                     ChannelAudioCooldown = 10,
                 },

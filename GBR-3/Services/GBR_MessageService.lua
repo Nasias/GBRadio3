@@ -9,6 +9,7 @@ function GBR_MessageService:New(obj)
     self._historyService = GBR_Singletons:FetchService(GBR_Constants.SRV_HISTORY_SERVICE);
     self._playerService = GBR_Singletons:FetchService(GBR_Constants.SRV_PLAYER_SERVICE);
     self._locationService = GBR_Singletons:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
+    self._notificationService = GBR_Singletons:FetchService(GBR_Constants.SRV_NOTIFICATION_SERVICE);
 
     self.ReceivedAudioCooldowns = {};
     self.ReceivedEmoteCooldowns = {};
@@ -259,8 +260,8 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
                 GBR_Constants.MSG_RADIO_EMERGENCY_NO_COORDS, 
                 channelColour:ToEscapedHexString(), 
                 messageModel.MessageData.Frequency,
-                messageModel.MessageData.CharacterModel.Location.CharacterName,
-                messageModel.MessageData.CharacterModel.Location.CharacterDisplayName,
+                messageModel.MessageData.CharacterModel.CharacterName,
+                messageModel.MessageData.CharacterModel.CharacterDisplayName,
                 messageModel.MessageData.CharacterModel.Location.Zone);
 
         chatFrame:AddMessage(emergencyMessage);
@@ -270,7 +271,28 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
         self:PlaySendEmergencyMessageAudio();
     else
         self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
-        --GBR_Delay:Delay(2, GBRadio.NotificationTest);        
+
+        local notificationModel = GBR_NotificationModel:New{
+            Title = "PANIC ALERT",
+            Grade = 1,
+            IncidentLocation = messageModel.MessageData.CharacterModel.Location.Zone,
+            IncidentReporter = messageModel.MessageData.CharacterModel.CharacterDisplayName,
+            IncidentFrequency = messageModel.MessageData.Frequency,
+            IncidentDescription = "A panic button has been pressed by " 
+                .. messageModel.MessageData.CharacterModel.CharacterDisplayName 
+                .. " at " 
+                .. messageModel.MessageData.CharacterModel.Location.Zone .. ".\n\nAll available units are required to respond with urgency.",
+            UnitsRequired = "All available units."
+        };
+
+        local zonePosition = messageModel.MessageData.CharacterModel.Location.ZonePosition
+        if zonePosition.X ~= nil and zonePosition.Y ~= nil then            
+            notificationModel.LocationCoordinateX = messageModel.MessageData.CharacterModel.Location.ZonePosition.X * 100;
+            notificationModel.LocationCoordinateY = messageModel.MessageData.CharacterModel.Location.ZonePosition.Y * 100;
+        end
+
+        self._notificationService:QueueNotification(notificationModel);
+        self:PlayNotificationAudio(messageModel.MessageData.Frequency);
     end
 
 end
@@ -341,6 +363,16 @@ function GBR_MessageService:PlayNoSignalAudio()
     end
 
     PlaySoundFile(self.Sounds.NoSignal, "SFX");
+
+end
+
+function GBR_MessageService:PlayNotificationAudio(frequency)
+
+    if not self._configService:IsNotificationAudioForFrequency(frequency) then
+        return;
+    end
+
+    PlaySoundFile(self.Sounds.Notification, "SFX");
 
 end
 
@@ -517,24 +549,25 @@ end
 GBR_MessageService.Sounds = {
     Send = {
         M = {
-            "Interface\\AddOns\\GBR-3\\Audio\\ms-1.ogg",
-            "Interface\\AddOns\\GBR-3\\Audio\\ms-2.ogg"
+            [[Interface\AddOns\GBR-3\Media\Audio\ms-1.ogg]],
+            [[Interface\AddOns\GBR-3\Media\Audio\ms-2.ogg]]
         },
         F = {
-            "Interface\\AddOns\\GBR-3\\Audio\\fs-1.ogg",
-            "Interface\\AddOns\\GBR-3\\Audio\\fs-2.ogg"
+            [[Interface\AddOns\GBR-3\Media\Audio\fs-1.ogg]],
+            [[Interface\AddOns\GBR-3\Media\Audio\fs-2.ogg]]
         },
     },
     Receive = {
         M = {
-            "Interface\\AddOns\\GBR-3\\Audio\\mr-1.ogg",
-            "Interface\\AddOns\\GBR-3\\Audio\\mr-2.ogg"
+            [[Interface\AddOns\GBR-3\Media\Audio\mr-1.ogg]],
+            [[Interface\AddOns\GBR-3\Media\Audio\mr-2.ogg]]
         },
         F = {
-            "Interface\\AddOns\\GBR-3\\Audio\\fr-1.ogg",
-            "Interface\\AddOns\\GBR-3\\Audio\\fr-2.ogg"
+            [[Interface\AddOns\GBR-3\Media\Audio\fr-1.ogg]],
+            [[Interface\AddOns\GBR-3\Media\Audio\fr-2.ogg]]
         },
     },
-    Emergency = "Interface\\AddOns\\GBR-3\\Audio\\emergency.ogg",
-    NoSignal = "Interface\\AddOns\\GBR-3\\Audio\\no-signal.ogg",
+    Emergency = [[Interface\AddOns\GBR-3\Media\Audio\emergency.ogg]],
+    NoSignal = [[Interface\AddOns\GBR-3\Media\Audio\no-signal.ogg]],
+    Notification = [[Interface\AddOns\GBR-3\Media\Audio\notification.ogg]]
 };

@@ -12,6 +12,7 @@ function GBR_SingletonService:New(obj)
         [GBR_Constants.SRV_MRP_SERVICE] = GBR_MRPService,
         [GBR_Constants.SRV_PLAYER_SERVICE] = GBR_PlayerService,
         [GBR_Constants.SRV_SERIALISER_SERVICE] = GBR_SerialiserService,
+        [GBR_Constants.SRV_NOTIFICATION_SERVICE] = GBR_NotificationService,
     };
 
     self._instantiatedServices = {};
