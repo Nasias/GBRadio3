@@ -2083,10 +2083,10 @@ function GBR_ConfigService:IsReceiveEmergencyMessageAudioEnabledForFrequency(fre
 
 end
 
-function GBR_ConfigService:IsNotificationAudioForFrequency(frequency)
+function GBR_ConfigService:IsNotificationAudioEnabledForFrequency(frequency)
 
     local settingsForFrequency = self:GetSettingsForFrequency(frequency);
-    return settingsForFrequency.InteractionSettings.AudioOnNotifactions;
+    return settingsForFrequency.InteractionSettings.AudioOnNotifications;
 
 end
 

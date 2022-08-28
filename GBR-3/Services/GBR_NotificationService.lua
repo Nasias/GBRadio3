@@ -98,7 +98,7 @@ function GBR_NotificationService:_buildIncidentLocation(parent)
     incidentLocationText:SetJustifyV("MIDDLE")
     incidentLocationText:SetWordWrap(true)
     incidentLocationText:SetPoint("TOPLEFT", incidentLocationFrame, "TOPLEFT", 43, 0)
-    incidentLocationText:SetPoint("BOTTOMRIGHT", incidentLocationFrame, "BOTTOMRIGHT", 0, -4)
+    incidentLocationText:SetPoint("BOTTOMRIGHT", incidentLocationFrame, "BOTTOMRIGHT", 0, 0)
     --userLocationText:SetText("STORMWIND CITY\n(52.43, 80.79)");
 
     incidentLocationFrame.Icon = incidentLocationIcon;
@@ -124,7 +124,7 @@ function GBR_NotificationService:_buildIncidentReporter(parent)
     reporterNameText:SetJustifyV("MIDDLE");
     reporterNameText:SetWordWrap(true);
     reporterNameText:SetPoint("TOPLEFT", reporterNameFrame, "TOPLEFT", 43, 0);
-    reporterNameText:SetPoint("BOTTOMRIGHT", reporterNameFrame, "BOTTOMRIGHT", 0, -4);
+    reporterNameText:SetPoint("BOTTOMRIGHT", reporterNameFrame, "BOTTOMRIGHT", 0, 0);
     --reporterNameText:SetText("ROOK TATSUYA\n(SO-159)");
 
     reporterNameFrame.Icon = reporterNameIcon;
@@ -175,7 +175,7 @@ function GBR_NotificationService:_buildIncidentDescription(parent)
     incidentDescriptionText:SetJustifyH("LEFT")
     incidentDescriptionText:SetJustifyV("TOP")
     incidentDescriptionText:SetWordWrap(true)
-    incidentDescriptionText:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 43, 0)
+    incidentDescriptionText:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 43, 4)
     incidentDescriptionText:SetPoint("BOTTOMRIGHT", incidentDescriptionFrame, "BOTTOMRIGHT", 0, 0)
     --incidentDescriptionText:SetText("INCIDENT OVERVIEW\nAlpha patrol (Echo Company) reports three armed suspects at large in the Mage Quarter, Stormwind City.\n\nInjures: 4 PUB, 2 LEA.");
 

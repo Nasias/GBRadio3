@@ -48,10 +48,10 @@ end
 function GBR_NotificationProxy:SetIncidentLocation(location, coordinateX, coordinateY)
 
     local locationText = location ~= nil and coordinateX ~= nil and coordinateY ~= nil
-        and string.format("%s\n(%s, %s)", location, coordinateX, coordinateY)
-        or location;
+        and string.format("%s\n(%.2f, %.2f)", location, coordinateX, coordinateY)
+        or location .. "\n-";
 
-    self.Notification.IncidentLocation.Text:SetText(location);
+    self.Notification.IncidentLocation.Text:SetText(locationText);
 
 end
 

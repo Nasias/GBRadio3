@@ -284,11 +284,10 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
                 .. messageModel.MessageData.CharacterModel.Location.Zone .. ".\n\nAll available units are required to respond with urgency.",
             UnitsRequired = "All available units."
         };
-
         local zonePosition = messageModel.MessageData.CharacterModel.Location.ZonePosition
-        if zonePosition.X ~= nil and zonePosition.Y ~= nil then            
-            notificationModel.LocationCoordinateX = messageModel.MessageData.CharacterModel.Location.ZonePosition.X * 100;
-            notificationModel.LocationCoordinateY = messageModel.MessageData.CharacterModel.Location.ZonePosition.Y * 100;
+        if zonePosition.X ~= nil and zonePosition.Y ~= nil then
+            notificationModel.LocationCoordinateX = zonePosition.X * 100;
+            notificationModel.LocationCoordinateY = zonePosition.Y * 100;
         end
 
         self._notificationService:QueueNotification(notificationModel);
@@ -368,7 +367,7 @@ end
 
 function GBR_MessageService:PlayNotificationAudio(frequency)
 
-    if not self._configService:IsNotificationAudioForFrequency(frequency) then
+    if not self._configService:IsNotificationAudioEnabledForFrequency(frequency) then
         return;
     end
 
