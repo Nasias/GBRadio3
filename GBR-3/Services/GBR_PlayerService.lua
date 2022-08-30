@@ -15,7 +15,7 @@ function GBR_PlayerService:GetCurrentCharacterModel()
     return GBR_CharacterModel:New
     {
         CharacterName = UnitName(GBR_Constants.ID_PLAYER),
-        CharacterColour = GBR_ARGB:New(),
+        CharacterColour = self:GetPlayerColour(),
         CharacterGender = self._configService:GetCharacterGender(),
         CharacterVoiceType = self._configService.GetCharacterVoiceType(),
         Location = self._locationService:GetCurrentCharacterLocation(),
@@ -32,5 +32,16 @@ function GBR_PlayerService:GetCharacterNameForNameType(nameType)
     };
 
     return t[nameType];
+
+end
+
+function GBR_PlayerService:GetPlayerColour()
+
+    local trpColour = self._mrpService:GetPlayerColour();
+
+    local _, unitClass = UnitClass(GBR_Constants.ID_PLAYER);
+    local _, _, _, classColour = GetClassColor(unitClass);
+
+    return trpColour or classColour;
 
 end

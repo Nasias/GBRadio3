@@ -4,28 +4,27 @@ GBR_Singletons = nil;
 
 function GBRadioAddonData:OnInitialize()
 
-    -- # Begin Globals
     GBR_Singletons = GBR_SingletonService:New();
-    GBRadio:ConfigureServices();
-    GBRadio:ConfigureCommunication();
-    -- # End Globals    
+
+    GBRadio
+        :AddServices()
+        :AddConfiguration()
+        :AddCommunication()
+        :AddHooks();
 
 end
 
-function GBRadio:ConfigureServices()
+function GBRadio:AddServices()
 
     GBR_Singletons:RegisterManualService(GBR_Constants.SRV_ADDON_SERVICE, GBRadioAddonData);
     GBR_Singletons:InstantiateService(GBR_Constants.SRV_COMMAND_SERVICE);    
 
-    local defaultSettings = GBR_ConfigPresets.BuzzBox;
-    
-    GBRadioAddonDataSettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
 
-    GBR_Singletons:InstantiateService(GBR_Constants.SRV_CONFIG_SERVICE);
+    return self;
 
 end
 
-function GBRadio:ConfigureCommunication()
+function GBRadio:AddCommunication()
 
     local frameMA = CreateFrame("FRAME");
     frameMA:RegisterEvent("PLAYER_ENTERING_WORLD");
@@ -35,7 +34,31 @@ function GBRadio:ConfigureCommunication()
     end
     
     frameMA:SetScript("OnEvent", frameMA.OnEvent);
-
+    
     GBRadioAddonData:RegisterComm(GBR_Constants.OPT_ADDON_CHANNEL_PREFIX, GBR_MessageService.StaticReceiveMessage);
+
+    return self;
+
+end
+
+function GBRadio:AddConfiguration()
+
+    local defaultSettings = GBR_ConfigPresets.BuzzBox;
+    
+    GBRadioAddonDataSettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
+
+    GBR_Singletons:InstantiateService(GBR_Constants.SRV_CONFIG_SERVICE);
+
+    return self;
+
+end
+
+function GBRadio:AddHooks()
+
+    GBR_Singletons:InstantiateService(GBR_Constants.SRV_HOOK_SERVICE)
+        :RegisterHooks();
+
+
+    return self;
 
 end

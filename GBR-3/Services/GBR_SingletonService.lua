@@ -13,6 +13,9 @@ function GBR_SingletonService:New(obj)
         [GBR_Constants.SRV_PLAYER_SERVICE] = GBR_PlayerService,
         [GBR_Constants.SRV_SERIALISER_SERVICE] = GBR_SerialiserService,
         [GBR_Constants.SRV_NOTIFICATION_SERVICE] = GBR_NotificationService,
+        [GBR_Constants.SRV_HOOK_SERVICE] = GBR_HookService,
+        [GBR_Constants.SRV_HYPERLINK_SERVICE] = GBR_HyperlinkService,
+        [GBR_Constants.SRV_ROLE_SERVICE] = GBR_RoleService,
     };
 
     self._instantiatedServices = {};

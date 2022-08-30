@@ -10,6 +10,8 @@ function GBR_MessageService:New(obj)
     self._playerService = GBR_Singletons:FetchService(GBR_Constants.SRV_PLAYER_SERVICE);
     self._locationService = GBR_Singletons:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
     self._notificationService = GBR_Singletons:FetchService(GBR_Constants.SRV_NOTIFICATION_SERVICE);
+    self._hyperlinkService = GBR_Singletons:FetchService(GBR_Constants.SRV_HYPERLINK_SERVICE);
+    self._roleService = GBR_Singletons:FetchService(GBR_Constants.SRV_ROLE_SERVICE);
 
     self.ReceivedAudioCooldowns = {};
     self.ReceivedEmoteCooldowns = {};
@@ -65,6 +67,7 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
     messageModel.MessageData.Frequency = frequency;    
     messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
     messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(frequency);
+    messageModel.MessageData.CharacterModel.CharacterRoles = self._configService:GetCharacterRolesForFrequency(frequency);
 
     local dispatchMethod = {
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,
@@ -218,12 +221,15 @@ function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
     local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
+    local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
 
     if chatFrame then
         chatFrame:AddMessage(string.format(
             GBR_Constants.MSG_RADIO_MESSAGE, 
             channelColour:ToEscapedHexString(), 
             messageModel.MessageData.Frequency,
+            roleIcons:len() > 0 and "[".. roleIcons .."] " or "",
+            messageModel.MessageData.CharacterModel.CharacterColour,
             messageModel.MessageData.CharacterModel.CharacterName,
             messageModel.MessageData.CharacterModel.CharacterDisplayName,
             messageModel.MessageData.Message));
@@ -244,13 +250,16 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
     local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
+    local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
     
     if chatFrame then
-        local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil
+        local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil and messageModel.MessageData.CharacterModel.Location.ZonePosition.Y ~= nil
             and string.format(
                 GBR_Constants.MSG_RADIO_EMERGENCY, 
                 channelColour:ToEscapedHexString(), 
                 messageModel.MessageData.Frequency,
+                roleIcons:len() > 0 and "[".. roleIcons .."] " or "",
+                messageModel.MessageData.CharacterModel.CharacterColour,
                 messageModel.MessageData.CharacterModel.CharacterName,
                 messageModel.MessageData.CharacterModel.CharacterDisplayName,
                 messageModel.MessageData.CharacterModel.Location.Zone,
@@ -260,6 +269,8 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
                 GBR_Constants.MSG_RADIO_EMERGENCY_NO_COORDS, 
                 channelColour:ToEscapedHexString(), 
                 messageModel.MessageData.Frequency,
+                roleIcons:len() > 0 and "[".. roleIcons .."] " or "",
+                messageModel.MessageData.CharacterModel.CharacterColour,
                 messageModel.MessageData.CharacterModel.CharacterName,
                 messageModel.MessageData.CharacterModel.CharacterDisplayName,
                 messageModel.MessageData.CharacterModel.Location.Zone);

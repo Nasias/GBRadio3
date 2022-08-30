@@ -6,6 +6,7 @@ function GBR_ConfigService:New(obj)
     self._locationService = GBR_SingletonService:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
     self._serialiserService = GBR_SingletonService:FetchService(GBR_Constants.SRV_SERIALISER_SERVICE);
     self._addonService = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+    self._roleService = GBR_SingletonService:FetchService(GBR_Constants.SRV_ROLE_SERVICE);
 
     self.StagingVars =
     {
@@ -199,30 +200,6 @@ function GBR_ConfigService:Initialize()
                                         return pronouns.A;
                                     end,
                                 order = 2
-                            },
-                            customPronounB =
-                            {
-                                name = "Pronoun B",
-                                type = "input",
-                                width = 0.75,
-                                get =
-                                    function(info)
-                                        local pronouns = GBR_ConfigService.GetCharacterPronouns();
-                                        return pronouns.B;
-                                    end,
-                                order = 3
-                            },
-                            customPronounC =
-                            {
-                                name = "Pronoun C",
-                                type = "input",
-                                width = 0.75,
-                                get =
-                                    function(info)
-                                        local pronouns = GBR_ConfigService.GetCharacterPronouns();
-                                        return pronouns.C;
-                                    end,
-                                order = 4
                             },
                             characterVoiceTypeDesc =
                             {
@@ -781,6 +758,43 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                             local key = info[#info-3];
                             GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.ChannelCallsign = value;
                         end,
+                },
+                showChannelRoles =
+                {
+                    order = 2,
+                    type = "toggle",
+                    name = "Show channel roles",
+                    get = 
+                        function(info)
+                            local key = info[#info-3];
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.ShowChannelRoles;
+                        end,
+                    set = 
+                        function(info, value)
+                            local key = info[#info-3];
+                            GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.ShowChannelRoles = value;
+                        end,
+                },
+                channelRoles =
+                {
+                    order = 3,
+                    type = "multiselect",
+                    name = "Channel roles",
+                    values =
+                        function(info)
+                            local roleService = GBR_SingletonService:FetchService(GBR_Constants.SRV_ROLE_SERVICE);
+                            return roleService:GetRolesAsKeyValuePairs();
+                        end,
+                    get =
+                        function(info, keyname)
+                            local key = info[#info-3];
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.SelectedChannelRoles[keyname];
+                        end,
+                    set =
+                        function(info, keyname, value)
+                            local key = info[#info-3];
+                            GBRadioAddonDataSettingsDB.char.Channels[key].IdentitySettings.SelectedChannelRoles[keyname] = value;
+                        end,
                 }
             }
         },
@@ -803,9 +817,21 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     name = 
                         function(info)
                             local key = info[#info-3];
+                            local configService = GBR_SingletonService:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
                             local frequency = GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelFrequency;
+                            local outputString = "|cFF00FF00[";
 
-                            return "|cFF00FF00[" .. GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency) .. "]|r";
+                            if configService:ShowChannelRolesForFrequency(frequency) then
+                                local roleString = configService:GetRoleDisplayForFrequency(frequency);
+
+                                if roleString:len() > 0 then -- Don't want to include empty brackets. If role is empty then don't show any of this.
+                                    outputString = outputString .. configService:GetRoleDisplayForFrequency(frequency) .. "][";
+                                end
+                            end
+
+                            outputString = outputString .. configService:GetCharacterDisplayNameForFrequency(frequency) .. "]|r";
+
+                            return outputString;
                         end,
                     type = "description",
                     fontSize = "medium",
@@ -1666,7 +1692,8 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
                                     }
                                 }
                             }
-                        }
+                        },
+                        order = 1,
                     },
                     deleteChannelPage =
                     {
@@ -1719,7 +1746,8 @@ function GBR_ConfigService.AddChannelToUi(targetSettingsTable, key, channelData)
                                     }
                                 }
                             }
-                        }
+                        },
+                        order = 2
                     }
                 }
             }
@@ -1830,7 +1858,17 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
         IdentitySettings =
         {
             IdentifyOnChannelAs = GBR_ENameType.Character,
-            ChannelCallsign = "",
+            ChannelCallsign = "",            
+            ShowChannelRoles = true,
+            SelectedChannelRoles =
+            {
+                [GBR_ERoleType.FLP] = false,
+                [GBR_ERoleType.POR] = false,
+                [GBR_ERoleType.AHO] = false,
+                [GBR_ERoleType.AFO] = false,
+                [GBR_ERoleType.AMO] = false,
+                [GBR_ERoleType.ELS] = false,
+            },
         },
         InteractionSettings =
         {
@@ -1931,8 +1969,6 @@ end
 function GBR_ConfigService.SetPronouns(pronounTable)
 
     GBRadioAddonDataSettingsDB.char.PronounA = pronounTable.A;
-    GBRadioAddonDataSettingsDB.char.PronounB = pronounTable.B;
-    GBRadioAddonDataSettingsDB.char.PronounC = pronounTable.C;
 
 end
 
@@ -1940,9 +1976,9 @@ function GBR_ConfigService.GetDefaultPronouns(genderId)
 
     local defaultPronouns =
     {
-        { A = "their", B = "them", C = "they" },
-        { A = "his",  B = "him",    C = "he" },
-        { A = "her",  B = "her",   C = "she" }
+        { A = "their" },
+        { A = "his" },
+        { A = "her" }
     };
 
     return defaultPronouns[genderId];
@@ -2009,8 +2045,6 @@ function GBR_ConfigService.GetCharacterPronouns()
     return
     {
         A = GBRadioAddonDataSettingsDB.char.PronounA,
-        B = GBRadioAddonDataSettingsDB.char.PronounB,
-        C = GBRadioAddonDataSettingsDB.char.PronounC
     };
     
 end
@@ -2097,6 +2131,13 @@ function GBR_ConfigService:IsSendEmergencyMessageAudioEnabled()
 
 end
 
+function GBR_ConfigService:ShowChannelRolesForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.IdentitySettings.ShowChannelRoles;
+
+end
+
 function GBR_ConfigService:GetChannelEmoteCooldownPeriodForFrequency(frequency)
 
     local settingsForFrequency = self:GetSettingsForFrequency(frequency);
@@ -2108,6 +2149,28 @@ function GBR_ConfigService:GetChannelAudioCooldownPeriodForFrequency(frequency)
 
     local settingsForFrequency = self:GetSettingsForFrequency(frequency);
     return settingsForFrequency.InteractionSettings.ChannelAudioCooldown;
+
+end
+
+function GBR_ConfigService:GetCharacterRolesForFrequency(frequency)
+
+    local settingsForFrequency = self:GetSettingsForFrequency(frequency);
+    return settingsForFrequency.IdentitySettings.SelectedChannelRoles;
+
+end
+
+function GBR_ConfigService:GetRoleDisplayForFrequency(frequency)
+
+    local roles = self:GetCharacterRolesForFrequency(frequency);
+    local roleString = "";
+
+    for k,v in ipairs(roles) do
+        if v then
+            roleString = roleString .. self._roleService:GetRoleForType(k).Icon;
+        end
+    end
+
+    return roleString;
 
 end
 
@@ -2128,7 +2191,7 @@ function GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency)
         [GBR_ENameType.CharacterWithCallsign] = function()
             local playerName = UnitName(GBR_Constants.ID_PLAYER);
 
-            if settingsForFrequency.IdentitySettings.ChannelCallsign ~= nil and settingsForFrequency.IdentitySettings.ChannelCallsign:len() > 1 then
+            if settingsForFrequency.IdentitySettings.ChannelCallsign ~= nil and settingsForFrequency.IdentitySettings.ChannelCallsign:len() > 0 then
                 playerName = playerName .. " (" .. settingsForFrequency.IdentitySettings.ChannelCallsign .. ")";
             end
 
@@ -2141,7 +2204,7 @@ function GBR_ConfigService:GetCharacterDisplayNameForFrequency(frequency)
                 playerName = UnitName(GBR_Constants.ID_PLAYER);
             end
 
-            if settingsForFrequency.IdentitySettings.ChannelCallsign ~= nil and settingsForFrequency.IdentitySettings.ChannelCallsign:len() > 1 then
+            if settingsForFrequency.IdentitySettings.ChannelCallsign ~= nil and settingsForFrequency.IdentitySettings.ChannelCallsign:len() > 0 then
                 playerName = playerName .. " (" .. settingsForFrequency.IdentitySettings.ChannelCallsign .. ")";
             end
 

@@ -4,7 +4,8 @@ function GBR_CharacterModel:New(obj)
 
     self.CharacterName = nil;
     self.CharacterDisplayName = nil;
-    self.CharacterColour = GBR_ARGB:New();
+    self.CharacterRoles = {};
+    self.CharacterColour = nil;
     self.CharacterGender = nil;
     self.CharacterVoiceType = nil;
     self.Location = GBR_LocationModel:New();

@@ -15,6 +15,7 @@ Common/Types/GBR_EMessageMethodType.lua
 Common/Types/GBR_EMessageType.lua
 Common/Types/GBR_ENameType.lua
 Common/Types/GBR_EMessageInterferenceType.lua
+Common/Types/GBR_ERoleType.lua
 
 Common/Resources/GBR_Constants.lua
 
@@ -37,6 +38,7 @@ Models/GBR_ClosestTransmitterModel.lua
 Models/GBR_ExportableChannelSettingsModel.lua
 Models/GBR_NotificationModel.lua
 Models/GBR_NotificationProxy.lua
+Models/GBR_RoleModel.lua
 
 Services/GBR_CommandService.lua
 Services/GBR_ConfigService.lua
@@ -48,5 +50,8 @@ Services/GBR_PlayerService.lua
 Services/GBR_SerialiserService.lua
 Services/GBR_SingletonService.lua
 Services/GBR_NotificationService.lua
+Services/GBR_HookService.lua
+Services/GBR_HyperlinkService.lua
+Services/GBR_RoleService.lua
 
 GBRadio.lua

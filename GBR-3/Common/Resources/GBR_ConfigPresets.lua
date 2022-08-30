@@ -9,8 +9,6 @@ GBR_ConfigPresets.BuzzBox =
         RadioMessageDelay = 1.5,
         Gender = nil,
         PronounA = nil,
-        PronounB = nil,
-        PronounC = nil,
         VoiceType = nil,
         Channels =
         {
@@ -36,6 +34,16 @@ GBR_ConfigPresets.BuzzBox =
                 {
                     IdentifyOnChannelAs = GBR_ENameType.Character,
                     ChannelCallsign = "",
+                    ShowChannelRoles = true,
+                    SelectedChannelRoles =
+                    {
+                        [GBR_ERoleType.FLP] = false,
+                        [GBR_ERoleType.POR] = false,
+                        [GBR_ERoleType.AHO] = false,
+                        [GBR_ERoleType.AFO] = false,
+                        [GBR_ERoleType.AMO] = false,
+                        [GBR_ERoleType.ELS] = false,
+                    },
                 },
                 InteractionSettings =
                 {
