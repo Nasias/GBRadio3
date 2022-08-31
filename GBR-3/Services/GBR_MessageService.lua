@@ -73,7 +73,8 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,
         [GBR_EMessageType.SilentSpeech] = self.SendSilentSpeechMessage,
         [GBR_EMessageType.Emergency] = self.SendEmergencyMessage,
-        [GBR_EMessageType.WhoIsListening] = self.SendWhoIsListeningMessage
+        [GBR_EMessageType.WhoIsListening] = self.SendWhoIsListeningMessage,
+        [GBR_EMessageType.Notification] = self.SendNotificationMessage,
     };
 
     dispatchMethod[messageModel.MessageData.MessageType](self, messageModel);
@@ -118,6 +119,7 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
         [GBR_EMessageType.Emergency] = self.ProcessReceivedEmergencyMessage,
         [GBR_EMessageType.WhoIsListening] = self.ProcessReceivedWhoIsListeningMessage,
         [GBR_EMessageType.IAmListening] = self.ProcessReceivedIAmListeningMessage,
+        [GBR_EMessageType.Notification] = self.ProcessReceivedNotification,
     };
 
     messageProcessor[messageModel.MessageData.MessageType](self, messageModel);
@@ -162,8 +164,38 @@ function GBR_MessageService:SendSilentSpeechMessage(messageModel)
 end
 
 function GBR_MessageService:SendEmergencyMessage(messageModel)
-
-    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);
+    
+    local serializedMessageData = self._serialiserService:Serialize(messageModel.MessageData);    
+    local zonePosition = messageModel.MessageData.CharacterModel.Location.ZonePosition;
+    
+    local notificationMessageModel = GBR_MessageModel:New
+    {
+        MessageData =
+        {    
+            Frequency = messageModel.MessageData.Frequency,
+            CharacterModel = messageModel.MessageData.CharacterModel,
+            MessageType = GBR_EMessageType.Notification,
+            NotificationModel = GBR_NotificationModel:New
+            {
+                Title = "PANIC ALERT",
+                Grade = GBR_ENotificationGradeType.Grade1,
+                IncidentLocation = messageModel.MessageData.CharacterModel.Location.Zone,
+                IncidentReporter = messageModel.MessageData.CharacterModel.CharacterDisplayName,
+                IncidentFrequency = messageModel.MessageData.Frequency,
+                IncidentDescription = "A panic button has been pressed by " 
+                    .. messageModel.MessageData.CharacterModel.CharacterDisplayName 
+                    .. " at " 
+                    .. messageModel.MessageData.CharacterModel.Location.Zone .. ".\n\nAll available units are required to respond with urgency.",
+                UnitsRequired = "All available units"
+            }
+        }
+    };
+    
+    if zonePosition.X ~= nil and zonePosition.Y ~= nil then
+        
+        notificationMessageModel.MessageData.NotificationModel.LocationCoordinateX = zonePosition.X * 100;
+        notificationMessageModel.MessageData.NotificationModel.LocationCoordinateY = zonePosition.Y * 100;
+    end
 
     self:ProcessEmergencySendEmote();
 
@@ -176,6 +208,12 @@ function GBR_MessageService:SendEmergencyMessage(messageModel)
         self._configService.GetCommChannelTarget(),
         GetChannelName(self._configService.GetCommChannelName()),
         "ALERT");
+
+    GBR_Delay:Delay(
+        self._configService:GetRadioMessageDelay() + 2,        
+        self.SendNotificationMessage,
+        self,
+        notificationMessageModel.MessageData);
 
 end
 
@@ -213,6 +251,19 @@ function GBR_MessageService:SendIAmListeningMessage(responseFrequency)
             self._configService.GetCommChannelTarget(),
             GetChannelName(self._configService.GetCommChannelName()),
             "ALERT");
+end
+
+function GBR_MessageService:SendNotificationMessage(messageModel)
+
+    local serializedMessageData  = self._serialiserService:Serialize(messageModel);
+
+    self._communicationLib:SendCommMessage(
+        self._configService.GetAddonChannelPrefix(),
+        serializedMessageData,
+        self._configService.GetCommChannelTarget(),
+        GetChannelName(self._configService.GetCommChannelName()),
+        "ALERT");
+
 end
 
 function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
@@ -281,28 +332,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
         self:PlaySendEmergencyMessageAudio();
     else
-        self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);
-
-        local notificationModel = GBR_NotificationModel:New{
-            Title = "PANIC ALERT",
-            Grade = 1,
-            IncidentLocation = messageModel.MessageData.CharacterModel.Location.Zone,
-            IncidentReporter = messageModel.MessageData.CharacterModel.CharacterDisplayName,
-            IncidentFrequency = messageModel.MessageData.Frequency,
-            IncidentDescription = "A panic button has been pressed by " 
-                .. messageModel.MessageData.CharacterModel.CharacterDisplayName 
-                .. " at " 
-                .. messageModel.MessageData.CharacterModel.Location.Zone .. ".\n\nAll available units are required to respond with urgency.",
-            UnitsRequired = "All available units."
-        };
-        local zonePosition = messageModel.MessageData.CharacterModel.Location.ZonePosition
-        if zonePosition.X ~= nil and zonePosition.Y ~= nil then
-            notificationModel.LocationCoordinateX = zonePosition.X * 100;
-            notificationModel.LocationCoordinateY = zonePosition.Y * 100;
-        end
-
-        self._notificationService:QueueNotification(notificationModel);
-        self:PlayNotificationAudio(messageModel.MessageData.Frequency);
+        self:PlayReceiveEmergencyMessageAudio(messageModel.MessageData.Frequency);        
     end
 
 end
@@ -319,6 +349,15 @@ end
 function GBR_MessageService:ProcessReceivedIAmListeningMessage(messageModel)
 
     self._configService:AddFrequencyListener(messageModel.MessageData.Frequency, messageModel.MessageData.CharacterModel.CharacterName);
+
+end
+
+function GBR_MessageService:ProcessReceivedNotification(messageModel)
+
+    local notificationModel = messageModel.MessageData.NotificationModel;
+
+    self._notificationService:QueueNotification(notificationModel);
+    self:PlayNotificationAudio(messageModel.MessageData.Frequency);
 
 end
 

@@ -6,7 +6,8 @@ GBR_ERoleType =
     AFO = 4, -- Authorised Firearms Officer
     AMO = 5, -- Authorised Magics Officer
     ELS = 6, -- Emergency Life Saver
-    JNOPGC = 7, -- JNOP Gold Commander
-    JNOPSC = 8, -- JNOP Silver Commander
-    JNOPBC = 9, -- JNOP Bronze Commander
+    EOD = 7, -- Explosive Ordnance Disposal
+    JNOPGC = 8, -- JNOP Gold Commander
+    JNOPSC = 9, -- JNOP Silver Commander
+    JNOPBC = 10, -- JNOP Bronze Commander
 };

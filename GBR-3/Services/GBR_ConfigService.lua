@@ -764,6 +764,7 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     order = 2,
                     type = "toggle",
                     name = "Show channel roles",
+                    width = "full",
                     get = 
                         function(info)
                             local key = info[#info-3];
@@ -780,6 +781,8 @@ function GBR_ConfigService.AddIdentitySettingsConfigurationPage(channelData)
                     order = 3,
                     type = "multiselect",
                     name = "Channel roles",
+                    dialogControl = "Dropdown",
+                    width = "full",
                     values =
                         function(info)
                             local roleService = GBR_SingletonService:FetchService(GBR_Constants.SRV_ROLE_SERVICE);
@@ -1868,6 +1871,7 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
                 [GBR_ERoleType.AFO] = false,
                 [GBR_ERoleType.AMO] = false,
                 [GBR_ERoleType.ELS] = false,
+                [GBR_ERoleType.EOD] = false,
                 [GBR_ERoleType.JNOPGC] = false,
                 [GBR_ERoleType.JNOPSC] = false,
                 [GBR_ERoleType.JNOPBC] = false,

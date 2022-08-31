@@ -5,4 +5,5 @@ GBR_EMessageType =
     Emergency = 3,
     WhoIsListening = 4,
     IAmListening = 5,
+    Notification = 6,
 };

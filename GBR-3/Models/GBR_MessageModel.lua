@@ -9,6 +9,7 @@ function GBR_MessageModel:New(obj)
         Timestamp = nil,
         MessageType = nil,
         Frequency = nil,
+        NotificationModel = nil,
     };
     
     return self:RegisterNew(obj);

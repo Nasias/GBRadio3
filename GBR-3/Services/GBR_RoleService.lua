@@ -77,6 +77,12 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_ELS,
         Icon = GBR_Constants.ROLE_ICON_ELS,
     },
+    [GBR_ERoleType.EOD] = GBR_RoleModel:New
+    {
+        Name = GBR_Constants.ROLE_NAME_EOD,
+        Abbreviation = GBR_Constants.ROLE_ABBREVIATION_EOD,
+        Icon = GBR_Constants.ROLE_ICON_EOD,
+    },
     [GBR_ERoleType.JNOPGC] = GBR_RoleModel:New
     {
         Name = GBR_Constants.ROLE_NAME_JNOPGC,
