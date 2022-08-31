@@ -30,20 +30,20 @@ function GBR_MessageService:SendMessage(messageModel)
 end
 
 function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
+
     local channelSettings = self._configService:GetSettingsForFrequency(frequency);
-    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
+
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
 
     if not channelSettings.ChannelSettings.ChannelIsEnabled then
-    
-        if chatFrame then
-            chatFrame:AddMessage(string.format(
-                GBR_Constants.MSG_RADIO_RADIO_OFF_ERROR,
-                channelColour:ToEscapedHexString(),
-                frequency));
-        end
 
-        return;
+        local message = string.format(
+            GBR_Constants.MSG_RADIO_RADIO_OFF_ERROR,
+            channelColour:ToEscapedHexString(),
+            frequency);
+
+        self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, message);
+
     end
 
     if channelSettings.TransmitterSettings.UseTransmitters then
@@ -51,16 +51,14 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
         local interferenceType = self:AddMessageInterference(messageModel, channelSettings);
 
         if interferenceType == GBR_EMessageInterferenceType.OutOfRange then
-            if chatFrame then
-                chatFrame:AddMessage(string.format(
-                    GBR_Constants.MSG_RADIO_TRANSMITTER_RANGE_ERROR,
-                    channelColour:ToEscapedHexString(),
-                    frequency));
+            local message = string.format(
+                GBR_Constants.MSG_RADIO_TRANSMITTER_RANGE_ERROR,
+                channelColour:ToEscapedHexString(),
+                frequency);
+            
+            self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, message);
 
-                GBR_MessageService:PlayNoSignalAudio();
-
-                return;
-            end            
+            self:PlayNoSignalAudio();
         end            
     end
 
@@ -93,6 +91,7 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
     {
         MessageData = self._serialiserService:Deserialize(serializedMessageData)
     };
+
 
     local registeredFrequencies = self._configService:GetRegisteredCommunicationFrequencies();
 
@@ -255,7 +254,7 @@ end
 
 function GBR_MessageService:SendNotificationMessage(messageModel)
 
-    local serializedMessageData  = self._serialiserService:Serialize(messageModel);
+    local serializedMessageData  = self._serialiserService:Serialize(messageModel.MessageData);
 
     self._communicationLib:SendCommMessage(
         self._configService.GetAddonChannelPrefix(),
@@ -270,21 +269,19 @@ function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
-    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
     local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
-
-    if chatFrame then
-        chatFrame:AddMessage(string.format(
-            GBR_Constants.MSG_RADIO_MESSAGE, 
-            channelColour:ToEscapedHexString(), 
-            messageModel.MessageData.Frequency,
-            roleIcons:len() > 0 and "[".. roleIcons .."] " or "",
-            messageModel.MessageData.CharacterModel.CharacterColour,
-            messageModel.MessageData.CharacterModel.CharacterName,
-            messageModel.MessageData.CharacterModel.CharacterDisplayName,
-            messageModel.MessageData.Message));
-    end
+    local message = string.format(
+        GBR_Constants.MSG_RADIO_MESSAGE, 
+        channelColour:ToEscapedHexString(), 
+        messageModel.MessageData.Frequency,
+        roleIcons:len() > 0 and "[".. roleIcons .."] " or "",
+        messageModel.MessageData.CharacterModel.CharacterColour,
+        messageModel.MessageData.CharacterModel.CharacterName,
+        messageModel.MessageData.CharacterModel.CharacterDisplayName,
+        messageModel.MessageData.Message);
+    
+    self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, message);
 
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
         self:PlaySendMessageAudio(messageModel.MessageData.CharacterModel.CharacterVoiceType);
@@ -295,16 +292,26 @@ function GBR_MessageService:ProcessReceivedSpeechMessage(messageModel)
 
 end
 
+function GBR_MessageService:SendToSelectedChatFrames(chatFrames, message)
+
+    for chatFrameId, isSelected in pairs(chatFrames) do
+        if isSelected then
+            local chatFrame = _G["ChatFrame"..chatFrameId];
+            if chatFrame then                
+                chatFrame:AddMessage(message);
+            end
+        end
+    end
+
+end
+
 function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
 
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
-    local chatFrame = _G["ChatFrame"..channelSettings.ChannelSettings.ChannelChatFrame];
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
     local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
-    
-    if chatFrame then
-        local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil and messageModel.MessageData.CharacterModel.Location.ZonePosition.Y ~= nil
+    local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil and messageModel.MessageData.CharacterModel.Location.ZonePosition.Y ~= nil
             and string.format(
                 GBR_Constants.MSG_RADIO_EMERGENCY, 
                 channelColour:ToEscapedHexString(), 
@@ -326,8 +333,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
                 messageModel.MessageData.CharacterModel.CharacterDisplayName,
                 messageModel.MessageData.CharacterModel.Location.Zone);
 
-        chatFrame:AddMessage(emergencyMessage);
-    end
+    self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, emergencyMessage);
 
     if messageModel.MessageData.CharacterModel.CharacterName == characterName then
         self:PlaySendEmergencyMessageAudio();

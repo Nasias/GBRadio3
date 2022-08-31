@@ -28,14 +28,14 @@ end
 
 function GBR_ConfigService:Initialize()
 
-    local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+    --local addon = GBR_SingletonService:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
     
-    addon.OptionsTable = 
+    self._addonService.OptionsTable = 
     {
         type = "group",
         name = "GB|cff00c0ffRadio|r 3 (v3.0.0) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
         childGroups = "tree",
-        handler = addon,        
+        handler = self._addonService,        
         args = {
             deviceConfig = 
             {
@@ -471,15 +471,35 @@ function GBR_ConfigService:Initialize()
                     }                    
                 }
             },
+            about =
+            {
+                name = "About",
+                type = "group",
+                order = 4,
+                args =
+                {
+                    aboutDesc =
+                    {
+                        type = "description",
+                        name = "Thanks for using GBRadio 3!"
+                            .. "\n\nGBRadio was developed with immersion in mind. If you roleplay a guard, no doubt you use a radio, a walker or a buzzbox (whatever your flavour) and the aim of this addon is to make that as easy, seamless and immersive as possible."
+                            .. "\n\nA shout-out to those who have helped test GBRadio 3 and offer feedback:"
+                            .. "\nÉphráim (Matthew Preston) @ Argent Dawn, EU"
+                            .. "\nHlídka (Company Unit) @ Argent Dawn, EU"
+                            .. "\nKaspbrák (Hendrick Kaspbrak) @ Argent Dawn, EU"
+                            .. "\n\n|cFF82C2FFAuthor:|r Nasias (Nasias Darkstar) @ Argent Dawn (EU)\n|cFF82C2FFContact:|r n@siasdarkstar.com\n|cFF82C2FFDiscord:|r nasias#0001",
+                    }
+                }
+            }
         }
     };
 
     for channelKey, channelData in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
-        self.AddChannelToUi(addon.OptionsTable.args.channelConfig.args, channelKey, channelData);
+        self.AddChannelToUi(self._addonService.OptionsTable.args.channelConfig.args, channelKey, channelData);
     end
     
-    addon.ConfigRegistry = LibStub("AceConfig-3.0"):RegisterOptionsTable("GBRadio3", addon.OptionsTable);
-    addon.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GBRadio3", "GB|cff00c0ffRadio|r 3");
+    self._addonService.ConfigRegistry = LibStub(GBR_Constants.LIB_ACE_CONFIG):RegisterOptionsTable(GBR_Constants.OPT_ADDON_ID, self._addonService.OptionsTable);
+    self._addonService.OptionsFrame = LibStub(GBR_Constants.LIB_ACE_CONFIG_DIALOG):AddToBlizOptions(GBR_Constants.OPT_ADDON_ID, "GB|cff00c0ffRadio|r 3");
 
 end
 
@@ -620,7 +640,7 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                 }
             }
         },
-        channelChatFrameGroup = 
+        channelChatFramesGroup = 
         {
             order = 1,
             name = "Chat frame settings",
@@ -653,29 +673,37 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                             } 
                         end,
                 },
-                channelChatFrame = 
+                channelChatFrames = 
                 {
                     order = 1,
                     name = "Output chat frame",
-                    type = "range",
-                    min = 1,
-                    max = 10,
-                    softMin = 1,
-                    softMax = 10,
-                    step = 1,
+                    type = "multiselect",
+                    values = {
+                        "Chat Frame #1",
+                        "Chat Frame #2",
+                        "Chat Frame #3",
+                        "Chat Frame #4",
+                        "Chat Frame #5",
+                        "Chat Frame #6",
+                        "Chat Frame #7",
+                        "Chat Frame #8",
+                        "Chat Frame #9",
+                        "Chat Frame #10",
+                    },                    
+                    dialogControl = "Dropdown",
                     width = "full",
-                    get = 
-                        function(info)
-                            local key = info[#info-3];
-                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame;
+                    get =
+                        function(info, keyname)
+                            local key = info[#info-3];                            
+                            return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrames[keyname];
                         end,
-                    set = 
-                        function(info, value)
+                    set =
+                        function(info, keyname, value)
                             local key = info[#info-3];
-                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrame = value;
+                            GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrames[keyname] = value;
                         end,
                 },
-                channelChatFrameIdentify = 
+                channelChatFramesIdentify = 
                 {
                     order = 2,
                     name = "Identify chat frames",
@@ -1856,7 +1884,19 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
                 G = 1,
                 B = 1
             },
-            ChannelChatFrame = 1,
+            ChannelChatFrames = 
+            {
+                [1] = true,
+                [2] = false,
+                [3] = false,
+                [4] = false,
+                [5] = false,
+                [6] = false,
+                [7] = false,
+                [8] = false,
+                [9] = false,
+                [10] = false,
+            },
         },
         IdentitySettings =
         {
@@ -1970,7 +2010,7 @@ function GBR_ConfigService:AddFrequencyListener(frequency, characterName)
         characterName,
         iAmListeningModel);
 
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("GBRadio3");
+    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService.SetPronouns(pronounTable)
@@ -2233,10 +2273,10 @@ function GBR_ConfigService:GetRadioMessageDelay()
     return GBRadioAddonDataSettingsDB.char.RadioMessageDelay;
 end
 
-function GBR_ConfigService:GetChatFrameForChannel(frequency)
+function GBR_ConfigService:GetChatFramesForChannel(frequency)
 
     local settings = self:GetSettingsForFrequency(frequency);    
-    return settings.ChannelSettings.ChannelChatFrame;
+    return settings.ChannelSettings.ChannelChatFrames;
 
 end
 

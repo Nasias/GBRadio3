@@ -21,7 +21,16 @@ end
 
 function GBR_CommandService.CommandHandler(input)
 
-    return nil;
+    local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
+    local addonService = GBR_Singletons:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
+
+    if input == "dispatch" then
+        dispatcherService:DisplayDispatcher();
+        return;
+    end
+    
+    InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
+    InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
 
 end
 

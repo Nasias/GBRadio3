@@ -2,10 +2,14 @@ GBR_Constants =
 {
     LIB_ACE_CONSOLE = "AceConsole-3.0",
     LIB_ACE_SERIALISER = "AceSerializer-3.0",
-    LIB_ACE_SETTINGS = "AceConfig-3.0",
+    LIB_ACE_CONFIG = "AceConfig-3.0",
     LIB_ACE_COMM = "AceComm-3.0",
     LIB_HBD_LOCATION = "HereBeDragons-2.0",
     LIB_ACE_DB = "AceDB-3.0",
+    LIB_ACE_CONFIG_DIALOG = "AceConfigDialog-3.0",
+    LIB_ACE_EVENT = "AceEvent-3.0",
+    LIB_ACE_ADDON = "AceAddon-3.0",
+    LIB_ACE_GUI = "AceGUI-3.0",
 
     SRV_COMMAND_SERVICE = "CommandService",
     SRV_CONFIG_SERVICE = "ConfigService",
@@ -21,13 +25,14 @@ GBR_Constants =
     SRV_HOOK_SERVICE = "HookService",
     SRV_HYPERLINK_SERVICE = "HyperlinkService",
     SRV_ROLE_SERVICE = "RoleService",
+    SRV_DISPATCHER_SERVICE = "DispatcherService",
 
     CMD_MAIN = "gbr",
     CMD_DEV_TEST = "gbr3test",
     CMD_SEND_MESSAGE = "bb",
     CMD_SEND_QUIET_MESSAGE = "wbb",
     CMD_TEST_RECEIVE_MESSAGE = "tbb",
-    CMD_SEND_EMERGENCY_MESSAGE = "pb",
+    CMD_SEND_EMERGENCY_MESSAGE = "pb",    
 
     ID_PLAYER = "player",
     ID_TARGET = "targer",
@@ -38,6 +43,7 @@ GBR_Constants =
     UI_COLOUR_ESCAPE_STRING_END = "|r",
     UI_HYPERLINK_ESCAPE_STRING = "|H",
 
+    OPT_ADDON_ID = "GBRadio3",
     OPT_ADDON_CHANNEL_PREFIX = "GBR3",
     OPT_ADDON_VERSION = "3.0",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",

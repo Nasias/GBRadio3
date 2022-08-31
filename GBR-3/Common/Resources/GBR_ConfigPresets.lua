@@ -28,7 +28,19 @@ GBR_ConfigPresets.BuzzBox =
                         G = 1,
                         B = 1
                     },
-                    ChannelChatFrame = 1,
+                    ChannelChatFrames = 
+                    {
+                        [1] = true,
+                        [2] = false,
+                        [3] = false,
+                        [4] = false,
+                        [5] = false,
+                        [6] = false,
+                        [7] = false,
+                        [8] = false,
+                        [9] = false,
+                        [10] = false,
+                    },
                 },
                 IdentitySettings =
                 {

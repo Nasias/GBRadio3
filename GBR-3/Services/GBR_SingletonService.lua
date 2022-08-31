@@ -16,6 +16,7 @@ function GBR_SingletonService:New(obj)
         [GBR_Constants.SRV_HOOK_SERVICE] = GBR_HookService,
         [GBR_Constants.SRV_HYPERLINK_SERVICE] = GBR_HyperlinkService,
         [GBR_Constants.SRV_ROLE_SERVICE] = GBR_RoleService,
+        [GBR_Constants.SRV_DISPATCHER_SERVICE] = GBR_DispatcherService,
     };
 
     self._instantiatedServices = {};
