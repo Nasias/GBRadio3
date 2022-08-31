@@ -481,13 +481,17 @@ function GBR_ConfigService:Initialize()
                     aboutDesc =
                     {
                         type = "description",
+                        fontSize = "medium",
                         name = "Thanks for using GBRadio 3!"
                             .. "\n\nGBRadio was developed with immersion in mind. If you roleplay a guard, no doubt you use a radio, a walker or a buzzbox (whatever your flavour) and the aim of this addon is to make that as easy, seamless and immersive as possible."
-                            .. "\n\nA shout-out to those who have helped test GBRadio 3 and offer feedback:"
-                            .. "\nÉphráim (Matthew Preston) @ Argent Dawn, EU"
-                            .. "\nHlídka (Company Unit) @ Argent Dawn, EU"
-                            .. "\nKaspbrák (Hendrick Kaspbrak) @ Argent Dawn, EU"
-                            .. "\n\n|cFF82C2FFAuthor:|r Nasias (Nasias Darkstar) @ Argent Dawn (EU)\n|cFF82C2FFContact:|r n@siasdarkstar.com\n|cFF82C2FFDiscord:|r nasias#0001",
+                            .. "\n\nMy thanks to my friends listed below who have helped test GBRadio 3 and offer their feedback:\n"
+                            .. "\n|cFF82C2FFÉphráim|r (Matthew Preston) @ Argent Dawn, EU"
+                            .. "\n|cFF82C2FFHlídka|r (Company Unit) @ Argent Dawn, EU"
+                            .. "\n|cFF82C2FFCadwëll|r (Andy Cadwell) @ Argent Dawn, EU"
+                            .. "\n|cFF82C2FFLizbelli|r (Lizbelli Darkstar) @ Argent Dawn, EU"
+                            .. "\n|cFF82C2FFKaspbrák|r (Hendrick Kaspbrak) @ Argent Dawn, EU"
+                            .. "\n\nGBRadio 3 is written in Lua, powered by the ACE-3.0 framework. All rights reserved."
+                            .. "\n\n|cFF82C2FFAuthor:|r Nasias (Nasias Darkstar) @ Argent Dawn (EU)\n|cFF82C2FFContact:|r n@siasdarkstar.com\n|cFF82C2FFDiscord:|r Nasias#0001",
                     }
                 }
             },
@@ -501,12 +505,13 @@ function GBR_ConfigService:Initialize()
                     aboutDesc =
                     {
                         type = "description",
+                        fontSize = "medium",
                         name = "Commands"
-                            .. "\n\n/gbr - Shows the config menu"
-                            .. "\n\n/gbr dispatch - Shows the notification dispatcher menu"
-                            .. "\n\n/bb <message> - Send a message"
-                            .. "\n\n/wbb <message> - Send a quiet message (no /say)"
-                            .. "\n\n/pb - Panic button - Sends an alert out to all listeners that you need assistance"
+                            .. "\n\n|cFF82C2FF/gbr|r - Shows the config menu"
+                            .. "\n\n|cFF82C2FF/gbr dispatch|r - Shows the notification dispatcher menu"
+                            .. "\n\n|cFF82C2FF/bb <message>|r - Send a message"
+                            .. "\n\n|cFF82C2FF/wbb <message>|r - Send a quiet message (no /say)"
+                            .. "\n\n|cFF82C2FF/pb|r - Panic button - Sends an alert out to all listeners that you need assistance"
                     }
                 }
             }
