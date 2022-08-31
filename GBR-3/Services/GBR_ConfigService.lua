@@ -1868,6 +1868,9 @@ function GBR_ConfigService.GetNewChannelSettingsModel(frequency, channelName)
                 [GBR_ERoleType.AFO] = false,
                 [GBR_ERoleType.AMO] = false,
                 [GBR_ERoleType.ELS] = false,
+                [GBR_ERoleType.JNOPGC] = false,
+                [GBR_ERoleType.JNOPSC] = false,
+                [GBR_ERoleType.JNOPBC] = false,
             },
         },
         InteractionSettings =

@@ -77,4 +77,22 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_ELS,
         Icon = GBR_Constants.ROLE_ICON_ELS,
     },
+    [GBR_ERoleType.JNOPGC] = GBR_RoleModel:New
+    {
+        Name = GBR_Constants.ROLE_NAME_JNOPGC,
+        Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPGC,
+        Icon = GBR_Constants.ROLE_ICON_JNOPGC,
+    }, 
+    [GBR_ERoleType.JNOPSC] = GBR_RoleModel:New
+    {
+        Name = GBR_Constants.ROLE_NAME_JNOPSC,
+        Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPSC,
+        Icon = GBR_Constants.ROLE_ICON_JNOPSC,
+    },
+    [GBR_ERoleType.JNOPBC] = GBR_RoleModel:New
+    {
+        Name = GBR_Constants.ROLE_NAME_JNOPBC,
+        Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPBC,
+        Icon = GBR_Constants.ROLE_ICON_JNOPBC,
+    },
 }

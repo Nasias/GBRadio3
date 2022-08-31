@@ -350,7 +350,7 @@ function GBR_NotificationService:Initialize()
     self.BackdropFormats = self:_getBackdropFormats();
     self.AnimationMeta = {
         CurrentIteration = 1,
-        Mode = 1,
+        Mode = 1, -- Mode 1 fade from start to end. Mode 2 fade from end to start.
         IterationCount = 30
     };
 
@@ -362,17 +362,17 @@ function GBR_NotificationService:Initialize()
     };
 
     self.BackdropColours = {
-        [1] = {
+        [GBR_ENotificationGradeType.Grade1] = {
             R = 0.7890,
             G = 0.2460,
             B = 0.1953,
         },
-        [2] = {
+        [GBR_ENotificationGradeType.Grade2] = {
             R = 0.0781,
             G = 0.2968,
             B = 0.5976,
         },
-        [3] = {
+        [GBR_ENotificationGradeType.Grade3] = {
             R = 0.3529,
             G = 0.3529,
             B = 0.3529,
@@ -380,7 +380,7 @@ function GBR_NotificationService:Initialize()
     };
 
     self.AnimatedBackdropColours = {
-        [1] = {
+        [GBR_ENotificationGradeType.Grade1] = {
             Start = {
                 R = 0.7890,
                 G = 0.2460,
@@ -433,7 +433,7 @@ function GBR_NotificationService:Initialize()
         for k,v in ipairs(notificationService.ActiveNotifications) do
             local grade = v.GBRMetaGrade;
 
-            if grade == 1 then             
+            if grade == GBR_ENotificationGradeType.Grade1 then             
                 v:SetBackdropColor(red, green, blue, 1);
                 v:SetBackdropBorderColor(red, green, blue, 1);
             end

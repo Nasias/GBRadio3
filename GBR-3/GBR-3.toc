@@ -16,6 +16,7 @@ Common/Types/GBR_EMessageType.lua
 Common/Types/GBR_ENameType.lua
 Common/Types/GBR_EMessageInterferenceType.lua
 Common/Types/GBR_ERoleType.lua
+Common/Types/GBR_ENotificationGradeType.lua
 
 Common/Resources/GBR_Constants.lua
 

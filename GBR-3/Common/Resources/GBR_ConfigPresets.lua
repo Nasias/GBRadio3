@@ -43,6 +43,9 @@ GBR_ConfigPresets.BuzzBox =
                         [GBR_ERoleType.AFO] = false,
                         [GBR_ERoleType.AMO] = false,
                         [GBR_ERoleType.ELS] = false,
+                        [GBR_ERoleType.JNOPGC] = false,
+                        [GBR_ERoleType.JNOPSC] = false,
+                        [GBR_ERoleType.JNOPBC] = false,
                     },
                 },
                 InteractionSettings =

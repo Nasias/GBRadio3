@@ -51,13 +51,19 @@ GBR_Constants =
     ROLE_ICON_AFO = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Authorised-Firearms-Officer.tga:14:14:0:0:128:128:-20:148:-20:148:255:97:0|t]],
     ROLE_ICON_AMO = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Authorised-Magics-Officer.tga:14:14:0:0:128:128:-20:148:-20:148:255:97:0|t]],
     ROLE_ICON_ELS = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Emergency-Life-Saver.tga:14:14:0:0:128:128:-20:148:-20:148:16:144:106|t]],
+    ROLE_ICON_JNOPGC = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Commander.tga:14:14:0:0:128:128:-20:148:-20:148:255:215:0|t]],
+    ROLE_ICON_JNOPSC = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Commander.tga:14:14:0:0:128:128:-20:148:-20:148:192:192:192|t]],
+    ROLE_ICON_JNOPBC = [[|TInterface\Addons\GBR-3\Media\Textures\Roles\Commander.tga:14:14:0:0:128:128:-20:148:-20:148:184:134:11|t]],
 
     ROLE_NAME_FLP = "Front Line Patrol",
-    ROLE_NAME_POR = "Public Order Officer",
+    ROLE_NAME_POR = "Public Order Response",
     ROLE_NAME_AHO = "Animal Handler Officer",
     ROLE_NAME_AFO = "Authorised Firearms Officer",
     ROLE_NAME_AMO = "Authorised Magics Officer",
     ROLE_NAME_ELS = "Emergency Life Saver",
+    ROLE_NAME_JNOPGC = "JNOP Gold Commander",
+    ROLE_NAME_JNOPSC = "JNOP Silver Commander",
+    ROLE_NAME_JNOPBC = "JNOP Bronze Commander",
 
     ROLE_ABBREVIATION_FLP = "FLP",
     ROLE_ABBREVIATION_POR = "POR",
@@ -65,6 +71,9 @@ GBR_Constants =
     ROLE_ABBREVIATION_AFO = "AFO",
     ROLE_ABBREVIATION_AMO = "AMO",
     ROLE_ABBREVIATION_ELS = "ELS",
+    ROLE_ABBREVIATION_JNOPGC = "JNOPGC",
+    ROLE_ABBREVIATION_JNOPSC = "JNOPSC",
+    ROLE_ABBREVIATION_JNOPBC = "JNOPBC",
 
     MSG_CHAT_FRAME_IDENTITY = [[|TInterface\DialogFrame\UI-Dialog-Icon-AlertOther:16:16:0:-1|t%s [GBRadio - Chatframe Identity] This is chat frame #%d.]],
     -- colour, frequency, role, charactername, displayname, message
