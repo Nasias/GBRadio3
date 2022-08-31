@@ -212,7 +212,7 @@ function GBR_MessageService:SendEmergencyMessage(messageModel)
         self._configService:GetRadioMessageDelay() + 2,        
         self.SendNotificationMessage,
         self,
-        notificationMessageModel.MessageData);
+        notificationMessageModel);
 
 end
 
