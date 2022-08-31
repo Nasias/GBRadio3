@@ -55,9 +55,19 @@ end
 
 function GBRadio:AddConfiguration()
 
-    local defaultSettings = GBRadioAddonDataSettingsDBSavedVars == nil and GBR_ConfigPresets.BuzzBox;
+    local defaultSettings = GBR_ConfigPresets.BuzzBox;
     
     GBRadioAddonDataSettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
+
+    local channelCount = 0;
+
+    for k,v in pairs(GBRadioAddonDataSettingsDB.char.Channels) do
+        channelCount = channelCount + 1;
+    end
+
+    if channelCount == 0 then 
+        GBRadioAddonDataSettingsDB.char.Channels["DEFAULT"] = GBR_ConfigPresets.DefaultChannel;
+    end
 
     GBR_Singletons:InstantiateService(GBR_Constants.SRV_CONFIG_SERVICE);
 
