@@ -46,7 +46,7 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
 
     end
 
-    if channelSettings.TransmitterSettings.UseTransmitters then
+    if messageModel.MessageData.MessageType ~= GBR_EMessageType.WhoIsListening and channelSettings.TransmitterSettings.UseTransmitters then
 
         local interferenceType = self:AddMessageInterference(messageModel, channelSettings);
 
@@ -59,6 +59,8 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
             self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, message);
 
             self:PlayNoSignalAudio();
+
+            return;
         end            
     end
 
@@ -101,7 +103,9 @@ function GBR_MessageService:ReceiveMessage(serializedMessageData)
 
     local receivingFrequencySettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
 
-    if receivingFrequencySettings.TransmitterSettings.UseTransmitters then
+    if messageModel.MessageData.MessageType ~= GBR_EMessageType.WhoIsListening 
+        and messageModel.MessageData.MessageType ~= GBR_EMessageType.IAmListening 
+        and receivingFrequencySettings.TransmitterSettings.UseTransmitters then
 
         local interferenceType = self:AddMessageInterference(messageModel, receivingFrequencySettings);
 
@@ -558,8 +562,8 @@ function GBR_MessageService:AddMessageInterference(messageModel, primaryChannelS
         stringSplits = math.random(0,2);
         letterEngulf = math.random(1,2);
     elseif interferenceType == GBR_EMessageInterferenceType.High then
-        stringSplits = math.random(0,6);
-        letterEngulf = math.random(2,6);
+        stringSplits = math.random(1,3);
+        letterEngulf = math.random(1,3);
     end
 
     if stringSplits > messageLength then
