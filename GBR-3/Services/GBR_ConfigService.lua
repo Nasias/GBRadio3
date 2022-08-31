@@ -490,6 +490,25 @@ function GBR_ConfigService:Initialize()
                             .. "\n\n|cFF82C2FFAuthor:|r Nasias (Nasias Darkstar) @ Argent Dawn (EU)\n|cFF82C2FFContact:|r n@siasdarkstar.com\n|cFF82C2FFDiscord:|r nasias#0001",
                     }
                 }
+            },
+            help =
+            {
+                name = "Help",
+                type = "group",
+                order = 5,
+                args =
+                {
+                    aboutDesc =
+                    {
+                        type = "description",
+                        name = "Commands"
+                            .. "\n\n/gbr - Shows the config menu"
+                            .. "\n\n/gbr dispatch - Shows the notification dispatcher menu"
+                            .. "\n\n/bb <message> - Send a message"
+                            .. "\n\n/wbb <message> - Send a quiet message (no /say)"
+                            .. "\n\n/pb - Panic button - Sends an alert out to all listeners that you need assistance"
+                    }
+                }
             }
         }
     };
