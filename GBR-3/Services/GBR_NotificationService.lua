@@ -18,7 +18,6 @@ function GBR_NotificationService:_getBackdropFormats()
             tileEdge = true,
             tileSize = 8,
             edgeSize = 12,
-            --insets = { left = 5, right = 5, top = 5, bottom = 5 },
         },
         BACKDROP_NOTIFICATION_TITLE = 
         {
@@ -26,7 +25,6 @@ function GBR_NotificationService:_getBackdropFormats()
             tile = true,
             tileEdge = true,
             tileSize = 8,
-            --insets = { left = 6, right = 6, top = 6, bottom = 0 },
         }
     };
 end
@@ -51,7 +49,6 @@ function GBR_NotificationService:_buildNotificaionTitle(parent)
     titleText:SetWordWrap(true);
     titleText:SetPoint("TOPLEFT", titleFrame, "TOPLEFT", 43, 0);
     titleText:SetPoint("BOTTOMRIGHT", titleFrame, "BOTTOMRIGHT", 0, -4);
-    --titleText:SetText("INCIDENT ALERT");
 
     titleFrame.Icon = titleIcon;
     titleFrame.Text = titleText;
@@ -74,7 +71,6 @@ function GBR_NotificationService:_buildIncidentGrade(parent)
     incidentGradeText:SetWordWrap(true);
     incidentGradeText:SetPoint("TOPLEFT", incidentGradeFrame, "TOPLEFT", 0, 0);
     incidentGradeText:SetPoint("BOTTOMRIGHT", incidentGradeFrame, "BOTTOMRIGHT", 0, -2);
-    --incidentGradeText:SetText("GRADE 1");
 
     incidentGradeFrame.Text = incidentGradeText;
 
@@ -90,16 +86,15 @@ function GBR_NotificationService:_buildIncidentLocation(parent)
 
     local incidentLocationIcon = incidentLocationFrame:CreateTexture(nil, "BORDER");
     incidentLocationIcon:SetSize(16, 16);
-    incidentLocationIcon:SetPoint("LEFT", incidentLocationFrame, "LEFT", 15, 0)
+    incidentLocationIcon:SetPoint("LEFT", incidentLocationFrame, "LEFT", 15, 0);
     incidentLocationIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Compass-Solid]]);
 
-    local incidentLocationText = incidentLocationFrame:CreateFontString(incidentLocationFrame, "BORDER", "GBRAlert_Details")
-    incidentLocationText:SetJustifyH("LEFT")
-    incidentLocationText:SetJustifyV("MIDDLE")
-    incidentLocationText:SetWordWrap(true)
-    incidentLocationText:SetPoint("TOPLEFT", incidentLocationFrame, "TOPLEFT", 43, 0)
-    incidentLocationText:SetPoint("BOTTOMRIGHT", incidentLocationFrame, "BOTTOMRIGHT", 0, 0)
-    --userLocationText:SetText("STORMWIND CITY\n(52.43, 80.79)");
+    local incidentLocationText = incidentLocationFrame:CreateFontString(incidentLocationFrame, "BORDER", "GBRAlert_Details");
+    incidentLocationText:SetJustifyH("LEFT");
+    incidentLocationText:SetJustifyV("MIDDLE");
+    incidentLocationText:SetWordWrap(true);
+    incidentLocationText:SetPoint("TOPLEFT", incidentLocationFrame, "TOPLEFT", 43, 0);
+    incidentLocationText:SetPoint("BOTTOMRIGHT", incidentLocationFrame, "BOTTOMRIGHT", 0, 0);
 
     incidentLocationFrame.Icon = incidentLocationIcon;
     incidentLocationFrame.Text = incidentLocationText;
@@ -125,7 +120,6 @@ function GBR_NotificationService:_buildIncidentReporter(parent)
     reporterNameText:SetWordWrap(true);
     reporterNameText:SetPoint("TOPLEFT", reporterNameFrame, "TOPLEFT", 43, 0);
     reporterNameText:SetPoint("BOTTOMRIGHT", reporterNameFrame, "BOTTOMRIGHT", 0, 0);
-    --reporterNameText:SetText("ROOK TATSUYA\n(SO-159)");
 
     reporterNameFrame.Icon = reporterNameIcon;
     reporterNameFrame.Text = reporterNameText;
@@ -151,7 +145,6 @@ function GBR_NotificationService:_buildIncidentFrequency(parent)
     incidentFrequencyText:SetWordWrap(true);
     incidentFrequencyText:SetPoint("TOPLEFT", incidentFrequencyFrame, "TOPLEFT", 43, 0);
     incidentFrequencyText:SetPoint("BOTTOMRIGHT", incidentFrequencyFrame, "BOTTOMRIGHT", 0, 0);
-    --incidentFrequencyText:SetText("EC999");
 
     incidentFrequencyFrame.Icon = incidentFrequencyIcon;
     incidentFrequencyFrame.Text = incidentFrequencyText;
@@ -177,7 +170,6 @@ function GBR_NotificationService:_buildIncidentDescription(parent)
     incidentDescriptionText:SetWordWrap(true)
     incidentDescriptionText:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 43, 4)
     incidentDescriptionText:SetPoint("BOTTOMRIGHT", incidentDescriptionFrame, "BOTTOMRIGHT", 0, 0)
-    --incidentDescriptionText:SetText("INCIDENT OVERVIEW\nAlpha patrol (Echo Company) reports three armed suspects at large in the Mage Quarter, Stormwind City.\n\nInjures: 4 PUB, 2 LEA.");
 
     incidentDescriptionFrame.Icon = incidentDescriptionIcon;
     incidentDescriptionFrame.Text = incidentDescriptionText;
@@ -198,12 +190,11 @@ function GBR_NotificationService:_buildUnitsRequired(parent)
     unitsRequiredIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Shield-Halved-Solid]]);
 
     local unitsRequiredText = unitsRequiredFrame:CreateFontString(unitsRequiredFrame, "BORDER", "GBRAlert_Details")
-    unitsRequiredText:SetJustifyH("LEFT")
-    unitsRequiredText:SetJustifyV("MIDDLE")
-    unitsRequiredText:SetWordWrap(true)
-    unitsRequiredText:SetPoint("TOPLEFT", unitsRequiredFrame, "TOPLEFT", 43, 0)
-    unitsRequiredText:SetPoint("BOTTOMRIGHT", unitsRequiredFrame, "BOTTOMRIGHT", 0, 0)
-    --unitsRequiredText:SetText("UNITS REQUIRED\nSilver Commander, OFC, AFO, FLP, ELS");
+    unitsRequiredText:SetJustifyH("LEFT");
+    unitsRequiredText:SetJustifyV("MIDDLE");
+    unitsRequiredText:SetWordWrap(true);
+    unitsRequiredText:SetPoint("TOPLEFT", unitsRequiredFrame, "TOPLEFT", 43, 0);
+    unitsRequiredText:SetPoint("BOTTOMRIGHT", unitsRequiredFrame, "BOTTOMRIGHT", 0, 0);
 
     unitsRequiredFrame.Icon = unitsRequiredIcon;
     unitsRequiredFrame.Text = unitsRequiredText;

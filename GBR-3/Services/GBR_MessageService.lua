@@ -45,6 +45,11 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
         self:SendToSelectedChatFrames(channelSettings.ChannelSettings.ChannelChatFrames, message);
 
     end
+    
+    messageModel.MessageData.Frequency = frequency;    
+    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
+    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(frequency);
+    messageModel.MessageData.CharacterModel.CharacterRoles = self._configService:GetCharacterRolesForFrequency(frequency);
 
     if messageModel.MessageData.MessageType ~= GBR_EMessageType.WhoIsListening and channelSettings.TransmitterSettings.UseTransmitters then
 
@@ -63,11 +68,6 @@ function GBR_MessageService:SendMessageForFrequency(messageModel, frequency)
             return;
         end            
     end
-
-    messageModel.MessageData.Frequency = frequency;    
-    messageModel.MessageData.CharacterModel = self._playerService:GetCurrentCharacterModel();
-    messageModel.MessageData.CharacterModel.CharacterDisplayName = self._configService:GetCharacterDisplayNameForFrequency(frequency);
-    messageModel.MessageData.CharacterModel.CharacterRoles = self._configService:GetCharacterRolesForFrequency(frequency);
 
     local dispatchMethod = {
         [GBR_EMessageType.Speech] = self.SendSpeechMessage,

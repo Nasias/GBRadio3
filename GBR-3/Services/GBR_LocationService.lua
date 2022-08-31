@@ -20,7 +20,7 @@ function GBR_LocationService:GetCurrentCharacterLocation()
     local worldPositionX, worldPositionY, worldInstanceId = self._locationLib:GetPlayerWorldPosition();
     local zoneMapId, zoneMapType = self._locationLib:GetPlayerZone();
 
-    local zone = GetZoneText();
+    local zone = C_Map.GetMapInfo(zoneMapId).name;
     local subZone = GetSubZoneText();
 
     local zonePositionVector = GBR_Vector3:New

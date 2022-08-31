@@ -55,7 +55,7 @@ end
 
 function GBRadio:AddConfiguration()
 
-    local defaultSettings = GBR_ConfigPresets.BuzzBox;
+    local defaultSettings = GBRadioAddonDataSettingsDBSavedVars == nil and GBR_ConfigPresets.BuzzBox;
     
     GBRadioAddonDataSettingsDB = LibStub(GBR_Constants.LIB_ACE_DB):New(GBR_Constants.OPT_ADDON_SETTINGS_DB, defaultSettings);
 

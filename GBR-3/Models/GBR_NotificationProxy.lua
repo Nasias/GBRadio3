@@ -68,18 +68,27 @@ function GBR_NotificationProxy:SetIncidentFrequency(frequency)
 end
 
 function GBR_NotificationProxy:SetIncidentDescription(description)
-    local incidentDescriptionText = "INCIDENT DETAILS\n" .. (description ~= nil 
-        and description 
-        or "Incident details not provided.");
+    local incidentDescriptionText = "INCIDENT DETAILS\n";
+    
+     if description ~= nil and description:len() > 0 then
+        incidentDescriptionText = incidentDescriptionText .. description;
+     else
+        incidentDescriptionText = incidentDescriptionText .. "Incident details not provided.";
+     end
 
     self.Notification.IncidentDescription.Text:SetText(incidentDescriptionText);
 
 end
 
 function GBR_NotificationProxy:SetUnitsRequired(unitsRequired)
-    local unitsRequiredText = "UNITS REQUIRED\n" .. (unitsRequired ~= nil 
-        and unitsRequired 
-        or "Required unit details not provided.");
+    local unitsRequiredText = "UNITS REQUIRED\n";
+
+    if unitsRequired ~= nil and unitsRequired:len() > 0 then
+        unitsRequiredText = unitsRequiredText .. unitsRequired;
+    else
+        unitsRequiredText = unitsRequiredText .. "Required unit details not provided.";
+    end
+
     self.Notification.UnitsRequired.Text:SetText(unitsRequiredText);
 
 end
