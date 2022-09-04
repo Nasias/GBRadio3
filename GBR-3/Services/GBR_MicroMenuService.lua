@@ -247,7 +247,7 @@ function GBR_MicroMenuService:_buildFirstTimeUserScreen()
         aceGUI:Release(widget);
     end);
 
-    welcomeScreen:SetWidth(500);
+    welcomeScreen:SetWidth(550);
     welcomeScreen:SetHeight(600);
     welcomeScreen:SetLayout("Flow");
     welcomeScreen:EnableResize(false);
@@ -258,10 +258,11 @@ function GBR_MicroMenuService:_buildFirstTimeUserScreen()
     welcomeScreen:AddChild(welcomeHeading);
 
     local welcomeText = self._aceGUI:Create("Label");
-    welcomeText:SetFont([[Interface\Addons\GBR-3\Media\Fonts\PT_Sans-Narrow-Regular.ttf]], 14);
+    welcomeText:SetFontObject(GameFontNormal);
     welcomeText:SetText(
         "Hi there, " .. GetUnitName(GBR_Constants.ID_PLAYER) ..". Welcome to GBRadio version 3."
-        .."\n\nVersion 3 is a complete rewrite and overhaul of the previous verison, GBRadio 2, and it comes with a plethora of new features aimed at immersion, tools and quality of life improvements.");
+        .."\n\nVersion 3 is a complete rewrite and overhaul of the previous verison, GBRadio 2, and it comes with a plethora of new features aimed at immersion, tools and quality of life improvements."
+        .."\n\nNote that your old settings won't work here. You'll need to set up your old channel and configure your addon again. Sorry about that.");
     welcomeText:SetRelativeWidth(1);
     welcomeScreen:AddChild(welcomeText);
 
@@ -271,7 +272,7 @@ function GBR_MicroMenuService:_buildFirstTimeUserScreen()
     welcomeScreen:AddChild(newFeaturesHeading);
 
     local newFeaturesText = self._aceGUI:Create("Label");
-    newFeaturesText:SetFont([[Interface\Addons\GBR-3\Media\Fonts\PT_Sans-Narrow-Regular.ttf]], 14);
+    newFeaturesText:SetFontObject(GameFontNormal);
     newFeaturesText:SetText(
         "- Brand new sound effects for sending messages, receiving messages, panic button presses and out of range reminders."
         .."\n\n- Incident alert notifications pop up on the screen of your frequency's subscribers. Send them via the new Dispatch menu or via panic buttons, with differing appearance based on incident grades."
@@ -290,11 +291,19 @@ function GBR_MicroMenuService:_buildFirstTimeUserScreen()
     welcomeScreen:AddChild(needHelpHeading);
 
     local needHelpText = self._aceGUI:Create("Label");
-    needHelpText:SetFont([[Interface\Addons\GBR-3\Media\Fonts\PT_Sans-Narrow-Regular.ttf]], 14);
+    needHelpText:SetFontObject(GameFontNormal);
     needHelpText:SetText(
-        "Need help with anything or have feedback for me? Check out the About page on the settings screen for contact details, or visit Help for a list of commands and links to guides.");
+        "Need help with anything or have feedback for me? Check out the About page on the settings screen for contact details, or visit Help for a list of commands and links to guides or alternatively, consult the GBRadio 3 wiki for useful help topics");
     needHelpText:SetRelativeWidth(1);
     welcomeScreen:AddChild(needHelpText);
+
+    local wikiLink = self._aceGUI:Create("EditBox");
+    wikiLink:SetLabel("GBRadio 3 Wiki");
+    wikiLink:SetText("https://github.com/Nasias/GBRadio3/wiki/");
+    wikiLink:DisableButton(true);
+    wikiLink:SetRelativeWidth(1);
+    welcomeScreen:AddChild(wikiLink);
+
 
 end
 
