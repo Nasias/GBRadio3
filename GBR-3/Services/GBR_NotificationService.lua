@@ -203,13 +203,27 @@ function GBR_NotificationService:_buildUnitsRequired(parent)
 
 end
 
+function GBR_NotificationService:_buildClickToClose(parent)
+    
+    local clickToCloseText = parent:CreateFontString(parent, "BORDER", "GBRAlert_Details")
+    clickToCloseText:SetJustifyH("CENTER");
+    clickToCloseText:SetJustifyV("TOP");
+    clickToCloseText:SetWordWrap(true);
+    clickToCloseText:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 20);
+    clickToCloseText:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", 0, 0);
+    clickToCloseText:SetText("[ Click to dismiss ]");
+
+    return clickToCloseText;
+
+end
+
 function GBR_NotificationService:_buildNotificationFrame()
 
     local notificationFrame = CreateFrame("Button", nil, UIParent, "BackdropTemplate");
     notificationFrame:SetFrameStrata("DIALOG");
     notificationFrame:Hide();
 
-    notificationFrame:SetSize(500, 175);
+    notificationFrame:SetSize(500, 200);
     notificationFrame:SetPoint("TOP", UIParent, "TOP", 0, -10);
     notificationFrame:SetBackdrop(self.BackdropFormats.BACKDROP_NOTIFICATION);
     notificationFrame:SetScript("OnClick", GBR_NotificationService.DismissNotification);
@@ -246,6 +260,9 @@ function GBR_NotificationService:_buildNotificationFrame()
 
     local unitsRequired = self:_buildUnitsRequired(incidentFrequency);
     notificationFrame.UnitsRequired = unitsRequired;
+
+    local clickToClose = self:_buildClickToClose(notificationFrame);
+    notificationFrame.ClickToClose = clickToClose;
 
     return notificationFrame;
 

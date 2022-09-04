@@ -52,6 +52,31 @@ function GBR_ConfigService:Initialize()
                         guiInline = true,
                         args =
                         {
+                            showMicroMenuOnLogIn = 
+                            {
+                                name = "Show micro menu on log in",
+                                desc = "Automatically show the GBRadio micro menu when you log in, allowing you to quickly change frequency and access other menus, from a small floating frame."
+                                    .."\n\nNote this can always be accessed by typing '/gbr'.",
+                                type = "toggle",
+                                get = 
+                                    function(info) 
+                                        return GBRadioAddonDataSettingsDB.char.ShowMicroMenuOnLogIn;
+                                    end,
+                                set = 
+                                    function(info, value) 
+                                        GBRadioAddonDataSettingsDB.char.ShowMicroMenuOnLogIn = value;
+                                    end,
+                                width = "full",
+                                cmdHidden = true,
+                                order = 0
+                            },
+                            showMicroMenuOnLogInDescription =
+                            {
+                                type = "description",
+                                name = "Automatically show the GBRadio micro menu when you log in, allowing you to quickly change frequency and access other menus, from a small floating frame."
+                                .."\n\nNote this can always be accessed by typing '/gbr'.",
+                                order = 1
+                            },
                             deviceName = 
                             {
                                 name = "Device name",
@@ -67,13 +92,13 @@ function GBR_ConfigService:Initialize()
                                     end,
                                 width = "full",
                                 cmdHidden = true,
-                                order = 0
+                                order = 2
                             },
                             deviceNameDescription =
                             {
                                 type = "description",
                                 name = "Your device's name is used in emotes to describe the type of device you're using.",
-                                order = 1
+                                order = 3
                             },
                             primaryChannel =
                             {
@@ -111,16 +136,18 @@ function GBR_ConfigService:Initialize()
                                         return GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
                                     end,
                                 set = 
-                                    function(info, value)                                        
+                                    function(info, value)
+                                        local microMenuService = GBR_Singletons:FetchService(GBR_Constants.SRV_MICROMENU_SERVICE);
                                         GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
+                                        microMenuService:RefreshPrimaryChannel();
                                     end,
-                                order = 2
+                                order = 4
                             },
                             primaryChannelDescription =
                             {
                                 type = "description",
                                 name = "You can listen on multiple different channels at once, but you can only send messages on one at a time.\n\nYour primary channel determines the channel that you use to send messages.",
-                                order = 3
+                                order = 5
                             },
                             radioMessagedDelay = 
                             {
@@ -141,7 +168,7 @@ function GBR_ConfigService:Initialize()
                                     function(info, value) 
                                         GBRadioAddonDataSettingsDB.char.RadioMessageDelay = value;
                                     end,
-                                order = 4
+                                order = 6
                             }
                         }
                     }
@@ -1823,6 +1850,27 @@ function GBR_ConfigService:IsAddChannelReady(info)
     return false;
 end
 
+function GBR_ConfigService:IsFirstTimeUser()
+    return GBRadioAddonDataSettingsDB.char.IsFirstTimeUser;
+end
+
+function GBR_ConfigService:SetIsFirstTimeUser(value)
+    GBRadioAddonDataSettingsDB.char.IsFirstTimeUser = value;
+end
+
+function GBR_ConfigService:ShowMicroMenuOnLogIn()
+    return GBRadioAddonDataSettingsDB.char.ShowMicroMenuOnLogIn;
+end
+
+function GBR_ConfigService:SaveMicroMenuPosition(x, y)
+    GBRadioAddonDataSettingsDB.char.LastMicroMenuPosition.X = x and math.floor(x);
+    GBRadioAddonDataSettingsDB.char.LastMicroMenuPosition.Y = y and math.floor(y);
+end
+
+function GBR_ConfigService:GetMicroMenuPosition()
+    return GBRadioAddonDataSettingsDB.char.LastMicroMenuPosition;
+end
+
 function GBR_ConfigService:SetGeoToolsWorldCoordinates(x, y)
     self.StagingVars.GeoToolsWorldCoordinates.X = x;
     self.StagingVars.GeoToolsWorldCoordinates.Y = y;
@@ -2326,6 +2374,11 @@ end
 
 function GBR_ConfigService:GetPrimaryFrequency()
     return GBRadioAddonDataSettingsDB.char.PrimaryFrequency;
+end
+
+function GBR_ConfigService:SetPrimaryFrequency(value)
+    GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
+    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService:GetTransmitterInterferenceTypeForChannelSettings(channelSettings)

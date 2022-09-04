@@ -66,3 +66,6 @@ function GBR_Converter.TableToStr (tt)
 
 end
 
+function GBR_Converter.FirstToUpper(str)
+    return (str:gsub("^%l", string.upper))
+end

@@ -223,7 +223,7 @@ end
 function GBR_DispatcherService:_buildMainFrame()
 
     local notificationConfigFrame = self._aceGUI:Create("Window");
-    notificationConfigFrame:SetTitle("GBRadio Notification Dispatcher Panel");
+    notificationConfigFrame:SetTitle("GBRadio Notification Dispatcher");
     notificationConfigFrame:SetCallback("OnClose", function(widget) 
         local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
         aceGUI:Release(widget);

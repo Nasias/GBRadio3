@@ -55,5 +55,6 @@ Services/GBR_HookService.lua
 Services/GBR_HyperlinkService.lua
 Services/GBR_RoleService.lua
 Services/GBR_DispatcherService.lua
+Services/GBR_MicroMenuService.lua
 
 GBRadio.lua

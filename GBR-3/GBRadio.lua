@@ -38,14 +38,39 @@ end
 
 function GBRadio:AddCommunication()
 
-    local frameMA = CreateFrame("FRAME");
-    frameMA:RegisterEvent("PLAYER_ENTERING_WORLD");
+    local frameEnteringWorldTriggers = CreateFrame("FRAME");
+    frameEnteringWorldTriggers:RegisterEvent("PLAYER_ENTERING_WORLD");
+
+    local frameLeavingWorldTriggers = CreateFrame("FRAME");
+    frameLeavingWorldTriggers:RegisterEvent("PLAYER_LEAVING_WORLD")
     
-    function frameMA:OnEvent(event)
+    function frameEnteringWorldTriggers:OnEvent(event)
+        local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+        local microMenu = GBR_Singletons:FetchService(GBR_Constants.SRV_MICROMENU_SERVICE);
+
         JoinChannelByName(GBR_Constants.OPT_COMM_CHANNEL_NAME, nil);
+
+        if configService:ShowMicroMenuOnLogIn() then
+            microMenu:Display();
+        end
+        
+        if configService:IsFirstTimeUser() then
+            microMenu:DisplayFirstTimeUserScreen();
+        end
+    end
+
+    function frameLeavingWorldTriggers:OnEvent(event)
+        local microMenu = GBR_Singletons:FetchService(GBR_Constants.SRV_MICROMENU_SERVICE);
+        local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
+
+        if microMenu.isShown then
+            local x, y = microMenu._window.frame:GetCenter();
+            configService:SaveMicroMenuPosition(x, y);
+        end
     end
     
-    frameMA:SetScript("OnEvent", frameMA.OnEvent);
+    frameEnteringWorldTriggers:SetScript("OnEvent", frameEnteringWorldTriggers.OnEvent);
+    frameLeavingWorldTriggers:SetScript("OnEvent", frameLeavingWorldTriggers.OnEvent);
     
     GBRadioAddonData:RegisterComm(GBR_Constants.OPT_ADDON_CHANNEL_PREFIX, GBR_MessageService.StaticReceiveMessage);
 

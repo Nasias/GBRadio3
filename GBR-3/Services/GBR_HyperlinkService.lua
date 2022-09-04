@@ -8,7 +8,7 @@ end
 
 function GBR_HyperlinkService:ProcessHyperlink(link)
 
-    print(link);
+    print(strsplit(":", link));
 
 end
 
