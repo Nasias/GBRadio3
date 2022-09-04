@@ -608,25 +608,25 @@ end
 GBR_MessageService.Sounds = {
     Send = {
         M = {
-            [[Interface\AddOns\GBR-3\Media\Audio\ms-1.ogg]],
-            [[Interface\AddOns\GBR-3\Media\Audio\ms-2.ogg]]
+            [[Interface\AddOns\GBRadio\Media\Audio\ms-1.ogg]],
+            [[Interface\AddOns\GBRadio\Media\Audio\ms-2.ogg]]
         },
         F = {
-            [[Interface\AddOns\GBR-3\Media\Audio\fs-1.ogg]],
-            [[Interface\AddOns\GBR-3\Media\Audio\fs-2.ogg]]
+            [[Interface\AddOns\GBRadio\Media\Audio\fs-1.ogg]],
+            [[Interface\AddOns\GBRadio\Media\Audio\fs-2.ogg]]
         },
     },
     Receive = {
         M = {
-            [[Interface\AddOns\GBR-3\Media\Audio\mr-1.ogg]],
-            [[Interface\AddOns\GBR-3\Media\Audio\mr-2.ogg]]
+            [[Interface\AddOns\GBRadio\Media\Audio\mr-1.ogg]],
+            [[Interface\AddOns\GBRadio\Media\Audio\mr-2.ogg]]
         },
         F = {
-            [[Interface\AddOns\GBR-3\Media\Audio\fr-1.ogg]],
-            [[Interface\AddOns\GBR-3\Media\Audio\fr-2.ogg]]
+            [[Interface\AddOns\GBRadio\Media\Audio\fr-1.ogg]],
+            [[Interface\AddOns\GBRadio\Media\Audio\fr-2.ogg]]
         },
     },
-    Emergency = [[Interface\AddOns\GBR-3\Media\Audio\emergency.ogg]],
-    NoSignal = [[Interface\AddOns\GBR-3\Media\Audio\no-signal.ogg]],
-    Notification = [[Interface\AddOns\GBR-3\Media\Audio\notification.ogg]]
+    Emergency = [[Interface\AddOns\GBRadio\Media\Audio\emergency.ogg]],
+    NoSignal = [[Interface\AddOns\GBRadio\Media\Audio\no-signal.ogg]],
+    Notification = [[Interface\AddOns\GBRadio\Media\Audio\notification.ogg]]
 };

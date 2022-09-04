@@ -13,7 +13,7 @@ function GBR_NotificationService:_getBackdropFormats()
     {
         BACKDROP_NOTIFICATION = 
         {
-            bgFile = [[Interface\Addons\GBR-3\Media\Textures\Notification-BG.tga]],
+            bgFile = [[Interface\Addons\GBRadio\Media\Textures\Notification-BG.tga]],
             tile = true,
             tileEdge = true,
             tileSize = 8,
@@ -21,7 +21,7 @@ function GBR_NotificationService:_getBackdropFormats()
         },
         BACKDROP_NOTIFICATION_TITLE = 
         {
-            bgFile = [[Interface\Addons\GBR-3\Media\Textures\Notification-BG.tga]],
+            bgFile = [[Interface\Addons\GBRadio\Media\Textures\Notification-BG.tga]],
             tile = true,
             tileEdge = true,
             tileSize = 8,
@@ -41,7 +41,7 @@ function GBR_NotificationService:_buildNotificaionTitle(parent)
     local titleIcon = titleFrame:CreateTexture(nil, "BORDER");
     titleIcon:SetSize(16, 16);
     titleIcon:SetPoint("LEFT", titleFrame, "LEFT", 15, 0);
-    titleIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Triangle-Exclamation-Solid]]);
+    titleIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Triangle-Exclamation-Solid]]);
 
     local titleText = titleFrame:CreateFontString(titleFrame, "BORDER", "GBRAlert_Title");
     titleText:SetJustifyH("LEFT");
@@ -87,7 +87,7 @@ function GBR_NotificationService:_buildIncidentLocation(parent)
     local incidentLocationIcon = incidentLocationFrame:CreateTexture(nil, "BORDER");
     incidentLocationIcon:SetSize(16, 16);
     incidentLocationIcon:SetPoint("LEFT", incidentLocationFrame, "LEFT", 15, 0);
-    incidentLocationIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Compass-Solid]]);
+    incidentLocationIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Compass-Solid]]);
 
     local incidentLocationText = incidentLocationFrame:CreateFontString(incidentLocationFrame, "BORDER", "GBRAlert_Details");
     incidentLocationText:SetJustifyH("LEFT");
@@ -112,7 +112,7 @@ function GBR_NotificationService:_buildIncidentReporter(parent)
     local reporterNameIcon = reporterNameFrame:CreateTexture(nil, "BORDER");
     reporterNameIcon:SetSize(16, 16);
     reporterNameIcon:SetPoint("LEFT", reporterNameFrame, "LEFT", 15, 0);
-    reporterNameIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\User-Solid]]);
+    reporterNameIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\User-Solid]]);
 
     local reporterNameText = reporterNameFrame:CreateFontString(reporterNameFrame, "BORDER", "GBRAlert_Details");
     reporterNameText:SetJustifyH("LEFT");
@@ -137,7 +137,7 @@ function GBR_NotificationService:_buildIncidentFrequency(parent)
     local incidentFrequencyIcon = incidentFrequencyFrame:CreateTexture(nil, "BORDER");
     incidentFrequencyIcon:SetSize(16, 16);
     incidentFrequencyIcon:SetPoint("LEFT", incidentFrequencyFrame, "LEFT", 15, 0)
-    incidentFrequencyIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Tower-Cell-Solid]]);
+    incidentFrequencyIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Tower-Cell-Solid]]);
 
     local incidentFrequencyText = incidentFrequencyFrame:CreateFontString(incidentFrequencyFrame, "BORDER", "GBRAlert_Details");
     incidentFrequencyText:SetJustifyH("LEFT");
@@ -162,7 +162,7 @@ function GBR_NotificationService:_buildIncidentDescription(parent)
     local incidentDescriptionIcon = incidentDescriptionFrame:CreateTexture(nil, "BORDER");
     incidentDescriptionIcon:SetSize(16, 16);
     incidentDescriptionIcon:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 15, 0)
-    incidentDescriptionIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Circle-Info-Solid]]);
+    incidentDescriptionIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Circle-Info-Solid]]);
 
     local incidentDescriptionText = incidentDescriptionFrame:CreateFontString(incidentDescriptionFrame, "BORDER", "GBRAlert_Details")
     incidentDescriptionText:SetJustifyH("LEFT")
@@ -187,7 +187,7 @@ function GBR_NotificationService:_buildUnitsRequired(parent)
     local unitsRequiredIcon = unitsRequiredFrame:CreateTexture(nil, "BORDER");
     unitsRequiredIcon:SetSize(16, 16);
     unitsRequiredIcon:SetPoint("LEFT", unitsRequiredFrame, "LEFT", 15, 0)
-    unitsRequiredIcon:SetTexture([[Interface\Addons\GBR-3\Media\Textures\Shield-Halved-Solid]]);
+    unitsRequiredIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Shield-Halved-Solid]]);
 
     local unitsRequiredText = unitsRequiredFrame:CreateFontString(unitsRequiredFrame, "BORDER", "GBRAlert_Details")
     unitsRequiredText:SetJustifyH("LEFT");

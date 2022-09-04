@@ -93,7 +93,7 @@ function GBR_MicroMenuService:_buildMainFrame()
     ------------------------------------------------------
 
     local btnPanic = self._aceGUI:Create("Button");
-    btnPanic:SetText([[|TInterface\Addons\GBR-3\Media\Textures\Buttons\Panic.tga:15:15:0:0:128:128:0:128:0:128:255:255:255|t]]);
+    btnPanic:SetText([[|TInterface\Addons\GBRadio\Media\Textures\Buttons\Panic.tga:15:15:0:0:128:128:0:128:0:128:255:255:255|t]]);
     btnPanic:SetRelativeWidth(0.25);
     btnPanic:SetHeight(35);
     btnPanic:SetCallback("OnClick", function(info, event)
@@ -128,7 +128,7 @@ function GBR_MicroMenuService:_buildMainFrame()
     ------------------------------------------------------
 
     local btnOpenDispatcher = self._aceGUI:Create("Button");
-    btnOpenDispatcher:SetText([[|TInterface\Addons\GBR-3\Media\Textures\Buttons\Dispatch.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
+    btnOpenDispatcher:SetText([[|TInterface\Addons\GBRadio\Media\Textures\Buttons\Dispatch.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
     btnOpenDispatcher:SetRelativeWidth(0.25);
     btnOpenDispatcher:SetHeight(35);
     btnOpenDispatcher:SetCallback("OnClick", function(info, event)
@@ -159,7 +159,7 @@ function GBR_MicroMenuService:_buildMainFrame()
     ------------------------------------------------------
 
     local btnViewHistory = self._aceGUI:Create("Button");
-    --btnPlaceholder:SetText([[|TInterface\Addons\GBR-3\Media\Textures\Buttons\History.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
+    --btnPlaceholder:SetText([[|TInterface\Addons\GBRadio\Media\Textures\Buttons\History.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
     btnViewHistory:SetDisabled(true);
     btnViewHistory:SetRelativeWidth(0.25);
     btnViewHistory:SetHeight(35);
@@ -191,7 +191,7 @@ function GBR_MicroMenuService:_buildMainFrame()
     notificationConfigFrame:AddChild(btnViewHistory);
 
     local btnOpenConfigScreen = self._aceGUI:Create("Button");
-    btnOpenConfigScreen:SetText([[|TInterface\Addons\GBR-3\Media\Textures\Buttons\Settings.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
+    btnOpenConfigScreen:SetText([[|TInterface\Addons\GBRadio\Media\Textures\Buttons\Settings.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
     btnOpenConfigScreen:SetRelativeWidth(0.25);
     btnOpenConfigScreen:SetHeight(35);
     btnOpenConfigScreen:SetCallback("OnClick", function(info, event) 
