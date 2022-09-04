@@ -18,6 +18,7 @@ function GBR_SingletonService:New(obj)
         [GBR_Constants.SRV_ROLE_SERVICE] = GBR_RoleService,
         [GBR_Constants.SRV_DISPATCHER_SERVICE] = GBR_DispatcherService,
         [GBR_Constants.SRV_MICROMENU_SERVICE] = GBR_MicroMenuService,
+        [GBR_Constants.SRV_TOOLTIP_SERVICE] = GBR_TooltipService,
     };
 
     self._instantiatedServices = {};

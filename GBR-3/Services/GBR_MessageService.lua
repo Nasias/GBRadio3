@@ -390,7 +390,7 @@ end
 function GBR_MessageService:PlayReceiveMessageAudio(frequency, characterGender)
 
     if not self._configService:IsReceiveMessageAudioEnabledForFrequency(frequency) 
-        or not self:HasChannelAudioCooldownPassedForFrequency(frequency) then
+        or not self:HasAudioCooldownPassed(frequency) then
         return;
     end
 
@@ -401,7 +401,7 @@ function GBR_MessageService:PlayReceiveMessageAudio(frequency, characterGender)
     local audioTrack = soundTable[math.random(1, #soundTable)];
 
     PlaySoundFile(audioTrack, "SFX");
-    self:StartChannelAudioCooldownForFrequency(frequency);
+    self:StartAudioCooldownForFrequency(frequency);
 
 end
 
@@ -438,12 +438,12 @@ end
 function GBR_MessageService:PlayReceiveEmergencyMessageAudio(frequency)
 
     if not self._configService:IsReceiveEmergencyMessageAudioEnabledForFrequency(frequency) 
-        or not self:HasChannelAudioCooldownPassedForFrequency(frequency) then
+        or not self:HasAudioCooldownPassed(frequency) then
         return;
     end
 
     PlaySoundFile(self.Sounds.Emergency, "SFX");
-    self:StartChannelAudioCooldownForFrequency(frequency);
+    self:StartAudioCooldownForFrequency(frequency);
 
 end
 
@@ -496,7 +496,7 @@ end
 function GBR_MessageService:ProcessReceiveEmote(frequency)
 
     if not self._configService:IsReceiveMessageEmoteEnabledForFrequency(frequency) 
-        or not self:HasChannelEmoteCooldownPassedForFrequency(frequency) then
+        or not self:HasEmoteCooldownPassed(frequency) then
         return;
     end
 
@@ -505,37 +505,37 @@ function GBR_MessageService:ProcessReceiveEmote(frequency)
     local radioVerb = GBR_Constants.MSG_EMOTE_RECEIVE_VERBS[math.random(1, #GBR_Constants.MSG_EMOTE_RECEIVE_VERBS)];
 
     SendChatMessage(string.format(GBR_Constants.MSG_EMOTE_RECEIVE_MESSAGE, deviceName, radioVerb), "EMOTE");
-    self:StartChannelEmoteCooldownForFrequency(frequency);
+    self:StartEmoteCooldownForFrequency(frequency);
 end
 
-function GBR_MessageService:StartChannelEmoteCooldownForFrequency(frequency)
+function GBR_MessageService:StartEmoteCooldownForFrequency(frequency)
 
     local cooldownPeriod = self._configService:GetChannelEmoteCooldownPeriodForFrequency(frequency);
     
-    self.ReceivedEmoteCooldowns[frequency] = time() + cooldownPeriod;
+    self.ReceivedEmoteCooldowns = time() + cooldownPeriod;
 
 end
 
-function GBR_MessageService:StartChannelAudioCooldownForFrequency(frequency)
+function GBR_MessageService:StartAudioCooldownForFrequency(frequency)
 
     local cooldownPeriod = self._configService:GetChannelAudioCooldownPeriodForFrequency(frequency);
     
-    self.ReceivedAudioCooldowns[frequency] = time() + cooldownPeriod;
+    self.ReceivedAudioCooldowns = time() + cooldownPeriod;
 end
 
-function GBR_MessageService:HasChannelEmoteCooldownPassedForFrequency(frequency)
+function GBR_MessageService:HasEmoteCooldownPassed()
 
-    return self.ReceivedEmoteCooldowns[frequency] == nil 
+    return self.ReceivedEmoteCooldowns == nil 
         and true
-        or self.ReceivedEmoteCooldowns[frequency] <= time();
+        or self.ReceivedEmoteCooldowns <= time();
 
 end
 
-function GBR_MessageService:HasChannelAudioCooldownPassedForFrequency(frequency)
+function GBR_MessageService:HasAudioCooldownPassed()
 
-    return self.ReceivedAudioCooldowns[frequency] == nil 
+    return self.ReceivedAudioCooldowns == nil 
         and true
-        or self.ReceivedAudioCooldowns[frequency] <= time();
+        or self.ReceivedAudioCooldowns <= time();
 
 end
 

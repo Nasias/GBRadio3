@@ -27,6 +27,7 @@ GBR_Constants =
     SRV_ROLE_SERVICE = "RoleService",
     SRV_DISPATCHER_SERVICE = "DispatcherService",
     SRV_MICROMENU_SERVICE = "MicroMenuService",
+    SRV_TOOLTIP_SERVICE = "TooltipService",
 
     CMD_MAIN = "gbr",
     CMD_DEV_TEST = "gbr3test",

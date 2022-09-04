@@ -33,7 +33,8 @@ end
 
 function GBR_NotificationProxy:SetTitle(title)
 
-    self.Notification.Title.Text:SetText(title);
+    local titleText = title and title:len() > 0 and title or "INCIDENT ALERT";
+    self.Notification.Title.Text:SetText(titleText);
 
 end
 
@@ -47,9 +48,15 @@ end
 
 function GBR_NotificationProxy:SetIncidentLocation(location, coordinateX, coordinateY)
 
-    local locationText = location ~= nil and coordinateX ~= nil and coordinateY ~= nil
-        and string.format("%s\n(%.2f, %.2f)", location, coordinateX, coordinateY)
-        or location .. "\n-";
+    local locationText;
+
+    if location and location:len() > 0 then
+        locationText = coordinateX and coordinateX:len() > 0 and coordinateY and coordinateY:len() > 0
+            and string.format("%s\n(%s, %s)", location, coordinateX, coordinateY)
+            or location .. "\n-";
+    else
+        locationText = "-";
+    end
 
     self.Notification.IncidentLocation.Text:SetText(locationText);
 
@@ -57,7 +64,8 @@ end
 
 function GBR_NotificationProxy:SetIncidentReporter(name)
 
-    self.Notification.IncidentReporter.Text:SetText(name);
+    local incidentReporter = name and name:len() > 0 and name or "-";
+    self.Notification.IncidentReporter.Text:SetText(incidentReporter);
 
 end
 
@@ -70,7 +78,7 @@ end
 function GBR_NotificationProxy:SetIncidentDescription(description)
     local incidentDescriptionText = "INCIDENT DETAILS\n";
     
-     if description ~= nil and description:len() > 0 then
+     if description and description:len() > 0 then
         incidentDescriptionText = incidentDescriptionText .. description;
      else
         incidentDescriptionText = incidentDescriptionText .. "Incident details not provided.";

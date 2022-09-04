@@ -223,7 +223,7 @@ function GBR_NotificationService:_buildNotificationFrame()
     notificationFrame:SetFrameStrata("DIALOG");
     notificationFrame:Hide();
 
-    notificationFrame:SetSize(500, 200);
+    notificationFrame:SetSize(self.Settings.FrameWidth, self.Settings.FrameHeight);
     notificationFrame:SetPoint("TOP", UIParent, "TOP", 0, -10);
     notificationFrame:SetBackdrop(self.BackdropFormats.BACKDROP_NOTIFICATION);
     notificationFrame:SetScript("OnClick", GBR_NotificationService.DismissNotification);
@@ -365,7 +365,7 @@ function GBR_NotificationService:Initialize()
     self.Settings = {
         MaxActiveNotifications = 2,
         FrameWidth = 500,
-        FrameHeight = 175,
+        FrameHeight = 200,
         FrameOffsetY = 15,
     };
 

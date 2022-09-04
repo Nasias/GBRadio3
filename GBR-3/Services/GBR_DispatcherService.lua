@@ -8,6 +8,9 @@ function GBR_DispatcherService:New(obj)
     self._playerService = GBR_Singletons:FetchService(GBR_Constants.SRV_PLAYER_SERVICE);
     self._notificationService = GBR_Singletons:FetchService(GBR_Constants.SRV_NOTIFICATION_SERVICE);
 
+    self._window = nil;
+    self._isShown = false;
+
     self.Cache =
     {
         NotificationDispatchData = {
@@ -36,9 +39,9 @@ function GBR_DispatcherService:_presetNotificationInputs()
     {
         Title = "INCIDENT ALERT",
         Grade = 1,
-        MainLocation = currentCharacter.Location.Zone,
-        CoordinateX = string.format("%.2f", currentCharacter.Location.ZonePosition.X * 100),
-        CoordinateY = string.format("%.2f", currentCharacter.Location.ZonePosition.Y * 100),
+        MainLocation = currentCharacter.Location.SubZone and currentCharacter.Location.SubZone:len() > 0 and currentCharacter.Location.SubZone or currentCharacter.Location.Zone,
+        CoordinateX = currentCharacter.Location.ZonePosition.X and string.format("%.2f", currentCharacter.Location.ZonePosition.X * 100) or "",
+        CoordinateY = currentCharacter.Location.ZonePosition.Y and string.format("%.2f", currentCharacter.Location.ZonePosition.Y * 100) or "",
         SenderName = self._configService:GetCharacterDisplayNameForFrequency(primaryFrequency),
         SenderFrequency = primaryFrequency,
         UnitsRequired = {},
@@ -46,16 +49,7 @@ function GBR_DispatcherService:_presetNotificationInputs()
 
 end
 
-function GBR_DispatcherService:_selectNavigationItem(container, event, group)
-    container:ReleaseChildren();
-    if group == 1 then
-        self:_drawSendNotificationPage(container);
-    elseif group == 2 then
-        self:_drawNotificationHistoryPage(container);
-    end
-end
-
-function GBR_DispatcherService:_drawSendNotificationPage(container)
+function GBR_DispatcherService:_buildSendNotification(container)
 
     self:_presetNotificationInputs();
     local notificationDetailsGroup = self:_buildNotificationDetailsGroup();
@@ -68,7 +62,27 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         dispatcherService.Cache.NotificationDispatchData.Title = value 
     end);
     txtTitle:SetText(self.Cache.NotificationDispatchData.Title);
+    txtTitle:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Title",
+            "Determines the title of the notification you will send",
+            "Example: INCIDENT ALERT, WANTED PERSON"
+        );
+
+    end);
+    txtTitle:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
     notificationDetailsGroup:AddChild(txtTitle);
+
+    ------------------------------------------------------
 
     local ddlGrade = self._aceGUI:Create("Dropdown");
     ddlGrade:SetLabel("Grade");
@@ -83,17 +97,58 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         dispatcherService.Cache.NotificationDispatchData.Grade = key:GetValue();
     end);
     ddlGrade:SetValue(self.Cache.NotificationDispatchData.Grade);
+    ddlGrade:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Grade",
+            "Determines the severity of the notification",
+            "Grade 1 - Emergency\nGrade 2 - Urgent\nGrade 3 - Routine"
+        );
+
+    end);
+    ddlGrade:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
     notificationDetailsGroup:AddChild(ddlGrade);
 
-    local txtMainLocation = self._aceGUI:Create("EditBox");
-    txtMainLocation:SetLabel("Main location");
-    txtMainLocation:SetRelativeWidth(0.5);
-    txtMainLocation:SetCallback("OnEnterPressed", function(info, event, value) 
+    ------------------------------------------------------
+
+    local txtLocation = self._aceGUI:Create("EditBox");
+    txtLocation:SetLabel("Location");
+    txtLocation:SetRelativeWidth(0.5);
+    txtLocation:SetCallback("OnEnterPressed", function(info, event, value) 
         local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
         dispatcherService.Cache.NotificationDispatchData.MainLocation = value;
     end);
-    txtMainLocation:SetText(self.Cache.NotificationDispatchData.MainLocation);
-    notificationDetailsGroup:AddChild(txtMainLocation);
+    txtLocation:SetText(self.Cache.NotificationDispatchData.MainLocation);
+    txtLocation:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Location",
+            "Determines the local area that this notification involves",
+            "Example: Mage District, Old Town, Raven Hill"
+        );
+
+    end);
+    txtLocation:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
+    container.Location = txtLocation;
+    notificationDetailsGroup:AddChild(txtLocation);
+
+    ------------------------------------------------------
 
     local txtLocationCoordX = self._aceGUI:Create("EditBox");
     txtLocationCoordX:SetLabel("Coordinate X");
@@ -103,7 +158,28 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         dispatcherService.Cache.NotificationDispatchData.CoordinateX = value;
     end);
     txtLocationCoordX:SetText(self.Cache.NotificationDispatchData.CoordinateX);
+    txtLocationCoordX:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Coordinate X",
+            "Set the local X map coordinate for where this notification is concerned",
+            "Example: 56.10"
+        );
+
+    end);
+    txtLocationCoordX:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
+    container.LocationCoordX = txtLocationCoordX;
     notificationDetailsGroup:AddChild(txtLocationCoordX);
+
+    ------------------------------------------------------
 
     local txtLocationCoordY = self._aceGUI:Create("EditBox");
     txtLocationCoordY:SetLabel("Coordinate Y");
@@ -113,7 +189,51 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         dispatcherService.Cache.NotificationDispatchData.CoordinateY = value;
     end);
     txtLocationCoordY:SetText(self.Cache.NotificationDispatchData.CoordinateY);
+    txtLocationCoordY:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Coordinate Y",
+            "Set the local Y map coordinate for where this notification is concerned",
+            "Example: 56.10"
+        );
+
+    end);
+    txtLocationCoordY:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
+    container.LocationCoordY = txtLocationCoordY;
     notificationDetailsGroup:AddChild(txtLocationCoordY);
+
+    ------------------------------------------------------
+
+    local cmdUseCurrentLocation = self._aceGUI:Create("Button");
+    cmdUseCurrentLocation:SetRelativeWidth(1);
+    cmdUseCurrentLocation:SetText("Update to current location");
+    cmdUseCurrentLocation:SetCallback("OnClick", function(info, event)
+        local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
+        local locationService = GBR_Singletons:FetchService(GBR_Constants.SRV_LOCATION_SERVICE);
+        local playerPosition = locationService:GetCurrentCharacterLocation();
+
+        if dispatcherService._window then
+            dispatcherService.Cache.NotificationDispatchData.CoordinateX = playerPosition.ZonePosition.X and string.format("%.2f", playerPosition.ZonePosition.X * 100) or "";
+            dispatcherService.Cache.NotificationDispatchData.CoordinateY = playerPosition.ZonePosition.Y and string.format("%.2f", playerPosition.ZonePosition.Y * 100) or "";
+            dispatcherService.Cache.NotificationDispatchData.MainLocation = playerPosition.SubZone and playerPosition.SubZone:len() > 0 and playerPosition.SubZone or playerPosition.Zone;
+
+            dispatcherService._window.LocationCoordX:SetText(playerPosition.ZonePosition.X and string.format("%.2f", playerPosition.ZonePosition.X * 100) or "");
+            dispatcherService._window.LocationCoordY:SetText(playerPosition.ZonePosition.Y and string.format("%.2f", playerPosition.ZonePosition.Y * 100) or "");
+            dispatcherService._window.Location:SetText(playerPosition.SubZone and playerPosition.SubZone:len() > 0 and playerPosition.SubZone or playerPosition.Zone);
+        end
+
+    end);
+    notificationDetailsGroup:AddChild(cmdUseCurrentLocation);
+
+    ------------------------------------------------------
 
     local txtSenderName = self._aceGUI:Create("EditBox");
     txtSenderName:SetLabel("Sender name");
@@ -131,6 +251,8 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         channelDropdownValues[k] = GBR_ConfigService.GetChannelGroupName(v.IsEnabled, v.ChannelName, k);
     end
 
+    ------------------------------------------------------
+
     local ddlChannel = self._aceGUI:Create("Dropdown");
     ddlChannel:SetLabel("Channel");
     ddlChannel:SetRelativeWidth(1);
@@ -140,7 +262,27 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         dispatcherService.Cache.NotificationDispatchData.SenderFrequency = value;
     end);
     ddlChannel:SetValue(self.Cache.NotificationDispatchData.SenderFrequency);
+    ddlChannel:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Sender name",
+            "Specify the person or entity this notification comes from",
+            "Example: Your name, Stormwind Control, Dispatch"
+        );
+
+    end);
+    ddlChannel:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
     notificationDetailsGroup:AddChild(ddlChannel);
+
+    ------------------------------------------------------
 
     local ddlUnitsRequired = self._aceGUI:Create("Dropdown");
     ddlUnitsRequired:SetLabel("Units required");
@@ -151,17 +293,57 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
         local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
         dispatcherService.Cache.NotificationDispatchData.UnitsRequired[value] = checked;
     end);
+    ddlUnitsRequired:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Units required",
+            "Select from the list the kind of units this notification concerns"
+        );
+
+    end);
+    ddlUnitsRequired:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
     notificationDetailsGroup:AddChild(ddlUnitsRequired);
+
+    ------------------------------------------------------
 
     local txtIncidentDetails = self._aceGUI:Create("MultiLineEditBox");
     txtIncidentDetails:SetLabel("Incident details");
     txtIncidentDetails:SetRelativeWidth(1);
     txtIncidentDetails:SetNumLines(5);
+    txtIncidentDetails:SetMaxLetters(200);
     txtIncidentDetails:SetCallback("OnEnterPressed", function(info, event, value) 
         local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
         dispatcherService.Cache.NotificationDispatchData.IncidentDetails = value;
     end);
+    txtIncidentDetails:SetCallback("OnEnter", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        
+        tooltipService:ShowTooltip(
+            info.frame,
+            "Incident details",
+            "Provide a summary of the details concerning this notification",
+            "Example: Active shooter in Old Town. 3 LEA units are down as are 2 members of the public.\n\nRequire emergency response."
+        );
+
+    end);
+    txtIncidentDetails:SetCallback("OnLeave", function(info, event)
+
+        local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
+        tooltipService:HideTooltip();
+
+    end);
     notificationDetailsGroup:AddChild(txtIncidentDetails);
+
+    ------------------------------------------------------
 
     local cmdDispatchNotification = self._aceGUI:Create("Button");
     cmdDispatchNotification:SetText("DISPATCH");
@@ -209,45 +391,26 @@ function GBR_DispatcherService:_drawSendNotificationPage(container)
 
 end
 
-function GBR_DispatcherService:_drawNotificationHistoryPage(container)
-
-    local notificationDetailsGroup = self._aceGUI:Create("InlineGroup");
-    notificationDetailsGroup:SetTitle("Notification history");
-    notificationDetailsGroup:SetLayout("Flow");
-    notificationDetailsGroup:SetFullWidth(true);
-    notificationDetailsGroup:SetFullHeight(true);
-    container:AddChild(notificationDetailsGroup);
-
-end
-
 function GBR_DispatcherService:_buildMainFrame()
 
     local notificationConfigFrame = self._aceGUI:Create("Window");
     notificationConfigFrame:SetTitle("GBRadio Notification Dispatcher");
     notificationConfigFrame:SetCallback("OnClose", function(widget) 
+        local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
         local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
+        
+        dispatcherService._isShown = false;
         aceGUI:Release(widget);
+        dispatcherService._window = nil;
+        dispatcherService.isShown = false;
     end);
     notificationConfigFrame:SetWidth(350);
     notificationConfigFrame:SetHeight(600);
     notificationConfigFrame:SetLayout("Fill");
     notificationConfigFrame:EnableResize(false);
-    
-    local notificationNavigation = self._aceGUI:Create("TabGroup");
-    notificationNavigation:SetTabs({{value = 1, text = "Send notification"}});
-    notificationNavigation:SetCallback("OnGroupSelected", function(container, event, group)
-        local dispatcherService = GBR_Singletons:FetchService(GBR_Constants.SRV_DISPATCHER_SERVICE);
-        dispatcherService:_selectNavigationItem(container, event, group);
-    end);
-    notificationNavigation:SetCallback("OnClose", function(widget) 
-        local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
-        aceGUI:Release(widget);
-    end);
-    notificationNavigation:SelectTab(1);
-    notificationNavigation:SetLayout("Fill");
 
-    notificationConfigFrame:AddChild(notificationNavigation);
-    notificationConfigFrame.NavigationPanel = notificationNavigation;
+    local notificationDetails = self:_buildSendNotification(notificationConfigFrame);
+    notificationConfigFrame.NotificationDetails = notificationDetails;
 
     return notificationConfigFrame;
 
@@ -260,16 +423,15 @@ function GBR_DispatcherService:_buildNotificationDetailsGroup()
     notificationDetailsGroup:SetLayout("Flow");
     notificationDetailsGroup:SetFullWidth(true);
     notificationDetailsGroup:SetFullHeight(true);
-    notificationDetailsGroup:SetCallback("OnClose", function(widget) 
-        local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
-        aceGUI:Release(widget);
-    end);
     
     return notificationDetailsGroup;
 end
 
 function GBR_DispatcherService:DisplayDispatcher()
 
-    local notificationDispatchFrame = self:_buildMainFrame();
+    if not self._isShown then
+        self._window = self:_buildMainFrame();
+        self._isShown = true;
+    end
 
 end
