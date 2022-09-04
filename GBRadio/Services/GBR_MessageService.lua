@@ -314,7 +314,7 @@ function GBR_MessageService:ProcessReceivedEmergencyMessage(messageModel)
     local characterName = self._playerService:GetCharacterNameForNameType(GBR_ENameType.Character);
     local channelSettings = self._configService:GetSettingsForFrequency(messageModel.MessageData.Frequency);
     local channelColour = GBR_ARGB:New(channelSettings.ChannelSettings.ChannelChatMessageColour);
-    local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
+    local roleIcons = channelSettings.IdentitySettings.ShowChannelRoles and self._roleService:GetRoleChatIconsForRoles(messageModel.MessageData.CharacterModel.CharacterRoles) or "";
     local emergencyMessage = messageModel.MessageData.CharacterModel.Location.ZonePosition.X ~= nil and messageModel.MessageData.CharacterModel.Location.ZonePosition.Y ~= nil
             and string.format(
                 GBR_Constants.MSG_RADIO_EMERGENCY, 
