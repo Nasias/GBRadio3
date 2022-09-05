@@ -542,12 +542,33 @@ function GBR_ConfigService:Initialize()
                         type = "description",
                         fontSize = "medium",
                         name = "Commands"
-                            .. "\n\n|cFF82C2FF/gbr|r - Shows the config menu"
-                            .. "\n\n|cFF82C2FF/gbr dispatch|r - Shows the notification dispatcher menu"
-                            .. "\n\n|cFF82C2FF/bb <message>|r - Send a message"
-                            .. "\n\n|cFF82C2FF/wbb <message>|r - Send a quiet message (no /say)"
-                            .. "\n\n|cFF82C2FF/pb|r - Panic button - Sends an alert out to all listeners that you need assistance"
-                    }
+                            .. "\n\n|cFF82C2FF/gbr config|r - Shows the micro menu"
+                                .. "\n\n|cFF82C2FF/gbr config|r - Shows the config menu"
+                                .. "\n\n|cFF82C2FF/gbr dispatch|r - Shows the notification dispatcher menu"
+                                .. "\n\n|cFF82C2FF/bb <message>|r - Send a message"
+                                .. "\n\n|cFF82C2FF/wbb <message>|r - Send a quiet message (no /say)"
+                                .. "\n\n|cFF82C2FF/pb|r - Panic button - Sends an alert out to all listeners that you need assistance",
+                        order = 0,
+                    },
+                    wikiDesc =
+                    {
+                        type = "description",
+                        fontSize = "medium",
+                        name = "\n\nVisit the GBRadio 3 wiki for guidance and how-tos.",
+                        order = 1,
+                    },
+                    wikiInput =
+                    {
+                        name = "Wiki",
+                        type = "input",
+                        desc = "Visit the GBRadio 3 wiki for guidance and how-tos.",
+                        width = "full",
+                        order = 2,
+                        get =
+                            function(info)
+                                return "https://github.com/Nasias/GBRadio3/wiki/";
+                            end,
+                    },
                 }
             }
         }
