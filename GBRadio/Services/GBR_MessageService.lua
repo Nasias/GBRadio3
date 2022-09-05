@@ -13,8 +13,8 @@ function GBR_MessageService:New(obj)
     self._hyperlinkService = GBR_Singletons:FetchService(GBR_Constants.SRV_HYPERLINK_SERVICE);
     self._roleService = GBR_Singletons:FetchService(GBR_Constants.SRV_ROLE_SERVICE);
 
-    self.ReceivedAudioCooldowns = {};
-    self.ReceivedEmoteCooldowns = {};
+    self.ReceivedAudioCooldowns = nil;
+    self.ReceivedEmoteCooldowns = nil;
     
     self.MessageQueue = {};
 
@@ -525,7 +525,7 @@ end
 
 function GBR_MessageService:HasEmoteCooldownPassed()
 
-    return self.ReceivedEmoteCooldowns == nil 
+    return self.ReceivedEmoteCooldowns == nil
         and true
         or self.ReceivedEmoteCooldowns <= time();
 
@@ -533,7 +533,7 @@ end
 
 function GBR_MessageService:HasAudioCooldownPassed()
 
-    return self.ReceivedAudioCooldowns == nil 
+    return self.ReceivedAudioCooldowns == nil
         and true
         or self.ReceivedAudioCooldowns <= time();
 
