@@ -33,7 +33,7 @@ function GBR_ConfigService:Initialize()
     self._addonService.OptionsTable = 
     {
         type = "group",
-        name = "GB|cff00c0ffRadio|r 3 (v3.0.0) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
+        name = "GB|cff00c0ffRadio|r 3 (v3.0.3) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
         childGroups = "tree",
         handler = self._addonService,        
         args = {
@@ -525,6 +525,8 @@ function GBR_ConfigService:Initialize()
                             .. "\n|cFF82C2FFCadwëll|r (Andy Cadwell) @ Argent Dawn, EU"
                             .. "\n|cFF82C2FFLizbelli|r (Lizbelli Darkstar) @ Argent Dawn, EU"
                             .. "\n|cFF82C2FFKaspbrák|r (Hendrick Kaspbrak) @ Argent Dawn, EU"
+                            .. "\n|cFFFFD700Agrovane|r (Darius Agrovane) @ Argent Dawn, EU"
+                            .. "\n|cFF82C2FFEcireth|r (Ecireth Eckleheart) @ Argent Dawn, EU"
                             .. "\n\nGBRadio 3 is written in Lua, powered by the ACE-3.0 framework. All rights reserved."
                             .. "\n\n|cFF82C2FFAuthor:|r Nasias (Nasias Darkstar) @ Argent Dawn (EU)\n|cFF82C2FFContact:|r n@siasdarkstar.com\n|cFF82C2FFDiscord:|r Nasias#0001",
                     }
