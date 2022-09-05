@@ -55,6 +55,21 @@ function GBR_RoleService:GetRoleChatIconsForRoles(roles)
 
 end
 
+GBR_RoleService.SortedRoleKeys =
+{
+    GBR_ERoleType.FLP,
+    GBR_ERoleType.POR,
+    GBR_ERoleType.AHO,
+    GBR_ERoleType.AFO,
+    GBR_ERoleType.AMO,
+    GBR_ERoleType.ELS,
+    GBR_ERoleType.EOD,
+    GBR_ERoleType.IO,
+    GBR_ERoleType.JNOPGC,
+    GBR_ERoleType.JNOPSC,
+    GBR_ERoleType.JNOPBC,
+};
+
 GBR_RoleService.Roles =
 {
     [GBR_ERoleType.FLP] = GBR_RoleModel:New
@@ -63,6 +78,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_FLP,
         Icon = GBR_Constants.ROLE_ICON_FLP,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_FLP,
+        Order = 100,
     },
     [GBR_ERoleType.POR] = GBR_RoleModel:New
     {
@@ -70,6 +86,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_POR,
         Icon = GBR_Constants.ROLE_ICON_POR,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_POR,
+        Order = 200,
     },
     [GBR_ERoleType.AHO] = GBR_RoleModel:New
     {
@@ -77,6 +94,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_AHO,
         Icon = GBR_Constants.ROLE_ICON_AHO,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_AHO,
+        Order = 300,
     },
     [GBR_ERoleType.AFO] = GBR_RoleModel:New
     {
@@ -84,6 +102,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_AFO,
         Icon = GBR_Constants.ROLE_ICON_AFO,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_AFO,
+        Order = 400,
     },
     [GBR_ERoleType.AMO] = GBR_RoleModel:New
     {
@@ -91,6 +110,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_AMO,
         Icon = GBR_Constants.ROLE_ICON_AMO,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_AMO,
+        Order = 500,
     },
     [GBR_ERoleType.ELS] = GBR_RoleModel:New
     {
@@ -98,6 +118,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_ELS,
         Icon = GBR_Constants.ROLE_ICON_ELS,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_ELS,
+        Order = 600,
     },
     [GBR_ERoleType.EOD] = GBR_RoleModel:New
     {
@@ -105,6 +126,15 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_EOD,
         Icon = GBR_Constants.ROLE_ICON_EOD,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_EOD,
+        Order = 700,
+    },
+    [GBR_ERoleType.IO] = GBR_RoleModel:New
+    {
+        Name = GBR_Constants.ROLE_NAME_IO,
+        Abbreviation = GBR_Constants.ROLE_ABBREVIATION_IO,
+        Icon = GBR_Constants.ROLE_ICON_IO,
+        ChatIcon = GBR_Constants.ROLE_ICON_CHAT_IO,
+        Order = 800,
     },
     [GBR_ERoleType.JNOPGC] = GBR_RoleModel:New
     {
@@ -112,6 +142,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPGC,
         Icon = GBR_Constants.ROLE_ICON_JNOPGC,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_JNOPGC,
+        Order = 900,
     }, 
     [GBR_ERoleType.JNOPSC] = GBR_RoleModel:New
     {
@@ -119,6 +150,7 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPSC,
         Icon = GBR_Constants.ROLE_ICON_JNOPSC,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_JNOPSC,
+        Order = 1000,
     },
     [GBR_ERoleType.JNOPBC] = GBR_RoleModel:New
     {
@@ -126,5 +158,6 @@ GBR_RoleService.Roles =
         Abbreviation = GBR_Constants.ROLE_ABBREVIATION_JNOPBC,
         Icon = GBR_Constants.ROLE_ICON_JNOPBC,
         ChatIcon = GBR_Constants.ROLE_ICON_CHAT_JNOPBC,
+        Order = 1100
     },
 }

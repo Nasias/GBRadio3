@@ -16,6 +16,10 @@ function GBR_MRPService:GetPlayerColour()
         return nil;
     end
 
+    if TRP3_API.profile.getPlayerCurrentProfile().player.characteristics.CH == nil then
+        return nil;
+    end    
+
     return "ff"..TRP3_API.profile.getPlayerCurrentProfile().player.characteristics.CH; -- TRP3 doesn't return alpha
 
 end
