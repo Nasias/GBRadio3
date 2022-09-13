@@ -13,7 +13,6 @@ GBR_Constants =
 
     SRV_COMMAND_SERVICE = "CommandService",
     SRV_CONFIG_SERVICE = "ConfigService",
-    SRV_HISTORY_SERVICE = "HistoryService",
     SRV_LOCATION_SERVICE = "LocationService",
     SRV_MESSAGE_SERVICE = "MessageService",
     SRV_MRP_SERVICE = "MRPService",
