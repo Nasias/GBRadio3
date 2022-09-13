@@ -544,7 +544,7 @@ function GBR_ConfigService:Initialize()
                         type = "description",
                         fontSize = "medium",
                         name = "Commands"
-                            .. "\n\n|cFF82C2FF/gbr config|r - Shows the micro menu"
+                            .. "\n\n|cFF82C2FF/gbr|r - Shows the micro menu"
                                 .. "\n\n|cFF82C2FF/gbr config|r - Shows the config menu"
                                 .. "\n\n|cFF82C2FF/gbr dispatch|r - Shows the notification dispatcher menu"
                                 .. "\n\n|cFF82C2FF/bb <message>|r - Send a message"
