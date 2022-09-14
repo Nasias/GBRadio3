@@ -61,5 +61,6 @@ Services/GBR_DispatcherService.lua
 Services/GBR_MicroMenuService.lua
 Services/GBR_TooltipService.lua
 Services/GBR_ReportService.lua
+Services/GBR_RecorderService.lua
 
 GBRadio.lua

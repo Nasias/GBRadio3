@@ -5,6 +5,10 @@ function GBR_ReportService:New(obj)
     self._aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
     self.ConfigRegistry = nil;
 
+    self.RecorderActors = {UnitName("player")};
+    self.RecordedTextWidget = nil;
+    self.RecordedText = "";
+
     if GBRSavedVar_Reports == nil then
         GBRSavedVar_Reports = {};
     end
@@ -76,21 +80,21 @@ function GBR_ReportService:RegisterOptions()
                                     },
                                     reportedOnDateTime =
                                     {
-                                        name = "Reported on",
+                                        name = "Reported on (date and time)",
                                         type = "input",
                                         width = 1.6,                                        
                                         order = 4,
                                     },
                                     occurredOnDateTime =
                                     {
-                                        name = "Occurred on",
+                                        name = "Occurred on (date and time)",
                                         type = "input",
                                         width = 1.6,                                        
                                         order = 5,
                                     },
                                     description =
                                     {
-                                        name = "Description",
+                                        name = "Circumstances of the incident",
                                         type = "input",
                                         multiline = 6,
                                         width = "full",                                        
@@ -103,6 +107,7 @@ function GBR_ReportService:RegisterOptions()
                                 name = "Witnesses",
                                 type = "group",
                                 order = 1,
+                                childGroups = "select",
                                 args =
                                 {
                                     ["1"] =
@@ -174,11 +179,23 @@ function GBR_ReportService:RegisterOptions()
                                             },      
                                         }
                                     },
-                                    addWitness =
+                                    addWitnessTitle =
+                                    {
+                                        name = "Add a new witness",
+                                        type = "header",
+                                        order = 0,
+                                    },
+                                    addWitnessDesc =
+                                    {
+                                        name = "|cff00ffffAdd a new witness to this incident report by clicking the add new witness button below, and selecting the witness from the dropdown list to the right.|r",
+                                        type = "description",
+                                        order = 1,
+                                    },
+                                    addWitnessButton =
                                     {
                                         name = "Add new witness",
                                         type = "execute",
-                                        order = 999
+                                        order = 2
                                     }
                                 }
                             },
@@ -187,6 +204,7 @@ function GBR_ReportService:RegisterOptions()
                                 name = "Suspects",
                                 type = "group",
                                 order = 2,
+                                childGroups = "select",
                                 args =
                                 {
                                     ["1"] =
@@ -228,7 +246,7 @@ function GBR_ReportService:RegisterOptions()
                                                     },
                                                     autoFillFromTrpButton =
                                                     {
-                                                        name = "Auto-fill description with targets TRP",
+                                                        name = "Auto-populate from target",
                                                         type = "execute",
                                                         width = "full",
                                                         order = 3,
@@ -260,7 +278,7 @@ function GBR_ReportService:RegisterOptions()
                                             {
                                                 name = "Suspected Offences",
                                                 type = "group",
-                                                childGroups = "tree",
+                                                childGroups = "select",
                                                 order = 1,
                                                 args = 
                                                 {
@@ -274,7 +292,6 @@ function GBR_ReportService:RegisterOptions()
                                                     {
                                                         name = "S1. Common Assault",
                                                         type = "group",
-                                                        inline = false,
                                                         args =
                                                         {
                                                             offenceCategory =
@@ -296,7 +313,7 @@ function GBR_ReportService:RegisterOptions()
                                                             delete =
                                                             {
                                                                 type = "execute",
-                                                                name = "Remove offence",
+                                                                name = "Remove this offence",
                                                                 order = 3,
                                                             }
                                                         }
@@ -360,95 +377,34 @@ function GBR_ReportService:RegisterOptions()
         }
     }
     
-    self.ConfigRegistry = LibStub(GBR_Constants.LIB_ACE_CONFIG):RegisterOptionsTable("GBR_Reports", options);
+    self.ConfigRegistry = LibStub(GBR_Constants.LIB_ACE_CONFIG):RegisterOptionsTable("LEA Suite", options);
 
 end
 
-function GBR_ReportService:ShowReportingWindow()
+function GBR_ReportService:ShowLeaSuiteWindow()
 
     local mainFrame = self:_buildMainFrame();
 
     local configDialog = LibStub(GBR_Constants.LIB_ACE_CONFIG_DIALOG);
 
-    configDialog:Open("GBR_Reports", mainFrame);
-    mainFrame:SetTitle("LEA Suite");
-    mainFrame:SetWidth(900);
-    mainFrame:SetHeight(800);
-    mainFrame:EnableResize(true);
+    configDialog:SetDefaultSize("LEA Suite", 700, 800);
+    configDialog:Open("LEA Suite", mainFrame);
 
 end
 
 function GBR_ReportService:_buildMainFrame()
 
-    local reportFrame = self._aceGUI:Create("Window");
+    local leaSuiteFrame = self._aceGUI:Create("Window");
+    leaSuiteFrame:SetTitle("LEA Suite");
+    leaSuiteFrame:EnableResize(false);
 
-    reportFrame:SetCallback("OnClose", function(widget)
+    leaSuiteFrame:SetUserData("reportFrameContainer", reportFrameContainer);
+
+    leaSuiteFrame:SetCallback("OnClose", function(widget)
         local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
         aceGUI:Release(widget);
     end);
 
-    return reportFrame;
-
-end
-
-function GBR_ReportService:_buildRecorderFrame()
-
-    local recorderFrame = self._aceGUI:Create("Window");
-
-    recorderFrame:SetCallback("OnClose", function(widget)
-        local aceGUI = LibStub(GBR_Constants.LIB_ACE_GUI);
-        aceGUI:Release(widget);
-    end);
-
-    recorderFrame:SetLayout("Flow");
-    recorderFrame:SetHeight(450);
-    recorderFrame:SetWidth(600);
-    recorderFrame:EnableResize(false);
-    recorderFrame:SetTitle("Statement Recorder");
-
-    local recorderFrameActors = self._aceGUI:Create("Dropdown");
-    recorderFrameActors:SetLabel("Record actors")
-    recorderFrameActors:SetList({UnitName("player")});
-    recorderFrameActors:SetMultiselect(true);
-    recorderFrameActors:SetRelativeWidth(0.7);
-    recorderFrame:AddChild(recorderFrameActors);
-
-    local recorderFrameActorsAddTargetButton = self._aceGUI:Create("Button");
-    recorderFrameActorsAddTargetButton:SetText("Add target to actors");
-    recorderFrameActorsAddTargetButton:SetRelativeWidth(0.3);
-    recorderFrame:AddChild(recorderFrameActorsAddTargetButton);
-
-    local recorderStartRecordingButton = self._aceGUI:Create("Button");
-    recorderStartRecordingButton:SetText("Start recording");
-    recorderStartRecordingButton:SetRelativeWidth(0.3);
-    recorderFrame:AddChild(recorderStartRecordingButton);
-
-    local recorderStopRecordingButton = self._aceGUI:Create("Button");
-    recorderStopRecordingButton:SetText("Stop recording");
-    recorderStopRecordingButton:SetRelativeWidth(0.3);
-    recorderFrame:AddChild(recorderStopRecordingButton);
-
-    local recorderStatusText = self._aceGUI:Create("Label");
-    recorderStatusText:SetText("[Statement recorder is recording...]");
-    recorderStatusText:SetColor(0, 1, 0);
-    recorderStatusText:SetRelativeWidth(1);
-    recorderFrame:AddChild(recorderStatusText);
-
-    local recorderRecordedText = self._aceGUI:Create("MultiLineEditBox");
-    recorderRecordedText:SetLabel("Recorded statement");
-    recorderRecordedText:SetNumLines(15);
-    recorderRecordedText:SetRelativeWidth(1);
-    recorderFrame:AddChild(recorderRecordedText);
-
-    local recorderReminderText = self._aceGUI:Create("Label");
-    recorderReminderText:SetText("NOTE: Don't forget to take a copy of your recorded statement!\nUse Ctrl + A (select all) and Ctrl + C (copy) to take a copy. Use Ctrl + P (paste) to paste it in to your destination.");
-    recorderReminderText:SetColor(0, 1, 1);
-    recorderReminderText:SetRelativeWidth(1);
-    recorderFrame:AddChild(recorderReminderText);
-
-    local recorderClose = self._aceGUI:Create("Button");
-    recorderClose:SetText("Close recorder");
-    recorderClose:SetRelativeWidth(0.3);
-    recorderFrame:AddChild(recorderClose);
+    return leaSuiteFrame;
 
 end
