@@ -10,6 +10,8 @@ function LEASuite_SingletonService:New(obj)
         [LEASuite_Constants.SRV_REPORT_SERVICE] = LEASuite_ReportService,
         [LEASuite_Constants.SRV_RECORDER_SERVICE] = LEASuite_RecorderService,
         [LEASuite_Constants.SRV_CHARACTER_DESCRIPTION_SERVICE] = LEASuite_CharacterDescriptionService,
+        [LEASuite_Constants.SRV_OFFENCE_SERVICE] = LEASuite_OffenceService,
+        [LEASuite_Constants.SRV_EXPORTER_SERVICE] = LEASuite_ExporterService,
     };
 
     self._instantiatedServices = {};

@@ -42,6 +42,7 @@ function LEASuite_ReportService:New(obj)
                 {
                     FullName,
                     OocName,
+                    IsIncidentReporter,
                     PersonalDescription,
                     Statement,
                 }
@@ -168,8 +169,8 @@ function LEASuite_ReportService:_addIncidentToUi(incidentKey, incidentData)
     self.OptionsTable.args.incidentReportsTab.args[incidentKey] =
     {
         type = "group",
-        name = incidentData.IncidentDetails.Title .. (incidentData.IncidentDetails.OccuredOnDateTime 
-            and string.format(" (%s)", incidentData.IncidentDetails.OccuredOnDateTime)
+        name = incidentData.IncidentDetails.Title .. (incidentData.IncidentDetails.OccurredOnDateTime 
+            and string.format(" (%s)", incidentData.IncidentDetails.OccurredOnDateTime)
             or ""),
         childGroups = "tab",
         args =
@@ -197,6 +198,7 @@ function LEASuite_ReportService:_addIncidentToDb(incidentKey)
         },
         Witnesses = {},
         Suspects = {},
+        Evidence = {},
     };
 
     return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey];
@@ -236,6 +238,17 @@ function LEASuite_ReportService:_addIncidentDetails()
                     function(info, value)
                         local key = info[#info-2];
                         LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.Title = value;
+
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
+                        local title = LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.Title;
+                        local occurredOn = LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.OccurredOnDateTime;
+
+                        local displayTitle = title .. (occurredOn
+                            and string.format(" (%s)", occurredOn)
+                            or "");
+
+                        reportService.OptionsTable.args.incidentReportsTab.args[key].name = displayTitle;
                     end
             },
             incidentType =
@@ -246,11 +259,10 @@ function LEASuite_ReportService:_addIncidentDetails()
                 order = 3,
                 dialogControl = "Dropdown",
                 values = 
-                {
-                    "Aggression", 
-                    "Contraband", 
-                    "Capital"
-                },
+                    function()
+                        local offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
+                        return offenceService:GetIncidentTypes();
+                    end,
                 get =
                     function(info, keyname)
                         local key = info[#info-2];
@@ -310,7 +322,18 @@ function LEASuite_ReportService:_addIncidentDetails()
                 set = 
                     function(info, value)
                         local key = info[#info-2];
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
                         LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.OccurredOnDateTime = value;
+
+                        local title = LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.Title;
+                        local occurredOn = LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.OccurredOnDateTime;
+
+                        local displayTitle = title .. (occurredOn
+                            and string.format(" (%s)", occurredOn)
+                            or "");
+
+                        reportService.OptionsTable.args.incidentReportsTab.args[key].name = displayTitle;
                     end
             },
             circumstances =
@@ -329,6 +352,61 @@ function LEASuite_ReportService:_addIncidentDetails()
                     function(info, value)
                         local key = info[#info-2];
                         LEASuiteAddonDataSettingsDB.char.IncidentReports[key].IncidentDetails.Circumstances = value;
+                    end
+            },
+            breaker1 =
+            {
+                type = "header",
+                name = "Export",
+                order = 8,
+            },
+            exportDescription =
+            {
+                name = "|cff00ffffWhen you've filled in your incident details, witnesses and suspects, export your report to Discord by clicking the export button and pasting your fields in to your Discord server.|r",
+                type = "description",
+                order = 9,
+            },
+            export =
+            {
+                type = "execute",
+                name = "Get Discord export string",
+                order = 10,
+                width = "full",
+                func = 
+                    function(info)
+                        local incidentKey = info[#info-2];
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                        local exporterService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_EXPORTER_SERVICE);
+
+                        exporterService:ShowExporter(LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey]);
+                    end
+            },
+            breaker2 =
+            {
+                type = "header",
+                name = "Delete",
+                order = 11,
+            },
+            deleteDescription =
+            {
+                name = "|cffff0000If you need to remove this incident report, then you can do so by clicking the button below. Just note that this can't be reversed.|r",
+                type = "description",
+                order = 12,
+            },
+            delete =
+            {
+                type = "execute",
+                name = "Remove this incident",
+                order = 13,
+                width = "full",
+                func = 
+                    function(info)
+                        local incidentKey = info[#info-2];
+
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
+                        reportService.OptionsTable.args.incidentReportsTab.args[incidentKey] = nil;
+                        LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey] = nil;
                     end
             }
         }
@@ -351,7 +429,7 @@ function LEASuite_ReportService:_addWitnessDetails(witnessData)
             },
             addWitnessDesc =
             {
-                name = "|cff00ffffAdd a new witness to this incident report by clicking the add new witness button below.\n\nSelecting different witnesses can be done from the dropdown list to the right.|r",
+                name = "|cff00ffffAdd a new witness to this incident report by clicking the add new witness button below.\n\nSelecting different witnesses can be done from the dropdown list to the right.|r\n\n|cffffff00Note that if you add a new witness, you must manually switch to it.|r",
                 type = "description",
                 order = 1,
             },
@@ -387,10 +465,10 @@ end
 
 function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, witnessData)
     local selectDisplay = {};
-    if witnessData.Details.FullName then
+    if witnessData.Details.FullName and witnessData.Details.FullName:len() > 0 then
         table.insert(selectDisplay, witnessData.Details.FullName);
     end    
-    if witnessData.Details.OocName then
+    if witnessData.Details.OocName and witnessData.Details.OocName:len() > 0 then
         table.insert(selectDisplay, string.format("(%s)", witnessData.Details.OocName));
     end
 
@@ -424,7 +502,24 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                             function(info, value)
                                 local incidentKey = info[#info-4];
                                 local witnessKey = info[#info-2];
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
                                 LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.FullName = value;
+
+                                local selectDisplay = {};
+                                local fullName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.FullName;
+                                local oocName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.OocName;
+
+                                if fullName and fullName:len() > 0 then
+                                    table.insert(selectDisplay, fullName);
+                                end    
+                                if oocName and oocName:len() > 0 then
+                                    table.insert(selectDisplay, string.format("(%s)", oocName));
+                                end
+
+                                local displayName = #selectDisplay > 0 and table.concat(selectDisplay, " ") or "Unknown witness";
+
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.witnessesTab.args[witnessKey].name = displayName;
                             end
                     },
                     oocName =
@@ -443,8 +538,44 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                             function(info, value)
                                 local incidentKey = info[#info-4];
                                 local witnessKey = info[#info-2];
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
                                 LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.OocName = value;
+
+                                local selectDisplay = {};
+                                local fullName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.FullName;
+                                local oocName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.OocName;
+
+                                if fullName and fullName:len() > 0 then
+                                    table.insert(selectDisplay, fullName);
+                                end    
+                                if oocName and oocName:len() > 0 then
+                                    table.insert(selectDisplay, string.format("(%s)", oocName));
+                                end
+
+                                local displayName = #selectDisplay > 0 and table.concat(selectDisplay, " ") or "Unknown witness";
+
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.witnessesTab.args[witnessKey].name = displayName;
                             end
+                    },
+                    personReportedIncident =
+                    {
+                        name = "Incident reporter",
+                        type = "toggle",
+                        width = "normal",
+                        order = 2,
+                        get =
+                            function(info)
+                                local incidentKey = info[#info-4];
+                                local witnessKey = info[#info-2];
+                                return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.IsIncidentReporter;
+                            end,
+                        set =
+                            function(info, value)
+                                local incidentKey = info[#info-4];
+                                local witnessKey = info[#info-2];
+                                LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details.IsIncidentReporter = value;
+                            end,
                     },
                     personalDescription =
                     {
@@ -452,7 +583,7 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                         type = "input",
                         multiline = 6,
                         width = "full",
-                        order = 2,
+                        order = 3,
                         get = 
                             function(info)
                                 local incidentKey = info[#info-4];
@@ -470,8 +601,9 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                     {
                         name = "Open description builder",
                         type = "execute",
+                        desc = "|cff00ffffUse the description builder to help you build descriptive statements of a person either by entering data yourself or auto-populating from the targets TRP profile.|r",
                         width = "full",
-                        order = 3,
+                        order = 4,
                         func =
                             function(info)
                                 local incidentKey = info[#info-4];
@@ -479,14 +611,15 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                                 local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
 
                                 reportService:SetDescriptionForSubject(
-                                    LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details);
+                                    LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details,
+                                    reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.witnessesTab.args[witnessKey]);
                             end,
                     },
                     breaker1 =
                     {
                         type = "header",
                         name = "",
-                        order = 4,
+                        order = 5,
                     },
                     statement =
                     {
@@ -494,7 +627,7 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                         type = "input",
                         multiline = 6,
                         width = "full",
-                        order = 5,
+                        order = 6,
                         get = 
                             function(info)
                                 local incidentKey = info[#info-4];
@@ -513,7 +646,8 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                         name = "Open statement recorder",
                         type = "execute",
                         width= "full",
-                        order = 6,
+                        order = 7,
+                        desc = "|cff00ffffUse the statement recorder to capture speech and emotes between multiple entities, and then automatically populate the statement field by clicking complete.|r",
                         func =
                             function(info)
                                 local incidentKey = info[#info-4];
@@ -523,6 +657,35 @@ function LEASuite_ReportService.AddWitnessToUi(targetDbTable, newWitnessKey, wit
                                 reportService:SetStatementForSubject(
                                     LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey].Details);
                             end,
+                    },
+                    breaker2 =
+                    {
+                        type = "header",
+                        name = "Delete",
+                        order = 8,
+                    },
+                    deleteDescription =
+                    {
+                        name = "|cffff0000If you need to remove this witness, then you can do so by clicking the button below. Just note that this can't be reversed.|r",
+                        type = "description",
+                        order = 9,
+                    },
+                    delete =
+                    {
+                        type = "execute",
+                        name = "Remove this witness",
+                        order = 10,
+                        width = "full",
+                        func = 
+                            function(info)
+                                local incidentKey = info[#info-4];
+                                local witnessKey = info[#info-2];
+        
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+        
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.witnessesTab.args[witnessKey] = nil;
+                                LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey] = nil;
+                            end
                     }
                 }
             },      
@@ -534,7 +697,7 @@ end
 function LEASuite_ReportService.AddWitnessToDb(incidentKey, witnessKey)
     LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Witnesses[witnessKey] = {
         Details = {
-            FullName = "New witness",
+            FullName = "*New witness",
             OocName = nil,
             PersonalDescription = nil,
             Statement = nil,
@@ -560,7 +723,7 @@ function LEASuite_ReportService:_addSuspectDetails(suspectData)
             },
             addSuspectDesc =
             {
-                name = "|cff00ffffAdd a new suspect to this incident report by clicking the add new suspect button below.\n\nSelecting different suspects can be done from the dropdown list to the right.|r",
+                name = "|cff00ffffAdd a new suspect to this incident report by clicking the add new suspect button below.\n\nSelecting different suspects can be done from the dropdown list to the right.|r\n\n|cffffff00Note that if you add a new suspect, you must manually switch to it.|r",
                 type = "description",
                 order = 1,
             },
@@ -570,7 +733,7 @@ function LEASuite_ReportService:_addSuspectDetails(suspectData)
                 type = "execute",
                 order = 2,
                 func =
-                    function(info)                        
+                    function(info)
                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
                         local newSuspectKey = reportService:GetNextRandomKey();
                         local incidentKey = info[#info-2];
@@ -633,7 +796,24 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                             function(info, value)
                                 local incidentKey = info[#info-4];
                                 local suspectKey = info[#info-2];
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
                                 LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.FullName = value;
+
+                                local selectDisplay = {};
+                                local fullName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.FullName;
+                                local oocName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.OocName;
+
+                                if fullName and fullName:len() > 0 then
+                                    table.insert(selectDisplay, fullName);
+                                end    
+                                if oocName and oocName:len() > 0 then
+                                    table.insert(selectDisplay, string.format("(%s)", oocName));
+                                end
+
+                                local displayName = #selectDisplay > 0 and table.concat(selectDisplay, " ") or "Unknown suspect";
+
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].name = displayName;
                             end
                     },
                     oocName =
@@ -652,7 +832,24 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                             function(info, value)
                                 local incidentKey = info[#info-4];
                                 local suspectKey = info[#info-2];
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
                                 LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.OocName = value;
+
+                                local selectDisplay = {};
+                                local fullName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.FullName;
+                                local oocName = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details.OocName;
+
+                                if fullName and fullName:len() > 0 then
+                                    table.insert(selectDisplay, fullName);
+                                end    
+                                if oocName and oocName:len() > 0 then
+                                    table.insert(selectDisplay, string.format("(%s)", oocName));
+                                end
+
+                                local displayName = #selectDisplay > 0 and table.concat(selectDisplay, " ") or "Unknown suspect";
+
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].name = displayName;
                             end
                     },
                     personalDescription =
@@ -679,6 +876,7 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                     {
                         name = "Open description builder",
                         type = "execute",
+                        desc = "|cff00ffffUse the description builder to help you build descriptive statements of a person either by entering data yourself or auto-populating from the targets TRP profile.|r",
                         width = "full",
                         order = 3,
                         func =
@@ -688,7 +886,9 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                                 local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
 
                                 reportService:SetDescriptionForSubject(
-                                    LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details);
+                                    LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details,
+                                    reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey]
+                                );
                             end,
                     },
                     breaker1 =
@@ -722,6 +922,7 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                         name = "Open statement recorder",
                         type = "execute",
                         width= "full",
+                        desc = "|cff00ffffUse the statement recorder to capture speech and emotes between multiple entities, and then automatically populate the statement field by clicking complete.|r",
                         order = 6,
                         func =
                             function(info)
@@ -732,10 +933,39 @@ function LEASuite_ReportService.AddSuspectToUi(targetDbTable, newSuspectKey, sus
                                 reportService:SetStatementForSubject(
                                     LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Details);
                             end,
+                    },
+                    breaker2 =
+                    {
+                        type = "header",
+                        name = "Delete",
+                        order = 7,
+                    },
+                    deleteDescription =
+                    {
+                        name = "|cffff0000If you need to remove this suspect, then you can do so by clicking the button below. Just note that this can't be reversed.|r",
+                        type = "description",
+                        order = 8,
+                    },
+                    delete =
+                    {
+                        type = "execute",
+                        name = "Remove this suspect",
+                        order = 9,
+                        width = "full",
+                        func = 
+                            function(info)
+                                local incidentKey = info[#info-4];
+                                local suspectKey = info[#info-2];
+        
+                                local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+        
+                                reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey] = nil;
+                                LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey] = nil;
+                            end
                     }
                 }
             },
-            offencesTab = self:_addSuspectOffences(suspectData.Offences)
+            offencesTab = LEASuite_ReportService.AddSuspectOffences(suspectData.Offences)
         }
     }    
 end
@@ -744,7 +974,7 @@ function LEASuite_ReportService.AddSuspectToDb(incidentKey, suspectKey)
     LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey] = {
         Details =
         {
-            FullName = "New suspect",
+            FullName = "*New suspect",
             OocName = nil,
             PersonalDescription = nil,
             Statement = nil,
@@ -755,7 +985,7 @@ function LEASuite_ReportService.AddSuspectToDb(incidentKey, suspectKey)
     return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey];
 end
 
-function LEASuite_ReportService:_addSuspectOffences(offenceData)
+function LEASuite_ReportService.AddSuspectOffences(offenceData)
     local offencesUiData = 
     {
         name = "Suspected Offences",
@@ -772,7 +1002,7 @@ function LEASuite_ReportService:_addSuspectOffences(offenceData)
             },
             incidentDetailsDesc =
             {
-                name = "|cff00ffffOffencees and their categories are as per the format of the King's Law.\n\nAdd offences and switch between them using the add offence button below or the dropdown to the right.|r",
+                name = "|cff00ffffOffences and their categories are as per the format of the King's Law.\n\nAdd offences and switch between them using the add offence button below or the dropdown to the right.|r\n\n|cffffff00Note that if you add a new offence, you must manually switch to it.|r",
                 type = "description",
                 order = 1,
             },
@@ -781,6 +1011,19 @@ function LEASuite_ReportService:_addSuspectOffences(offenceData)
                 type = "execute",
                 name = "Add offence",
                 order = 2,
+                func =
+                    function(info)
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                        local incidentKey = info[#info-4];
+                        local suspectKey = info[#info-2];
+                        local newOffenceKey = reportService:GetNextRandomKey();
+                        
+                        local newDetails = LEASuite_ReportService.AddSuspectOffenceToDb(incidentKey, suspectKey, newOffenceKey);                        
+                        LEASuite_ReportService.AddSuspectOffenceToUi(                            
+                            reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].args.offencesTab,
+                            newOffenceKey,
+                            newDetails);
+                    end
             }
         }
     };
@@ -794,10 +1037,13 @@ function LEASuite_ReportService:_addSuspectOffences(offenceData)
     return offencesUiData;
 end
 
-function LEASuite_ReportService:AddSuspectOffenceToUi(targetDbTable, newOffenceKey, offenceData)
+function LEASuite_ReportService.AddSuspectOffenceToUi(targetDbTable, newOffenceKey, offenceData)
 
+    local offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
+    
+    local offenceName = offenceService:GetOffencesForCategory(offenceData.CategoryId)[offenceData.OffenceId];
     targetDbTable.args[newOffenceKey] = {
-        name = "PLACEHOLDER", --Offences[offenceData.CategoryId][offenceData.OffenceId]
+        name = offenceName or "*New offence",
         type = "group",
         args =
         {
@@ -805,32 +1051,118 @@ function LEASuite_ReportService:AddSuspectOffenceToUi(targetDbTable, newOffenceK
             {
                 type = "select",
                 name = "Offence category",
-                values = {"Offences Against the Person"},
+                values = 
+                    function()
+                        local offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
+                        return offenceService:GetOffenceCategories();
+                    end,
                 order = 0,
                 width = "full",
+                get = 
+                    function(info)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+                        
+                        return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].CategoryId;
+                    end,
+                set = 
+                    function(info, value)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
+                        local oldValue = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].CategoryId;
+                        
+                        if oldValue ~= value then
+                            LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].OffenceId = nil;
+                            reportService.OptionsTable.args.incidentReportsTab.args[incidentKey]
+                                .args.suspectsTab.args[suspectKey].args.offencesTab.args[offenceKey].name = "*New offence";
+                        end
+
+                        LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].CategoryId = value;
+                    end,
             },
             offence =
             {
                 type = "select",
                 name = "Offence",
-                values = {"S1. Common Assault"},
+                values = 
+                    function(info)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+
+                        local offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
+                        local selectedCategory = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].CategoryId;
+
+                        return offenceService:GetOffencesForCategory(selectedCategory);
+                    end,
                 order = 1,
                 width = "full",
+                get = 
+                    function(info)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+
+                        return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].OffenceId;
+                    end,
+                set = 
+                    function(info, value)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+
+                        local offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
+                        local selectedCategory = LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].CategoryId;
+                        reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].args.offencesTab.args[offenceKey].name
+                            = offenceService:GetOffencesForCategory(selectedCategory)[value] or "*New offence";
+
+                        LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey].OffenceId = value;
+                    end,
+            },
+            breaker1 =
+            {
+                type = "header",
+                name = "Delete",
+                order = 2,
+            },
+            deleteDescription =
+            {
+                name = "|cffff0000If you need to remove this offence, then you can do so by clicking the button below. Just note that this can't be reversed.|r",
+                type = "description",
+                order = 3,
             },
             delete =
             {
                 type = "execute",
                 name = "Remove this offence",
-                order = 3,
+                order = 4,
+                width = "full",
+                func = 
+                    function(info)
+                        local incidentKey = info[#info-5];
+                        local suspectKey = info[#info-3];
+                        local offenceKey = info[#info-1];
+
+                        local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+
+                        reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].args.offencesTab.args[offenceKey] = nil;
+                        LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey] = nil;
+                    end
             }
         }
     }
 end
 
-function LEASuite_ReportService:AddSuspectOffenceToDb(incidentKey, suspectKey, offenceKey)
+function LEASuite_ReportService.AddSuspectOffenceToDb(incidentKey, suspectKey, offenceKey)
     LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey] = {
         {
-            DisplayName = "New offence",
             CategoryId = nil,
             OffenceId = nil,
         }
@@ -839,7 +1171,7 @@ function LEASuite_ReportService:AddSuspectOffenceToDb(incidentKey, suspectKey, o
     return LEASuiteAddonDataSettingsDB.char.IncidentReports[incidentKey].Suspects[suspectKey].Offences[offenceKey];
 end
 
-function LEASuite_ReportService:SetDescriptionForSubject(node)    
+function LEASuite_ReportService:SetDescriptionForSubject(descriptionNode, selectionNode)
 
     self._charDescService:ShowDescriptionBuilder(function(characterData)
         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
@@ -859,10 +1191,26 @@ function LEASuite_ReportService:SetDescriptionForSubject(node)
         if charDescService:UseCharacterData(characterData.UseLastName, characterData.LastName) then
             table.insert(characterFullNameTable, characterData.LastName);
         end
+
+
         
-        node.FullName = #characterFullNameTable > 0 and table.concat(characterFullNameTable, " ");
-        node.OocName = characterData.UseOocName and characterData.OocName;
-        node.PersonalDescription = descriptionText;
+        descriptionNode.FullName = #characterFullNameTable > 0 and table.concat(characterFullNameTable, " ");
+        descriptionNode.OocName = characterData.UseOocName and characterData.OocName;
+        descriptionNode.PersonalDescription = descriptionText;
+
+        local selectDisplay = {};
+        if descriptionNode.FullName and descriptionNode.FullName:len() > 0 then
+            table.insert(selectDisplay, descriptionNode.FullName);
+        end    
+        if descriptionNode.OocName and descriptionNode.OocName:len() > 0 then
+            table.insert(selectDisplay, string.format("(%s)", descriptionNode.OocName));
+        end
+
+        local displayName = #selectDisplay > 0 and table.concat(selectDisplay, " ") or "Unknown witness";
+
+        if selectionNode then
+            selectionNode.name = displayName;
+        end
         
         LibStub("AceConfigRegistry-3.0"):NotifyChange("Office of Justice - LEA Suite");
     end);
@@ -884,24 +1232,8 @@ function LEASuite_ReportService:ShowLeaSuiteWindow()
 
     local configDialog = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
 
-    configDialog:SetDefaultSize("Office of Justice - LEA Suite", 700, 800);
+    configDialog:SetDefaultSize("Office of Justice - LEA Suite", 850, 750);
     configDialog:Open("Office of Justice - LEA Suite");
-
-end
-
-function LEASuite_ReportService:_buildMainFrame()
-
-    local leaSuiteFrame = self._aceGUI:Create("Window");
-    leaSuiteFrame:EnableResize(false);
-
-    leaSuiteFrame:SetUserData("reportFrameContainer", reportFrameContainer);
-
-    leaSuiteFrame:SetCallback("OnClose", function(widget)
-        local aceGUI = LibStub(LEASuite_Constants.LIB_ACE_GUI);
-        aceGUI:Release(widget);
-    end);
-
-    return leaSuiteFrame;
 
 end
 

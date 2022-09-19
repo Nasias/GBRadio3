@@ -19,6 +19,8 @@ LEASuite_Constants =
     SRV_REPORT_SERVICE = "ReportService",
     SRV_RECORDER_SERVICE = "RecorderService",
     SRV_CHARACTER_DESCRIPTION_SERVICE = "CharacterDescriptionService",
+    SRV_OFFENCE_SERVICE = "OffenceService",
+    SRV_EXPORTER_SERVICE = "ExporterService",
 
     CMD_MAIN = "lea",   
 

@@ -13,6 +13,7 @@ Common/Types/LEASuite_ENameType.lua
 
 Common/Resources/LEASuite_Constants.lua
 Common/Resources/LEASuite_ConfigPresets.lua
+Common/Resources/LEASuite_Offences.lua
 
 Common/DataTypes/LEASuite_Object.lua
 
@@ -28,5 +29,7 @@ Services/LEASuite_PlayerService.lua
 Services/LEASuite_ReportService.lua
 Services/LEASuite_RecorderService.lua
 Services/LEASuite_CharacterDescriptionService.lua
+Services/LEASuite_OffenceService.lua
+Services/LEASuite_ExporterService.lua
 
 LEASuite.lua
