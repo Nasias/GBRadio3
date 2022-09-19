@@ -778,12 +778,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                         "Chat Frame #8",
                         "Chat Frame #9",
                         "Chat Frame #10",
-                    },                    
+                    },
                     dialogControl = "Dropdown",
                     width = "full",
                     get =
                         function(info, keyname)
-                            local key = info[#info-3];                            
+                            local key = info[#info-3];
                             return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrames[keyname];
                         end,
                     set =
@@ -1556,7 +1556,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                 type = "execute",
                 order = 3,
                 func =
-                    function(info)                        
+                    function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
                         local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);

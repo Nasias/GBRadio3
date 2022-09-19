@@ -105,7 +105,20 @@ function GBRadio:AddHooks()
     GBR_Singletons:InstantiateService(GBR_Constants.SRV_HOOK_SERVICE)
         :RegisterHooks();
 
+    if TRP3_API then
+        if TRP3_API.globals.extended_version then
+            TRP3_API.globals.extended_display_version = TRP3_API.globals.extended_display_version .. GBRadio:GetTooltipVersionDisplay();
+        else
+            TRP3_API.globals.display_version = TRP3_API.globals.display_version .. GBRadio:GetTooltipVersionDisplay();
+        end
+    end
 
     return self;
 
+end
+
+function GBRadio:GetTooltipVersionDisplay()
+    return string.format("\n" 
+        .. [[|TInterface\COMMON\Indicator-Green:16:16:0:0|t |cFF00FF00GBRadio v-%s|r]],
+        GBR_Constants.OPT_ADDON_VERSION);
 end

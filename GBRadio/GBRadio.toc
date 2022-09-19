@@ -1,10 +1,11 @@
 ## Interface: 90207
 ## Title: GB|cff00c0ffRadio|r 3
 ## Notes: A buzzbox addon for roleplay.
-## SavedVariables: GBRadioAddonDataSettingsDBSavedVars, GBRSavedVar_Reports
+## SavedVariables: GBRadioAddonDataSettingsDBSavedVars
 ## DefaultState: enabled
 ## Author: Nasias Darkstar
 ## Version: 3.0.3
+## OptionalDeps: totalRP3, totalRP3_Extended
 
 embeds.xml
 XML/Fonts.xml
@@ -40,10 +41,6 @@ Models/GBR_ExportableChannelSettingsModel.lua
 Models/GBR_NotificationModel.lua
 Models/GBR_NotificationProxy.lua
 Models/GBR_RoleModel.lua
-Models/GBR_Reports/GBR_Report_ReportModel.lua
-Models/GBR_Reports/GBR_Report_IncidentDetailsModel.lua
-Models/GBR_Reports/GBR_Report_SuspectModel.lua
-Models/GBR_Reports/GBR_Report_WitnessModel.lua
 
 Services/GBR_CommandService.lua
 Services/GBR_ConfigService.lua
@@ -60,7 +57,5 @@ Services/GBR_RoleService.lua
 Services/GBR_DispatcherService.lua
 Services/GBR_MicroMenuService.lua
 Services/GBR_TooltipService.lua
-Services/GBR_ReportService.lua
-Services/GBR_RecorderService.lua
 
 GBRadio.lua

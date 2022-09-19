@@ -1,6 +1,6 @@
-LEASuite_IncidentDetailsModel = LEASuite_Object:New();
+GBR_Report_IncidentDetailsModel = LEASuite_Object:New();
 
-function LEASuite_IncidentDetailsModel:New(obj)
+function GBR_Report_IncidentDetailsModel:New(obj)
 
     self.Title = nil;
     self.IncidentType = nil;

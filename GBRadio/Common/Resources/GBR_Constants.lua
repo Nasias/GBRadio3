@@ -27,7 +27,6 @@ GBR_Constants =
     SRV_DISPATCHER_SERVICE = "DispatcherService",
     SRV_MICROMENU_SERVICE = "MicroMenuService",
     SRV_TOOLTIP_SERVICE = "TooltipService",
-    SRV_RECORDER_SERVICE = "RecorderService",
 
     CMD_MAIN = "gbr",
     CMD_DEV_TEST = "gbr3test",
@@ -37,7 +36,7 @@ GBR_Constants =
     CMD_SEND_EMERGENCY_MESSAGE = "pb",    
 
     ID_PLAYER = "player",
-    ID_TARGET = "targer",
+    ID_TARGET = "target",
 
     STRING_FORMAT_HEX = "%02x",
 
@@ -47,7 +46,7 @@ GBR_Constants =
 
     OPT_ADDON_ID = "GBRadio3",
     OPT_ADDON_CHANNEL_PREFIX = "GBR3",
-    OPT_ADDON_VERSION = "3.0",
+    OPT_ADDON_VERSION = "3.1.0",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
     OPT_ADDON_SETTINGS_DB = "GBRadioAddonDataSettingsDBSavedVars",

@@ -1,0 +1,32 @@
+## Interface: 90207
+## Title: Office of Justice |cff00c0ffLEA Suite|r
+## Notes: A law enforcement toolkit for roleplay.
+## SavedVariables: LEASuite_SavedVars, LEASuiteAddonDataSettingsDBSavedVars
+## DefaultState: enabled
+## Author: Nasias Darkstar
+## Version: 1.0.7
+## OptionalDeps: totalRP3, totalRP3_Extended, GBRadio
+
+embeds.xml
+
+Common/Types/LEASuite_ENameType.lua
+
+Common/Resources/LEASuite_Constants.lua
+Common/Resources/LEASuite_ConfigPresets.lua
+
+Common/DataTypes/LEASuite_Object.lua
+
+Models/LEASuite_ReportModel.lua
+Models/LEASuite_IncidentDetailsModel.lua
+Models/LEASuite_SuspectModel.lua
+Models/LEASuite_WitnessModel.lua
+
+Services/LEASuite_CommandService.lua
+Services/LEASuite_MRPService.lua
+Services/LEASuite_SingletonService.lua
+Services/LEASuite_PlayerService.lua
+Services/LEASuite_ReportService.lua
+Services/LEASuite_RecorderService.lua
+Services/LEASuite_CharacterDescriptionService.lua
+
+LEASuite.lua
