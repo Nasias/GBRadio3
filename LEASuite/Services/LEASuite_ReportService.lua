@@ -6,6 +6,7 @@ function LEASuite_ReportService:New(obj)
     self._mrpService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_MRP_SERVICE);
     self._charDescService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_CHARACTER_DESCRIPTION_SERVICE);
     self._recorderService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_RECORDER_SERVICE);
+    self._offenceService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_OFFENCE_SERVICE);
 
     self.OptionsTable = nil;
 
@@ -87,7 +88,7 @@ function LEASuite_ReportService:RegisterOptions()
         {
             incidentReportsTab =
             {
-                name = "Incident Reports",
+                name = [[|TInterface\Store\category-icon-book:26:26:-4:0:64:64:13:51:13:51|t Incident Reports]],
                 type = "group",
                 childGroups = "tree",
                 order = 0,
@@ -98,13 +99,33 @@ function LEASuite_ReportService:RegisterOptions()
                         type = "group",
                         name = "|TInterface\\BUTTONS\\UI-PlusButton-Up:16:16:0:0|t Add new incident",
                         order = 0,
+                        width = "double",
                         args =
                         {
+                            incidentReportTitle =
+                            {
+                                type = "description",
+                                name = "Welcome to Incident Reports",
+                                image = [[Interface\ICONS\INV_Misc_Book_09]],
+                                fontSize = "large",
+                                imageWidth = 40,
+                                imageHeight = 40,
+                                order = 0,
+                            },
+                            incidentReportDesc =
+                            {
+                                type = "description",
+                                name = 
+                                    "Use the LEA Suite incident report manager to build maintain your own incident reports."
+                                    .. "\n\nIncident reports can be exported to copy + pastable Markdown which you can use to add your reports to platforms like Discord or forums to share them with the rest of your organisation."
+                                    .. "\n\nStart by clicking the Add new incident report button below and selecting the new report.",
+                                order = 1,
+                            },
                             addNewIncidentButton =
                             {
                                 type = "execute",
                                 name = "Add new incident report",
-                                order = 0,
+                                order = 2,
                                 func = 
                                     function()
                                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
@@ -120,27 +141,124 @@ function LEASuite_ReportService:RegisterOptions()
             },
             pnbTab =
             {
-                name = "Pocket Notebook",
+                name = [[|TInterface\Store\category-icon-book:26:26:-4:0:64:64:13:51:13:51|t Pocket Notebook]],
                 type = "group",
                 order = 1,
                 args =
                 {
-
+                    pocketNotebookTitle =
+                    {
+                        type = "description",
+                        name = "Welcome to your Pocket Notebook",
+                        image = [[Interface\ICONS\INV_Misc_Book_09]],
+                        fontSize = "large",
+                        imageWidth = 40,
+                        imageHeight = 40,
+                        order = 0,
+                    },
+                    pocketNotebookDesc =
+                    {
+                        type = "description",
+                        name = 
+                            "Use your pocket notebook to take notes and keep track of other details as you see fit.\n\nYour notes will persist between reloads and relogs. Just remember to click \"accept\" whenever you make a change.",
+                        order = 1,
+                    },
+                    pocketNotebookNotes =
+                    {
+                        type = "input",
+                        name = "Pocket Notebook",
+                        multiline = 35,
+                        width = "full"
+                    }
                 }
             },
             theKingsLawTab =
             {
-                name = "The Kings Law",
+                name = [[|TInterface\Store\category-icon-services:26:26:-4:0:64:64:13:51:13:51|t The King's Law]],
                 type = "group",
                 order = 1,
                 args =
                 {
-
+                    theKingsLaw =
+                    {
+                        type = "group",
+                        name = "The King's Law",
+                        order = 0,
+                        args =
+                        {
+                            kingsLawTitle =
+                            {
+                                type = "description",
+                                name = "Welcome to The King's Law Handbook",
+                                image = [[Interface\ICONS\INV_MISC_NOTE_02]],
+                                fontSize = "large",
+                                imageWidth = 40,
+                                imageHeight = 40,
+                                order = 0,
+                            },
+                            kingsLawDescContainer =
+                            {
+                                type = "group",
+                                inline = true,
+                                name = "About the King's Law",
+                                order = 1,
+                                args =
+                                {
+                                    kingsLawDesc =
+                                    {
+                                        type = "description",
+                                        name = 
+                                            "The King's Law is the server-canon lawbook of Argent Dawn, EU. Built through community engagement by the Office of Justice, with help from guilds such as Stormwind Investigations, Stormwind City Guard and Echo Company, and through community engagement via The Royal Court's council and public committees."
+                                            .. "\n\n|cff00ffffWant to contribute? Join the Royal Court Discord or join the weekly Court Council in-game.|r"
+                                            .. "\n\n|cff00ffffFor a more comprehensive guide, visit the Office of Justice: Royal Criminal Archives below.|r",
+                                        order = 0,
+                                    },
+                                    rcaLink =
+                                    {
+                                        type = "input",
+                                        name = "Office of Justice: Royal Criminal Archives",
+                                        get = 
+                                            function()
+                                                return "https://rca.officeofjustice.eu";
+                                            end,
+                                        width = "double",
+                                        order = 1
+                                    },
+                                }
+                            },                            
+                            browseTitle =
+                            {
+                                type = "description",
+                                name = "Navigate the handbook",
+                                image = [[Interface\ICONS\INV_MISC_NOTE_02]],
+                                fontSize = "large",
+                                imageWidth = 40,
+                                imageHeight = 40,
+                                order = 2,
+                            },
+                            browseDescContainer =
+                            {                                
+                                type = "group",
+                                inline = true,
+                                name = "Categories and sections",
+                                order = 3,
+                                args =
+                                {
+                                    browseDesc =
+                                    {
+                                        type = "description",
+                                        name = "Browse through the various offence sections and offences using the categories to the left.",
+                                        order = 1,
+                                    }
+                                }
+                            }
+                        }
+                    },
                 }
             },
             jnopTab =
             {
-                name = "JNOP",
+                name = [[|TInterface\Store\category-icon-clothes:26:26:-4:0:64:64:13:51:13:51|t JNOP Protocol]],
                 type = "group",
                 order = 2,
                 args =
@@ -150,7 +268,7 @@ function LEASuite_ReportService:RegisterOptions()
             },
             helpTab =
             {
-                name = "Help",
+                name = [[|TInterface\Store\category-icon-placeholder:26:26:-4:0:64:64:13:51:13:51|t Help]],
                 type = "group",
                 order = 3,
                 args =
@@ -160,8 +278,245 @@ function LEASuite_ReportService:RegisterOptions()
             }
         }
     }
+
+    local theKingsLawOffences = self._offenceService:GetAllOffences();
+    for key, offencePage in ipairs(theKingsLawOffences) do    
+        self.OptionsTable.args.theKingsLawTab.args.theKingsLaw.args["offence-page-" .. key] = self:_addOffencePageToUi(key, offencePage);
+    end
     
     self.ConfigRegistry = LibStub(LEASuite_Constants.LIB_ACE_CONFIG):RegisterOptionsTable("Office of Justice - LEA Suite", self.OptionsTable);
+
+end
+
+function LEASuite_ReportService:_addOffencePageToUi(key, offencePage)
+
+    local offencePageLayout = 
+    {
+        type = "group",
+        childGroups = "tree",
+        name = offencePage.Title,
+        order = key,
+        args =
+        {
+            title =
+            {
+                type = "description",
+                name = offencePage.Title,
+                image = [[Interface\ICONS\INV_MISC_NOTE_02]],
+                fontSize = "large",
+                imageWidth = 40,
+                imageHeight = 40,
+                order = 0,
+            },
+            descriptionContainer =
+            {                    
+                type = "group",
+                inline = true,
+                name = "Category summary",
+                width = "full",
+                order = 1,
+                args =
+                {
+                    description =
+                    {
+                        type = "description",
+                        name = offencePage.Description,
+                        order = 0
+                    },
+                }
+            },
+            descriptionFurtherInfoContainer =
+            {                    
+                type = "group",
+                inline = true,
+                name = "Category details",
+                width = "full",
+                order = 2,
+                args =
+                {
+                    description =
+                    {
+                        type = "description",
+                        name = offencePage.Title .. " contains " .. #offencePage.Offences .. " sections.\n\nExpand the category selector to the left to browse through these sections.",
+                        order = 0
+                    },
+                }
+            }
+        }
+    }
+
+    for key, offence in ipairs(offencePage.Offences) do
+        local offenceSectionLayout =
+        {
+            type = "group",
+            name = offence.Title,
+            order = key,
+            args =
+            {
+                title =
+                {
+                    type = "description",
+                    name = offence.Title,
+                    image = [[Interface\ICONS\INV_MISC_NOTE_02]],
+                    fontSize = "large",
+                    imageWidth = 40,
+                    imageHeight = 40,
+                    order = 0,
+                },
+                descriptionContainer =
+                {                    
+                    type = "group",
+                    inline = true,
+                    name = "Offence summary",
+                    width = "full",
+                    order = 1,
+                    args =
+                    {
+                        description =
+                        {
+                            type = "description",
+                            name = offence.Description,
+                            order = 0
+                        },
+                    }
+                },
+                offenceTypes =
+                {
+                    type = "group",
+                    inline = true,
+                    name = "Offence types",
+                    width = "full",
+                    order = 2,
+                    args =
+                    {
+                        isPenaltyOffence =
+                        {
+                            type = "toggle",
+                            name = "Penalty",
+                            desc = "A fixed penalty notice (FPN) can be issued for a penalty offence without a court hearing or supervisor escalation.",
+                            order = 0,
+                            width = 0.7,
+                            get =
+                                function()
+                                    return offence.IsPenaltyOffence;
+                                end
+                        },
+                        isSummaryOffence =
+                        {
+                            type = "toggle",
+                            name = "Summary",
+                            desc = "A trial in the Magistrates Court, or a supervisor review is required for a summary offence, in order for the suspect to be lawfully convicted and sentenced.",
+                            order = 1,
+                            width = 0.7,
+                            get =
+                                function()
+                                    return offence.IsSummaryOffence;
+                                end
+                        },
+                        isIndictableOffence =
+                        {
+                            type = "toggle",
+                            name = "Indictable",
+                            desc = "A trial in the Crown Court, or a senior supervisor review is required for an indictable offence, in order for the suspect to be lawfully convicted and sentenced.",
+                            order = 2,
+                            width = 0.7,
+                            get =
+                                function()
+                                    return offence.IsIndictableOffence;
+                                end
+                        },
+                        isEitherWayOffence =
+                        {
+                            type = "toggle",
+                            name = "Either way",
+                            desc = "An offence can be classified as more than one type, in which case it's an either way offence. Use your best judgement in these situations to classify how punishment should be handled."
+                            .. "\n\nIf the circumstances are severe, you should escalate it to a higher authority. Otherwise it may be minor enough for a milder approach to conviction and sentencing.|r",
+                            order = 3,
+                            width = 0.7,
+                            get =
+                                function()
+                                    local offenceTypeCount = 0;
+                                    
+                                    if offence.IsPenaltyOffence then offenceTypeCount = offenceTypeCount + 1; end
+                                    if offence.IsSummaryOffence then offenceTypeCount = offenceTypeCount + 1; end
+                                    if offence.IsIndictableOffence then offenceTypeCount = offenceTypeCount + 1; end
+
+                                    return offenceTypeCount > 1;
+                                    
+                                end
+                        }
+                    }
+                },
+                appliesWhen =
+                {
+                    type = "group",
+                    inline = true,
+                    name = [[|TInterface\LFGFRAME\UI-LFG-ICON-ROLES:20:20:-4:0:256:256:134:201:0:67|t Applies when]],
+                    width = "full",
+                    order = 3,
+                    args =
+                    {
+
+                    }
+                },
+                doesntApplyWhen =
+                {
+                    type = "group",
+                    inline = true,
+                    name = [[|TInterface\LFGFRAME\UI-LFG-ICON-ROLES:20:20:-4:0:256:256:67:134:134:202|t Doesn't apply when]],
+                    width = "full",
+                    order = 4,
+                    args =
+                    {
+
+                    }
+                },
+                sentencingGuidelines =
+                {
+                    type = "group",
+                    inline = true,
+                    name = [[|TInterface\LFGFRAME\UI-LFG-ICON-ROLES:20:20:-4:0:256:256:67:134:67:134|t Suggested sentences]],
+                    width = "full",
+                    order = 5,
+                    args =
+                    {
+
+                    }
+                },
+            }
+        }
+
+        for appliesKey, appliesWhen in ipairs(offence.AppliesWhen) do
+            offenceSectionLayout.args.appliesWhen.args["offence-applies-when-" .. appliesKey] =
+            {
+                type = "description",
+                name = "• " .. appliesWhen,
+                order = appliesKey,
+            }
+        end
+
+        for appliesKey, appliesWhen in ipairs(offence.NotAppliesWhen) do
+            offenceSectionLayout.args.doesntApplyWhen.args["offence-not-applies-when-" .. appliesKey] =
+            {
+                type = "description",
+                name = "• " .. appliesWhen,
+                order = appliesKey,
+            }
+        end
+
+        for sentenceKey, sentence in ipairs(offence.SuggestedPunishments) do
+            offenceSectionLayout.args.sentencingGuidelines.args["offence-suggested-punishment-" .. sentenceKey] =
+            {
+                type = "description",
+                name = "• " .. sentence,
+                order = sentenceKey,
+            }
+        end
+
+        offencePageLayout.args["offence-sub-page-" .. key] = offenceSectionLayout;
+    end
+
+    return offencePageLayout;
 
 end
 

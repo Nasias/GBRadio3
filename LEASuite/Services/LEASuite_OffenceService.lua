@@ -34,6 +34,11 @@ function LEASuite_OffenceService:GetOffenceCategories()
     return self.OffenceCategories;
 end
 
+function LEASuite_OffenceService:GetAllOffences()
+
+    return LEASuite_Offences;
+end
+
 function LEASuite_OffenceService:GetOffenceCategoryName(offenceCategoryId)
 
     return self.OffenceCategories[offenceCategoryId];
@@ -41,11 +46,17 @@ end
 
 function LEASuite_OffenceService:GetOffencesForCategory(offenceCategoryId)
 
+    local offenceList = {};
+
     if not LEASuite_Offences[offenceCategoryId] then
-        return {};
+        return offenceList;
     end
 
-    return LEASuite_Offences[offenceCategoryId].Offences;
+    for k,v in ipairs(LEASuite_Offences[offenceCategoryId].Offences) do
+        table.insert(offenceList, v.Title);
+    end
+
+    return offenceList;
 end
 
 function LEASuite_OffenceService:GetIncidentTypes()
