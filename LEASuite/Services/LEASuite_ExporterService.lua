@@ -52,7 +52,7 @@ function LEASuite_ExporterService:_buildIncidentReportDocument(incidentModel)
         end
     end
     local incidentTypes = (#selectedIncidentTypes > 0 and table.concat(selectedIncidentTypes, ", ")) or "Unknown incident type";
-    local circumstances = self:_getValueOrDefault(incidentModel.IncidentDetails.Circumstances, "-");
+    local circumstances = self:_getValueOrDefault(incidentModel.IncidentDetails.Circumstances, "None");
     local selectedReporters = {};
     if incidentModel.Witnesses then
         for k,v in pairs(incidentModel.Witnesses) do
@@ -64,45 +64,23 @@ function LEASuite_ExporterService:_buildIncidentReportDocument(incidentModel)
         end
     end
     local reportingWitnesses = (#selectedReporters > 0 and table.concat(selectedReporters, "\n")) or "None";
-    local suspectList = {};
-    if incidentModel.Suspects then
-        for k,v in pairs(incidentModel.Suspects) do
-            local name = v.Details.FullName and v.Details.FullName:len() > 0 and v.Details.FullName or "Unknown witness";
-            name = name .. (v.Details.OocName and v.Details.OocName:len() > 0 and string.format(" (%s)", v.Details.OocName)) or "";
-
-            local offenceList = {};
-            for offenceKey, offenceValue in pairs(v.Offences) do
-                if offenceValue.CategoryId and offenceValue.OffenceId then
-                    table.insert(
-                        offenceList, 
-                        string.format(" -- %s, %s",
-                            self._offenceService:GetOffencesForCategory(offenceValue.CategoryId)[offenceValue.OffenceId],
-                            self._offenceService:GetOffenceCategoryName(offenceValue.CategoryId)));
-                end
-            end
-
-            table.insert(suspectList, "**" .. name .. "**" .. "\n" .. (#offenceList > 0 and table.concat(offenceList, "\n") or " -- No offences"));
-        end
-    end
-    local suspects = (#suspectList > 0 and table.concat(suspectList, "\n")) or "None";
 
     local lines =
     {
-        string.format("__**%s**__", title),
-        string.format("__**Reported on:**__ %s", reportedOnDateTime),
-        string.format("__**Occured at:**__ %s on %s", location, occurredOnDateTime),
-        string.format("__**Incident type(s):**__ %s", incidentTypes),
+        [[**--------------- [ Incident Report ] ---------------**]],
         "",
-        "=================================================",
+        string.format("**%s**", title),
+        string.format("**Reported on:** %s", reportedOnDateTime),
+        string.format("**Occured at:** %s on %s", location, occurredOnDateTime),
+        string.format("**Incident type(s):** %s", incidentTypes),
         "",
-        "__**Circumstances**__",
-        circumstances,
+        [[**------------------- [ Details ] -------------------**]],
         "",
-        "__**Reported by**__",
+        "**Reported by**",
         reportingWitnesses,
         "",
-        "__**Suspects**__",
-        suspects
+        "**Circumstances**",
+        circumstances,
     };
 
     return table.concat(lines, "\n");
@@ -111,7 +89,7 @@ end
 
 function LEASuite_ExporterService:_formatWitnessData(witnessData)
     return string.format(
-        "**%s**\n_**Description**_\n%s\n_**Statement**_\n%s", 
+        "**%s**\n__Description__\n%s\n__Statement__\n%s", 
         witnessData.Name, 
         witnessData.PersonalDescription, 
         witnessData.Statement);
@@ -125,23 +103,25 @@ function LEASuite_ExporterService:_buildWitnessesDocument(incidentModel)
         for k,v in pairs(incidentModel.Witnesses) do
             local witnessData = {};
             witnessData.Name = v.Details.FullName and v.Details.FullName:len() > 0 and v.Details.FullName or "Unknown witness";
-            witnessData.Name = witnessData.Name .. (v.Details.OocName and v.Details.OocName:len() > 0 and string.format(" (%s)", v.Details.OocName)) or "";
+            witnessData.Name = witnessData.Name .. ((v.Details.OocName and v.Details.OocName:len() > 0 and string.format(" (%s)", v.Details.OocName)) or "");
 
             witnessData.PersonalDescription = v.Details.PersonalDescription and v.Details.PersonalDescription:len() > 0 and v.Details.PersonalDescription
-                or "- No description";
+                or "- There is no description for this witness";
 
             witnessData.Statement = v.Details.Statement and v.Details.Statement:len() > 0 and v.Details.Statement
-                or "- No statement";
+                or "- There is no statement for this witness";
 
             table.insert(witnesses, self:_formatWitnessData(witnessData));
         end
     end
 
-    local witnessesDetails = (#witnesses > 0 and table.concat(witnesses, "\n\n" .. "=================================================" .. "\n\n")) or "None";
+    local witnessesDetails = (#witnesses > 0 and table.concat(witnesses, "\n\n" .. "----------------------------------------" .. "\n\n")) or "No witnesses";
 
     local lines =
     {
-        string.format("__**Witnesses counterpart for \"%s\"**__", title),
+        [[**------------- [ Witness Counterpart ] -------------**]],
+        "",
+        string.format("**Witness list for report:** %s", title),
         "",
         witnessesDetails
     };
@@ -152,7 +132,7 @@ end
 
 function LEASuite_ExporterService:_formatSuspectData(suspectData)
     return string.format(
-        "**%s**\n_**Offences**_\n%s\n_**Description**_\n%s\n_**Statement**_\n%s", 
+        "**%s**\n__Offences__\n%s\n__Description__\n%s\n__Statement__\n%s", 
         suspectData.Name,
         suspectData.Offences,
         suspectData.PersonalDescription,
@@ -166,35 +146,37 @@ function LEASuite_ExporterService:_buildSuspectsDocument(incidentModel)
     if incidentModel.Suspects then
         for k,v in pairs(incidentModel.Suspects) do
             local suspectData = {};
-            suspectData.Name = (v.Details.FullName and v.Details.FullName:len() > 0 and v.Details.FullName or "Unknown suspect");
-            suspectData.Name = suspectData.Name .. (v.Details.OocName and v.Details.OocName:len() > 0 and string.format(" (%s)", v.Details.OocName)) or "";
+            suspectData.Name = v.Details.FullName and v.Details.FullName:len() > 0 and v.Details.FullName or "Unknown suspect";
+            suspectData.Name = suspectData.Name .. ((v.Details.OocName and v.Details.OocName:len() > 0 and string.format(" (%s)", v.Details.OocName)) or "");
 
             suspectData.PersonalDescription = v.Details.PersonalDescription and v.Details.PersonalDescription:len() > 0 and v.Details.PersonalDescription
-                or "- No description";
+                or "- There is no description for this suspect";
 
             suspectData.Statement = v.Details.Statement and v.Details.Statement:len() > 0 and v.Details.Statement
-                or "- No statement";
+                or "- There is no statement for this suspect";
 
             suspectData.OffenceList = {};
             for offenceKey, offenceValue in pairs(v.Offences) do
                 if offenceValue.CategoryId and offenceValue.OffenceId then
                     table.insert(
                         suspectData.OffenceList, 
-                        string.format(" -- %s, %s",
+                        string.format("- %s, %s",
                             self._offenceService:GetOffencesForCategory(offenceValue.CategoryId)[offenceValue.OffenceId],
                             self._offenceService:GetOffenceCategoryName(offenceValue.CategoryId)));
                 end
             end
 
-            suspectData.Offences = #suspectData.OffenceList > 0 and table.concat(suspectData.OffenceList, "\n") or " -- No offences";
+            suspectData.Offences = #suspectData.OffenceList > 0 and table.concat(suspectData.OffenceList, "\n") or "- There are no offences listed against this suspect";
             table.insert(suspects, self:_formatSuspectData(suspectData));
         end
     end
-    local suspectDetails = (#suspects > 0 and table.concat(suspects, "\n\n" .. "=================================================" .. "\n\n")) or "None";
+    local suspectDetails = (#suspects > 0 and table.concat(suspects, "\n\n" .. "----------------------------------------" .. "\n\n")) or "No suspects";
 
     local lines =
     {
-        string.format("__**Suspects counterpart for \"%s\"**__", title),
+        [[**------------- [ Suspect Counterpart ] -------------**]],
+        "",
+        string.format("**Suspect list for report:** %s", title),
         "",
         suspectDetails
     };

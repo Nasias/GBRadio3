@@ -103,7 +103,7 @@ function LEASuite_CharacterDescriptionService:BuildDescriptionMatrixText(charact
     end
 
     if self:UseCharacterData(characterData.UseClothingWorn, characterData.ClothingWorn) then
-        description = description .. string.format("\n\nThey were last seen wearing %s,", characterData.ClothingWorn);
+        description = description .. string.format("\nThey were last seen wearing %s,", characterData.ClothingWorn);
     else
         description = description .. "\nIt is not known what they were last wearing,"
     end
@@ -115,7 +115,7 @@ function LEASuite_CharacterDescriptionService:BuildDescriptionMatrixText(charact
     end
 
     if self:UseCharacterData(characterData.UseOtherFeatures, characterData.OtherFeatures) then
-        description = description .. string.format("\n\nOther notable features include %s.", characterData.OtherFeatures);
+        description = description .. string.format("\nOther notable features include %s.", characterData.OtherFeatures);
     else
         description = description .. "\nThere are no other notable features.";
     end
