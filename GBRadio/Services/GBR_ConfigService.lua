@@ -2120,7 +2120,7 @@ function GBR_ConfigService:AddFrequencyListener(frequency, characterName)
         characterName,
         iAmListeningModel);
 
-    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
+    LibStub(GBR_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService.SetPronouns(pronounTable)
@@ -2416,7 +2416,7 @@ end
 
 function GBR_ConfigService:SetPrimaryFrequency(value)
     GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
-    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
+    LibStub(GBR_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService:GetTransmitterInterferenceTypeForChannelSettings(channelSettings)
