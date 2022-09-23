@@ -33,7 +33,7 @@ function GBR_ConfigService:Initialize()
     self._addonService.OptionsTable = 
     {
         type = "group",
-        name = "GB|cff00c0ffRadio|r 3 (v3.0.3) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
+        name = string.format("GB|cff00c0ffRadio|r 3 (v%s) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)", GBR_Constants.OPT_ADDON_VERSION),
         childGroups = "tree",
         handler = self._addonService,        
         args = {

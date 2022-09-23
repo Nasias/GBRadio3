@@ -46,7 +46,7 @@ GBR_Constants =
 
     OPT_ADDON_ID = "GBRadio3",
     OPT_ADDON_CHANNEL_PREFIX = "GBR3",
-    OPT_ADDON_VERSION = "3.0.8",
+    OPT_ADDON_VERSION = "3.0.4",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
     OPT_ADDON_SETTINGS_DB = "GBRadioAddonDataSettingsDBSavedVars",

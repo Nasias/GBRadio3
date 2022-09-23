@@ -4,7 +4,7 @@
 ## SavedVariables: GBRadioAddonDataSettingsDBSavedVars
 ## DefaultState: enabled
 ## Author: Nasias Darkstar
-## Version: 3.0.3
+## Version: 3.0.4
 ## OptionalDeps: totalRP3, totalRP3_Extended
 
 embeds.xml
