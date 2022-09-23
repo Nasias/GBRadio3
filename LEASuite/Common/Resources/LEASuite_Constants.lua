@@ -7,6 +7,7 @@ LEASuite_Constants =
     LIB_HBD_LOCATION = "HereBeDragons-2.0",
     LIB_ACE_DB = "AceDB-3.0",
     LIB_ACE_CONFIG_DIALOG = "AceConfigDialog-3.0",
+    LIB_ACE_CONFIG_REGISTRY = "AceConfigRegistry-3.0",
     LIB_ACE_EVENT = "AceEvent-3.0",
     LIB_ACE_ADDON = "AceAddon-3.0",
     LIB_ACE_GUI = "AceGUI-3.0",
@@ -33,7 +34,7 @@ LEASuite_Constants =
     UI_COLOUR_ESCAPE_STRING_END = "|r",
     UI_HYPERLINK_ESCAPE_STRING = "|H",
 
-    OPT_ADDON_ID = "LEASuite",
+    OPT_ADDON_ID = "Office of Justice - LEA Suite",
     OPT_ADDON_CHANNEL_PREFIX = "LEASUITE",
     OPT_ADDON_VERSION = "1.0.7",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",

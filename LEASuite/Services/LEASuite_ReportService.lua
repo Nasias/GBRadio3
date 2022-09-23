@@ -129,10 +129,13 @@ function LEASuite_ReportService:RegisterOptions()
                                 func = 
                                     function()
                                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                                        local configDialogService = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
+
                                         local newKey = reportService:GetNextRandomKey();
 
                                         local newDetails = reportService:_addIncidentToDb(newKey);
                                         reportService:_addIncidentToUi(newKey, newDetails);
+                                        configDialogService:SelectGroup(LEASuite_Constants.OPT_ADDON_ID, "incidentReportsTab", newKey);
                                     end
                             }
                         }
@@ -168,7 +171,15 @@ function LEASuite_ReportService:RegisterOptions()
                         type = "input",
                         name = "Pocket Notebook",
                         multiline = 35,
-                        width = "full"
+                        width = "full",
+                        get =
+                            function(info)
+                                return LEASuiteAddonDataSettingsDB.char.PocketNotebook;
+                            end,
+                        set =
+                            function(info, value)
+                                LEASuiteAddonDataSettingsDB.char.PocketNotebook = value;
+                            end,
                     }
                 }
             },
@@ -284,7 +295,7 @@ function LEASuite_ReportService:RegisterOptions()
         self.OptionsTable.args.theKingsLawTab.args.theKingsLaw.args["offence-page-" .. key] = self:_addOffencePageToUi(key, offencePage);
     end
     
-    self.ConfigRegistry = LibStub(LEASuite_Constants.LIB_ACE_CONFIG):RegisterOptionsTable("Office of Justice - LEA Suite", self.OptionsTable);
+    self.ConfigRegistry = LibStub(LEASuite_Constants.LIB_ACE_CONFIG):RegisterOptionsTable(LEASuite_Constants.OPT_ADDON_ID, self.OptionsTable);
 
 end
 
@@ -784,7 +795,7 @@ function LEASuite_ReportService:_addWitnessDetails(witnessData)
             },
             addWitnessDesc =
             {
-                name = "|cff00ffffAdd a new witness to this incident report by clicking the add new witness button below.\n\nSelecting different witnesses can be done from the dropdown list to the right.|r\n\n|cffffff00Note that if you add a new witness, you must manually switch to it.|r",
+                name = "|cff00ffffAdd a new witness to this incident report by clicking the add new witness button below.\n\nSelecting different witnesses can be done from the dropdown list to the right.|r",
                 type = "description",
                 order = 1,
             },
@@ -796,6 +807,7 @@ function LEASuite_ReportService:_addWitnessDetails(witnessData)
                 func =
                     function(info)                        
                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                        local configDialogService = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
                         local newWitnessKey = reportService:GetNextRandomKey();
                         local incidentKey = info[#info-2];
 
@@ -804,6 +816,8 @@ function LEASuite_ReportService:_addWitnessDetails(witnessData)
                             reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.witnessesTab,
                             newWitnessKey,
                             newDetails);
+                            
+                        configDialogService:SelectGroup(LEASuite_Constants.OPT_ADDON_ID, "incidentReportsTab", incidentKey, "witnessesTab", newWitnessKey, "detailsTab");
                     end
             }
         }
@@ -1078,7 +1092,7 @@ function LEASuite_ReportService:_addSuspectDetails(suspectData)
             },
             addSuspectDesc =
             {
-                name = "|cff00ffffAdd a new suspect to this incident report by clicking the add new suspect button below.\n\nSelecting different suspects can be done from the dropdown list to the right.|r\n\n|cffffff00Note that if you add a new suspect, you must manually switch to it.|r",
+                name = "|cff00ffffAdd a new suspect to this incident report by clicking the add new suspect button below.\n\nSelecting different suspects can be done from the dropdown list to the right.|r",
                 type = "description",
                 order = 1,
             },
@@ -1090,6 +1104,7 @@ function LEASuite_ReportService:_addSuspectDetails(suspectData)
                 func =
                     function(info)
                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                        local configDialogService = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
                         local newSuspectKey = reportService:GetNextRandomKey();
                         local incidentKey = info[#info-2];
 
@@ -1098,6 +1113,7 @@ function LEASuite_ReportService:_addSuspectDetails(suspectData)
                             reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab,
                             newSuspectKey,
                             newDetails);
+                        configDialogService:SelectGroup(LEASuite_Constants.OPT_ADDON_ID, "incidentReportsTab", incidentKey, "suspectsTab", newSuspectKey, "detailsTab");
                     end
             }
         }
@@ -1357,7 +1373,7 @@ function LEASuite_ReportService.AddSuspectOffences(offenceData)
             },
             incidentDetailsDesc =
             {
-                name = "|cff00ffffOffences and their categories are as per the format of the King's Law.\n\nAdd offences and switch between them using the add offence button below or the dropdown to the right.|r\n\n|cffffff00Note that if you add a new offence, you must manually switch to it.|r",
+                name = "|cff00ffffOffences and their categories are as per the format of the King's Law.\n\nAdd offences and switch between them using the add offence button below or the dropdown to the right.|r",
                 type = "description",
                 order = 1,
             },
@@ -1369,6 +1385,7 @@ function LEASuite_ReportService.AddSuspectOffences(offenceData)
                 func =
                     function(info)
                         local reportService = LEASuite_Singletons:FetchService(LEASuite_Constants.SRV_REPORT_SERVICE);
+                        local configDialogService = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
                         local incidentKey = info[#info-4];
                         local suspectKey = info[#info-2];
                         local newOffenceKey = reportService:GetNextRandomKey();
@@ -1378,6 +1395,8 @@ function LEASuite_ReportService.AddSuspectOffences(offenceData)
                             reportService.OptionsTable.args.incidentReportsTab.args[incidentKey].args.suspectsTab.args[suspectKey].args.offencesTab,
                             newOffenceKey,
                             newDetails);
+
+                        configDialogService:SelectGroup(LEASuite_Constants.OPT_ADDON_ID, "incidentReportsTab", incidentKey, "suspectsTab", suspectKey, "offencesTab", newOffenceKey);
                     end
             }
         }
@@ -1567,7 +1586,7 @@ function LEASuite_ReportService:SetDescriptionForSubject(descriptionNode, select
             selectionNode.name = displayName;
         end
         
-        LibStub("AceConfigRegistry-3.0"):NotifyChange("Office of Justice - LEA Suite");
+        LibStub(LEASuite_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(LEASuite_Constants.OPT_ADDON_ID);
     end);
 
 end
@@ -1578,7 +1597,7 @@ function LEASuite_ReportService:SetStatementForSubject(node)
 
         node.Statement = statementText;
         
-        LibStub("AceConfigRegistry-3.0"):NotifyChange("Office of Justice - LEA Suite");
+        LibStub(LEASuite_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(LEASuite_Constants.OPT_ADDON_ID);
     end);
 
 end
@@ -1587,11 +1606,11 @@ function LEASuite_ReportService:ShowLeaSuiteWindow()
 
     local configDialog = LibStub(LEASuite_Constants.LIB_ACE_CONFIG_DIALOG);
 
-    configDialog:SetDefaultSize("Office of Justice - LEA Suite", 850, 750);
-    configDialog:Open("Office of Justice - LEA Suite");
+    configDialog:SetDefaultSize(LEASuite_Constants.OPT_ADDON_ID, 850, 750);
+    configDialog:Open(LEASuite_Constants.OPT_ADDON_ID);
 
 end
 
 function LEASuite_ReportService:GetNextRandomKey()
-    return date("!%Y%m%d%H%M%S");
+    return tostring(date("!%Y%m%d%H%M%S"));
 end

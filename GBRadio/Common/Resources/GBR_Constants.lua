@@ -7,6 +7,7 @@ GBR_Constants =
     LIB_HBD_LOCATION = "HereBeDragons-2.0",
     LIB_ACE_DB = "AceDB-3.0",
     LIB_ACE_CONFIG_DIALOG = "AceConfigDialog-3.0",
+    LIB_ACE_CONFIG_REGISTRY = "AceConfigRegistry-3.0",
     LIB_ACE_EVENT = "AceEvent-3.0",
     LIB_ACE_ADDON = "AceAddon-3.0",
     LIB_ACE_GUI = "AceGUI-3.0",
@@ -29,7 +30,6 @@ GBR_Constants =
     SRV_TOOLTIP_SERVICE = "TooltipService",
 
     CMD_MAIN = "gbr",
-    CMD_DEV_TEST = "gbr3test",
     CMD_SEND_MESSAGE = "bb",
     CMD_SEND_QUIET_MESSAGE = "wbb",
     CMD_TEST_RECEIVE_MESSAGE = "tbb",
@@ -46,7 +46,7 @@ GBR_Constants =
 
     OPT_ADDON_ID = "GBRadio3",
     OPT_ADDON_CHANNEL_PREFIX = "GBR3",
-    OPT_ADDON_VERSION = "3.1.0",
+    OPT_ADDON_VERSION = "3.0.8",
     OPT_COMM_CHANNEL_NAME = "xtensionxtooltip2",
     OPT_COMM_CHANNEL_TARGET = "CHANNEL",
     OPT_ADDON_SETTINGS_DB = "GBRadioAddonDataSettingsDBSavedVars",
@@ -83,10 +83,10 @@ GBR_Constants =
     ROLE_NAME_AMO = "Authorised Magics Officer",
     ROLE_NAME_ELS = "Emergency Life Saver",
     ROLE_NAME_EOD = "Explosive Ordnance Disposal",
+    ROLE_NAME_IO = "Intelligence Officer",
     ROLE_NAME_JNOPGC = "JNOP Gold Commander",
     ROLE_NAME_JNOPSC = "JNOP Silver Commander",
     ROLE_NAME_JNOPBC = "JNOP Bronze Commander",
-    ROLE_NAME_IO = "Intelligence Officer",
 
     ROLE_ABBREVIATION_FLP = "FLP",
     ROLE_ABBREVIATION_POR = "POR",
