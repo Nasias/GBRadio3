@@ -267,26 +267,26 @@ function LEASuite_ReportService:RegisterOptions()
                     },
                 }
             },
-            jnopTab =
-            {
-                name = [[|TInterface\Store\category-icon-clothes:26:26:-4:0:64:64:13:51:13:51|t JNOP Protocol]],
-                type = "group",
-                order = 2,
-                args =
-                {
+            -- jnopTab =
+            -- {
+            --     name = [[|TInterface\Store\category-icon-clothes:26:26:-4:0:64:64:13:51:13:51|t JNOP Protocol]],
+            --     type = "group",
+            --     order = 2,
+            --     args =
+            --     {
 
-                }
-            },
-            helpTab =
-            {
-                name = [[|TInterface\Store\category-icon-placeholder:26:26:-4:0:64:64:13:51:13:51|t Help]],
-                type = "group",
-                order = 3,
-                args =
-                {
+            --     }
+            -- },
+            -- helpTab =
+            -- {
+            --     name = [[|TInterface\Store\category-icon-placeholder:26:26:-4:0:64:64:13:51:13:51|t Help]],
+            --     type = "group",
+            --     order = 3,
+            --     args =
+            --     {
                     
-                }
-            }
+            --     }
+            -- }
         }
     }
 
