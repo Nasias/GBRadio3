@@ -50,8 +50,15 @@ function GBR_NotificationProxy:SetIncidentLocation(location, coordinateX, coordi
 
     local locationText;
 
-    local coordinateXText = coordinateX and string.format("%.2f", coordinateX) or "";
-    local coordinateYText = coordinateY and string.format("%.2f", coordinateY) or "";
+    local convertedCoordinateX = tonumber(coordinateX);
+    local convertedCoordinateY = tonumber(coordinateY);
+
+    local coordinateXText = convertedCoordinateX 
+        and string.format("%.2f", convertedCoordinateX) 
+        or "";
+    local coordinateYText = convertedCoordinateY 
+        and string.format("%.2f", convertedCoordinateY) 
+        or "";
 
     if location and location:len() > 0 then
         locationText = coordinateXText:len() > 0 and coordinateYText:len() > 0
