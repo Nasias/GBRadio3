@@ -1896,8 +1896,21 @@ function GBR_ConfigService:SetIsFirstTimeUser(value)
     GBRadioAddonDataSettingsDB.char.IsFirstTimeUser = value;
 end
 
-function GBR_ConfigService:ShowMicroMenuOnLogIn()
-    return GBRadioAddonDataSettingsDB.char.ShowMicroMenuOnLogIn;
+function GBR_ConfigService:ShouldShowMicroMenu(isInitialLogin, isReloadingUi)
+
+    if isInitialLogin and GBRadioAddonDataSettingsDB.char.ShowMicroMenuOnLogIn then
+        return true;
+    end
+
+    if isReloadingUi and GBRadioAddonDataSettingsDB.char.MenuIsOpen then
+        return true;
+    end
+
+    return false;
+end
+
+function GBR_ConfigService:SetMenuIsOpen(isOpen)
+    GBRadioAddonDataSettingsDB.char.MenuIsOpen = isOpen;
 end
 
 function GBR_ConfigService:SaveMicroMenuPosition(x, y)

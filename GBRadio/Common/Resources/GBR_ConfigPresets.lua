@@ -7,6 +7,7 @@ GBR_ConfigPresets.BuzzBox =
         IsFirstTimeUser = true,
         LastMicroMenuPosition = { Point = nil, RelativeTo = nil, RelativePoint = nil, X = nil, Y = nil },
         ShowMicroMenuOnLogIn = true,
+        MenuIsOpen = true,
         DeviceName = "buzzbox",
         PrimaryFrequency = "GBRADIO",
         RadioMessageDelay = 1.5,
