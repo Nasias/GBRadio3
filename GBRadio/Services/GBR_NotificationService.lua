@@ -43,7 +43,8 @@ function GBR_NotificationService:_buildNotificaionTitle(parent)
     titleIcon:SetPoint("LEFT", titleFrame, "LEFT", 15, 0);
     titleIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Triangle-Exclamation-Solid]]);
 
-    local titleText = titleFrame:CreateFontString(titleFrame, "BORDER", "GBRAlert_Title");
+    local titleText = titleFrame:CreateFontString();
+    titleText:SetFontObject("GBRAlert_Title");
     titleText:SetJustifyH("LEFT");
     titleText:SetJustifyV("MIDDLE");
     titleText:SetWordWrap(true);
@@ -65,7 +66,8 @@ function GBR_NotificationService:_buildIncidentGrade(parent)
     incidentGradeFrame:SetBackdrop(self.BackdropFormats.BACKDROP_NOTIFICATION_TITLE);
     incidentGradeFrame:SetBackdropColor(0.8509, 0.1215, 0.4627, 1);
 
-    local incidentGradeText = incidentGradeFrame:CreateFontString(incidentGradeFrame, "BORDER", "GBRAlert_Grade");
+    local incidentGradeText = incidentGradeFrame:CreateFontString();
+    incidentGradeText:SetFontObject("GBRAlert_Grade");
     incidentGradeText:SetJustifyH("CENTER");
     incidentGradeText:SetJustifyV("MIDDLE");
     incidentGradeText:SetWordWrap(true);
@@ -89,7 +91,8 @@ function GBR_NotificationService:_buildIncidentLocation(parent)
     incidentLocationIcon:SetPoint("LEFT", incidentLocationFrame, "LEFT", 15, 0);
     incidentLocationIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Compass-Solid]]);
 
-    local incidentLocationText = incidentLocationFrame:CreateFontString(incidentLocationFrame, "BORDER", "GBRAlert_Details");
+    local incidentLocationText = incidentLocationFrame:CreateFontString();
+    incidentLocationText:SetFontObject("GBRAlert_Details");
     incidentLocationText:SetJustifyH("LEFT");
     incidentLocationText:SetJustifyV("MIDDLE");
     incidentLocationText:SetWordWrap(true);
@@ -114,7 +117,8 @@ function GBR_NotificationService:_buildIncidentReporter(parent)
     reporterNameIcon:SetPoint("LEFT", reporterNameFrame, "LEFT", 15, 0);
     reporterNameIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\User-Solid]]);
 
-    local reporterNameText = reporterNameFrame:CreateFontString(reporterNameFrame, "BORDER", "GBRAlert_Details");
+    local reporterNameText = reporterNameFrame:CreateFontString();
+    reporterNameText:SetFontObject("GBRAlert_Details");
     reporterNameText:SetJustifyH("LEFT");
     reporterNameText:SetJustifyV("MIDDLE");
     reporterNameText:SetWordWrap(true);
@@ -139,7 +143,8 @@ function GBR_NotificationService:_buildIncidentFrequency(parent)
     incidentFrequencyIcon:SetPoint("LEFT", incidentFrequencyFrame, "LEFT", 15, 0)
     incidentFrequencyIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Tower-Cell-Solid]]);
 
-    local incidentFrequencyText = incidentFrequencyFrame:CreateFontString(incidentFrequencyFrame, "BORDER", "GBRAlert_Details");
+    local incidentFrequencyText = incidentFrequencyFrame:CreateFontString();
+    incidentFrequencyText:SetFontObject("GBRAlert_Details");
     incidentFrequencyText:SetJustifyH("LEFT");
     incidentFrequencyText:SetJustifyV("MIDDLE");
     incidentFrequencyText:SetWordWrap(true);
@@ -164,12 +169,13 @@ function GBR_NotificationService:_buildIncidentDescription(parent)
     incidentDescriptionIcon:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 15, 0)
     incidentDescriptionIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Circle-Info-Solid]]);
 
-    local incidentDescriptionText = incidentDescriptionFrame:CreateFontString(incidentDescriptionFrame, "BORDER", "GBRAlert_Details")
-    incidentDescriptionText:SetJustifyH("LEFT")
-    incidentDescriptionText:SetJustifyV("TOP")
-    incidentDescriptionText:SetWordWrap(true)
-    incidentDescriptionText:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 43, 4)
-    incidentDescriptionText:SetPoint("BOTTOMRIGHT", incidentDescriptionFrame, "BOTTOMRIGHT", 0, 0)
+    local incidentDescriptionText = incidentDescriptionFrame:CreateFontString();
+    incidentDescriptionText:SetFontObject("GBRAlert_Details");
+    incidentDescriptionText:SetJustifyH("LEFT");
+    incidentDescriptionText:SetJustifyV("TOP");
+    incidentDescriptionText:SetWordWrap(true);
+    incidentDescriptionText:SetPoint("TOPLEFT", incidentDescriptionFrame, "TOPLEFT", 43, 4);
+    incidentDescriptionText:SetPoint("BOTTOMRIGHT", incidentDescriptionFrame, "BOTTOMRIGHT", 0, 0);
 
     incidentDescriptionFrame.Icon = incidentDescriptionIcon;
     incidentDescriptionFrame.Text = incidentDescriptionText;
@@ -189,7 +195,8 @@ function GBR_NotificationService:_buildUnitsRequired(parent)
     unitsRequiredIcon:SetPoint("LEFT", unitsRequiredFrame, "LEFT", 15, 0)
     unitsRequiredIcon:SetTexture([[Interface\Addons\GBRadio\Media\Textures\Shield-Halved-Solid]]);
 
-    local unitsRequiredText = unitsRequiredFrame:CreateFontString(unitsRequiredFrame, "BORDER", "GBRAlert_Details")
+    local unitsRequiredText = unitsRequiredFrame:CreateFontString();
+    unitsRequiredText:SetFontObject("GBRAlert_Details");
     unitsRequiredText:SetJustifyH("LEFT");
     unitsRequiredText:SetJustifyV("MIDDLE");
     unitsRequiredText:SetWordWrap(true);
@@ -205,7 +212,8 @@ end
 
 function GBR_NotificationService:_buildClickToClose(parent)
     
-    local clickToCloseText = parent:CreateFontString(parent, "BORDER", "GBRAlert_Details")
+    local clickToCloseText = parent:CreateFontString();
+    clickToCloseText:SetFontObject("GBRAlert_Details");
     clickToCloseText:SetJustifyH("CENTER");
     clickToCloseText:SetJustifyV("TOP");
     clickToCloseText:SetWordWrap(true);
