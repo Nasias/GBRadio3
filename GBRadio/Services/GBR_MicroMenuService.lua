@@ -43,6 +43,7 @@ function GBR_MicroMenuService:_buildMainFrame()
 
         local x, y = widget.frame:GetCenter();
         configService:SaveMicroMenuPosition(x, y);
+        configService:SetMenuIsOpen(false);
 
         aceGUI:Release(widget);
         microMenu._window = nil;
@@ -159,35 +160,9 @@ function GBR_MicroMenuService:_buildMainFrame()
     ------------------------------------------------------
 
     local btnViewHistory = self._aceGUI:Create("Button");
-    --btnPlaceholder:SetText([[|TInterface\Addons\GBRadio\Media\Textures\Buttons\History.tga:15:15:0:0:128:128:0:128:0:128:255:204:9|t]]);
     btnViewHistory:SetDisabled(true);
     btnViewHistory:SetRelativeWidth(0.25);
     btnViewHistory:SetHeight(35);
-    -- btnViewHistory:SetCallback("OnClick", function(info, event) 
-
-    --     local addonService = GBR_Singletons:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-    --     InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
-    --     InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
-
-    -- end);
-    -- btnViewHistory:SetCallback("OnEnter", function(info, event)
-
-    --     local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
-        
-    --     tooltipService:ShowTooltip(
-    --         info.frame,
-    --         "History",
-    --         "Opens the message history window for your primary channel.",
-    --         "Quick command: /gbr history"
-    --     );
-
-    -- end);
-    -- btnViewHistory:SetCallback("OnLeave", function(info, event)
-
-    --     local tooltipService = GBR_Singletons:FetchService(GBR_Constants.SRV_TOOLTIP_SERVICE);
-    --     tooltipService:HideTooltip();
-
-    -- end);
     notificationConfigFrame:AddChild(btnViewHistory);
 
     local btnOpenConfigScreen = self._aceGUI:Create("Button");
@@ -233,6 +208,7 @@ function GBR_MicroMenuService:Display()
 
     self._window = self:_buildMainFrame();
     self.isShown = true;
+    self._configService:SetMenuIsOpen(true);
     self:RefreshChannels();
 
 end

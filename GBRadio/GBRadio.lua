@@ -44,13 +44,13 @@ function GBRadio:AddCommunication()
     local frameLeavingWorldTriggers = CreateFrame("FRAME");
     frameLeavingWorldTriggers:RegisterEvent("PLAYER_LEAVING_WORLD")
     
-    function frameEnteringWorldTriggers:OnEvent(event)
+    function frameEnteringWorldTriggers:OnEvent(event, isInitialLogin, isReloadingUi)
         local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
         local microMenu = GBR_Singletons:FetchService(GBR_Constants.SRV_MICROMENU_SERVICE);
 
         JoinChannelByName(GBR_Constants.OPT_COMM_CHANNEL_NAME, nil);
-
-        if configService:ShowMicroMenuOnLogIn() then
+        
+        if configService:ShouldShowMicroMenu(isInitialLogin, isReloadingUi) then
             microMenu:Display();
         end
         
@@ -105,20 +105,6 @@ function GBRadio:AddHooks()
     GBR_Singletons:InstantiateService(GBR_Constants.SRV_HOOK_SERVICE)
         :RegisterHooks();
 
-    if TRP3_API then
-        if TRP3_API.globals.extended_version then
-            TRP3_API.globals.extended_display_version = TRP3_API.globals.extended_display_version .. GBRadio:GetTooltipVersionDisplay();
-        else
-            TRP3_API.globals.display_version = TRP3_API.globals.display_version .. GBRadio:GetTooltipVersionDisplay();
-        end
-    end
-
     return self;
 
-end
-
-function GBRadio:GetTooltipVersionDisplay()
-    return string.format("\n" 
-        .. [[|TInterface\COMMON\Indicator-Green:16:16:0:0|t |cFF00FF00GBRadio v-%s|r]],
-        GBR_Constants.OPT_ADDON_VERSION);
 end
