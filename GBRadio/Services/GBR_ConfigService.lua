@@ -2106,7 +2106,7 @@ function GBR_ConfigService:AddFrequencyListener(frequency, characterName)
     local iAmListeningModel = GBR_IAmListeningModel:New
     {
         CharacterName = characterName,
-        LastSeenDateTime = lastSeenHours .. ":" .. lastSeenMinutes,
+        LastSeenDateTime = string.format("%02d:%02d", lastSeenHours, lastSeenMinutes),
     };
 
     if self.StagingVars.FrequencyListeners[settingsKey] == nil then
