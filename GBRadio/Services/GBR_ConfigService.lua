@@ -33,7 +33,7 @@ function GBR_ConfigService:Initialize()
     self._addonService.OptionsTable = 
     {
         type = "group",
-        name = "GB|cff00c0ffRadio|r 3 (v3.0.3) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)",
+        name = string.format("GB|cff00c0ffRadio|r 3 (v%s) - by |cff00c0ffNasias Darkstar|r, Argent Dawn (EU)", GBR_Constants.OPT_ADDON_VERSION),
         childGroups = "tree",
         handler = self._addonService,        
         args = {
@@ -544,7 +544,7 @@ function GBR_ConfigService:Initialize()
                         type = "description",
                         fontSize = "medium",
                         name = "Commands"
-                            .. "\n\n|cFF82C2FF/gbr config|r - Shows the micro menu"
+                            .. "\n\n|cFF82C2FF/gbr|r - Shows the micro menu"
                                 .. "\n\n|cFF82C2FF/gbr config|r - Shows the config menu"
                                 .. "\n\n|cFF82C2FF/gbr dispatch|r - Shows the notification dispatcher menu"
                                 .. "\n\n|cFF82C2FF/bb <message>|r - Send a message"
@@ -778,12 +778,12 @@ function GBR_ConfigService.AddChannelSettingsConfigurationPage(channelData)
                         "Chat Frame #8",
                         "Chat Frame #9",
                         "Chat Frame #10",
-                    },                    
+                    },
                     dialogControl = "Dropdown",
                     width = "full",
                     get =
                         function(info, keyname)
-                            local key = info[#info-3];                            
+                            local key = info[#info-3];
                             return GBRadioAddonDataSettingsDB.char.Channels[key].ChannelSettings.ChannelChatFrames[keyname];
                         end,
                     set =
@@ -1556,7 +1556,7 @@ function GBR_ConfigService.AddTransmitterToUi(targetSettingsTable, key, transmit
                 type = "execute",
                 order = 3,
                 func =
-                    function(info)                        
+                    function(info)
                         local channelKey = info[#info-4];
                         local transmitterKey = info[#info-1];
                         local configService = GBR_Singletons:FetchService(GBR_Constants.SRV_CONFIG_SERVICE);
@@ -2120,7 +2120,7 @@ function GBR_ConfigService:AddFrequencyListener(frequency, characterName)
         characterName,
         iAmListeningModel);
 
-    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
+    LibStub(GBR_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService.SetPronouns(pronounTable)
@@ -2416,7 +2416,7 @@ end
 
 function GBR_ConfigService:SetPrimaryFrequency(value)
     GBRadioAddonDataSettingsDB.char.PrimaryFrequency = value;
-    LibStub("AceConfigRegistry-3.0"):NotifyChange(GBR_Constants.OPT_ADDON_ID);
+    LibStub(GBR_Constants.LIB_ACE_CONFIG_REGISTRY):NotifyChange(GBR_Constants.OPT_ADDON_ID);
 end
 
 function GBR_ConfigService:GetTransmitterInterferenceTypeForChannelSettings(channelSettings)

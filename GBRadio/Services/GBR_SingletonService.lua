@@ -6,7 +6,6 @@ function GBR_SingletonService:New(obj)
     {
         [GBR_Constants.SRV_COMMAND_SERVICE] = GBR_CommandService,
         [GBR_Constants.SRV_CONFIG_SERVICE] = GBR_ConfigService,
-        [GBR_Constants.SRV_HISTORY_SERVICE] = GBR_HistoryService,
         [GBR_Constants.SRV_LOCATION_SERVICE] = GBR_LocationService,
         [GBR_Constants.SRV_MESSAGE_SERVICE] = GBR_MessageService,
         [GBR_Constants.SRV_MRP_SERVICE] = GBR_MRPService,
