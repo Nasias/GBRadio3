@@ -581,7 +581,7 @@ function GBR_ConfigService:Initialize()
     end
     
     self._addonService.ConfigRegistry = LibStub(GBR_Constants.LIB_ACE_CONFIG):RegisterOptionsTable(GBR_Constants.OPT_ADDON_ID, self._addonService.OptionsTable);
-    self._addonService.OptionsFrame = LibStub(GBR_Constants.LIB_ACE_CONFIG_DIALOG):AddToBlizOptions(GBR_Constants.OPT_ADDON_ID, "GB|cff00c0ffRadio|r 3");
+    self._addonService.OptionsFrame, self._addonService.OptionsFrameID = LibStub(GBR_Constants.LIB_ACE_CONFIG_DIALOG):AddToBlizOptions(GBR_Constants.OPT_ADDON_ID, "GB|cff00c0ffRadio|r 3");
 
 end
 

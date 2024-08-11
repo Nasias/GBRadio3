@@ -172,8 +172,7 @@ function GBR_MicroMenuService:_buildMainFrame()
     btnOpenConfigScreen:SetCallback("OnClick", function(info, event) 
 
         local addonService = GBR_Singletons:FetchService(GBR_Constants.SRV_ADDON_SERVICE);
-        InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
-        InterfaceOptionsFrame_OpenToCategory(addonService.OptionsFrame);
+        Settings.OpenToCategory(addonService.OptionsFrameID);
 
     end);
     btnOpenConfigScreen:SetCallback("OnEnter", function(info, event)

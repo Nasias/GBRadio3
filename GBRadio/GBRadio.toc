@@ -1,10 +1,10 @@
-## Interface: 90207
+## Interface: 110000
 ## Title: GB|cff00c0ffRadio|r 3
 ## Notes: A buzzbox addon for roleplay.
 ## SavedVariables: GBRadioAddonDataSettingsDBSavedVars
 ## DefaultState: enabled
 ## Author: Nasias Darkstar
-## Version: 3.0.6
+## Version: 3.0.7
 ## OptionalDeps: totalRP3, totalRP3_Extended
 
 embeds.xml
