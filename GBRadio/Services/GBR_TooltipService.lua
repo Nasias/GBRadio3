@@ -21,7 +21,7 @@ function GBR_TooltipService:ShowTooltip(parent, name, desc, note)
 
     tooltip:SetOwner(parent, "ANCHOR_TOPRIGHT");
 
-    tooltip:SetText(name, 1, .82, 0, true);
+    tooltip:SetText(name, 1, .82, 0, 1, true);
 
     if desc then
         tooltip:AddLine(desc, 1, 1, 1, true);
